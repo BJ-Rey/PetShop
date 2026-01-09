@@ -1,0 +1,236 @@
+/* pages/mine/orders/orders.wxss */
+
+/* 订单状态筛选 - 优化为与全局筛选栏样式一致 */
+.order-status-filter {
+  display: flex;
+  background: #fff;
+  border-radius: 16rpx;
+  margin-bottom: 25rpx;
+  padding: 10rpx;
+  box-shadow: 0 2rpx 12rpx rgba(0, 0, 0, 0.08);
+  overflow-x: auto;
+  scrollbar-width: none;
+  -ms-overflow-style: none;
+  gap: 15rpx;
+}
+
+.order-status-filter::-webkit-scrollbar {
+  display: none;
+}
+
+/* 筛选项 - 优化为与全局筛选项样式一致 */
+.filter-item {
+  padding: 16rpx 32rpx;
+  border-radius: 28rpx;
+  font-size: 32rpx;
+  color: #666;
+  transition: all 0.3s ease;
+  cursor: pointer;
+  position: relative;
+  overflow: hidden;
+  background: #f5f5f5;
+  border: 2rpx solid transparent;
+  white-space: nowrap;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+.filter-item::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(26, 173, 25, 0.1);
+  transform: scaleX(0);
+  transition: transform 0.3s ease;
+}
+
+.filter-item:active::before {
+  transform: scaleX(1);
+}
+
+.filter-item.active {
+  background: #1aad19;
+  color: #fff;
+  font-weight: bold;
+  border-color: #179715;
+  box-shadow: 0 4rpx 12rpx rgba(26, 173, 25, 0.3);
+}
+
+.filter-item:active {
+  transform: scale(0.95);
+}
+
+/* 订单列表 - 优化为与全局样式一致 */
+.order-list {
+  display: flex;
+  flex-direction: column;
+  gap: 25rpx;
+}
+
+/* 订单项 - 优化为与全局卡片样式一致 */
+.order-item {
+  background: #fff;
+  border-radius: 16rpx;
+  padding: 25rpx;
+  box-shadow: 0 2rpx 12rpx rgba(0, 0, 0, 0.08);
+  transition: all 0.3s ease;
+}
+
+.order-item:active {
+  transform: translateY(-2rpx);
+  box-shadow: 0 6rpx 16rpx rgba(0, 0, 0, 0.12);
+}
+
+/* 订单头部 - 优化为与全局样式一致 */
+.order-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 20rpx;
+  padding-bottom: 15rpx;
+  border-bottom: 2rpx solid #f0f0f0;
+}
+
+.order-id {
+  font-size: 28rpx;
+  color: #666;
+}
+
+.order-status {
+  font-size: 30rpx;
+  font-weight: bold;
+  color: #1aad19;
+}
+
+/* 订单内容 - 优化为与全局样式一致 */
+.order-content {
+  display: flex;
+  align-items: center;
+  margin-bottom: 20rpx;
+  padding-bottom: 15rpx;
+  border-bottom: 2rpx solid #f0f0f0;
+  gap: 20rpx;
+}
+
+.product-image {
+  width: 150rpx;
+  height: 150rpx;
+  border-radius: 12rpx;
+  object-fit: cover;
+  flex-shrink: 0;
+}
+
+.product-info {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 8rpx;
+}
+
+.product-name {
+  font-size: 32rpx;
+  font-weight: bold;
+  color: #333;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  line-height: 1.4;
+}
+
+.product-sku {
+  font-size: 26rpx;
+  color: #666;
+}
+
+.product-price {
+  font-size: 32rpx;
+  font-weight: bold;
+  color: #e64340;
+  margin-left: auto;
+}
+
+/* 订单底部 - 优化为与全局样式一致 */
+.order-footer {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.order-total {
+  font-size: 28rpx;
+  color: #333;
+  font-weight: 500;
+}
+
+/* 订单操作区 - 优化为与全局样式一致 */
+.order-actions {
+  display: flex;
+  gap: 15rpx;
+}
+
+/* 操作按钮 - 优化为与全局按钮样式一致 */
+.action-btn {
+  height: 60rpx;
+  line-height: 60rpx;
+  font-size: 28rpx;
+  padding: 0 24rpx;
+  border-radius: 30rpx;
+  border: 2rpx solid #1aad19;
+  color: #1aad19;
+  background: #fff;
+  transition: all 0.3s ease;
+  font-weight: 500;
+  box-shadow: 0 2rpx 8rpx rgba(26, 173, 25, 0.15);
+}
+
+.action-btn:active {
+  background: #1aad19;
+  color: #fff;
+  transform: scale(0.95);
+  box-shadow: 0 4rpx 12rpx rgba(26, 173, 25, 0.3);
+}
+
+/* 空状态 - 优化为与全局空状态样式一致 */
+.empty {
+  text-align: center;
+  padding: 100rpx 0;
+  color: #999;
+}
+
+.empty-icon {
+  font-size: 100rpx;
+  margin-bottom: 20rpx;
+  display: block;
+}
+
+.empty-text {
+  font-size: 32rpx;
+  margin-bottom: 30rpx;
+  display: block;
+}
+
+.empty-btn {
+  background: #1aad19;
+  color: #fff;
+  border: none;
+  border-radius: 40rpx;
+  padding: 16rpx 40rpx;
+  font-size: 32rpx;
+  font-weight: 500;
+  transition: all 0.3s ease;
+  box-shadow: 0 2rpx 8rpx rgba(26, 173, 25, 0.3);
+}
+
+.empty-btn:active {
+  background: #179715;
+  transform: scale(0.98);
+  box-shadow: 0 4rpx 12rpx rgba(26, 173, 25, 0.4);
+}

@@ -1,0 +1,148 @@
+<!-- pages/merchant/setting/promotion/promotion.wxml -->
+<view class="container">
+  <!-- 顶部操作栏 -->
+  <view class="standard-action-bar">
+    <text class="standard-back-btn" bindtap="goBack">←</text>
+    <text class="page-title">优惠活动设置</text>
+  </view>
+
+  <!-- 标签页 -->
+  <view class="tabs">
+    <view class="tab-item {{activeTab === 'active' ? 'active' : ''}}" bindtap="switchTab" data-tab="active">进行中</view>
+    <view class="tab-item {{activeTab === 'scheduled' ? 'active' : ''}}" bindtap="switchTab" data-tab="scheduled">未开始</view>
+    <view class="tab-item {{activeTab === 'ended' ? 'active' : ''}}" bindtap="switchTab" data-tab="ended">已结束</view>
+  </view>
+
+  <!-- 活动列表 -->
+  <view class="promotion-list" wx:if="{{filteredPromotions.length > 0}}">
+    <view class="promotion-item" wx:for="{{filteredPromotions}}" wx:key="id">
+      <view class="promotion-status-badge status-{{item.status}}">
+        {{item.status === 'active' ? '进行中' : item.status === 'scheduled' ? '未开始' : '已结束'}}
+      </view>
+      
+      <view class="promotion-header">
+        <text class="promotion-title">{{item.title}}</text>
+        <text class="promotion-type">{{item.type === 'discount' ? '折扣券' : '满减券'}}</text>
+      </view>
+      
+      <view class="promotion-content">
+        <view class="info-row">
+          <text class="info-label">优惠内容：</text>
+          <text class="info-value" wx:if="{{item.type === 'discount'}}">{{item.value}}折</text>
+          <text class="info-value" wx:else>减{{item.value}}元</text>
+        </view>
+        <view class="info-row">
+          <text class="info-label">使用门槛：</text>
+          <text class="info-value">{{item.minSpend > 0 ? '满' + item.minSpend + '元可用' : '无门槛'}}</text>
+        </view>
+        <view class="info-row">
+          <text class="info-label">活动时间：</text>
+          <text class="info-value">{{item.startTime}} 至 {{item.endTime}}</text>
+        </view>
+      </view>
+      
+      <view class="promotion-footer">
+        <view class="action-btn edit-btn" bindtap="showEditForm" data-id="{{item.id}}" wx:if="{{item.status !== 'ended'}}">编辑</view>
+        <view class="action-btn end-btn" bindtap="endPromotion" data-id="{{item.id}}" wx:if="{{item.status === 'active'}}">结束</view>
+        <view class="action-btn delete-btn" bindtap="deletePromotion" data-id="{{item.id}}" wx:if="{{item.status !== 'active'}}">删除</view>
+      </view>
+    </view>
+  </view>
+
+  <!-- 空状态 -->
+  <view class="empty-state" wx:else>
+    <text class="empty-icon">🎫</text>
+    <text class="empty-text">暂无相关活动</text>
+  </view>
+
+  <!-- 添加按钮 -->
+  <view class="add-promotion-btn" bindtap="showAddForm">
+    <text>+ 创建活动</text>
+  </view>
+
+  <!-- 全屏表单弹窗 -->
+  <view class="form-modal" wx:if="{{showForm}}">
+    <view class="modal-header">
+      <view class="close-btn" bindtap="hideForm">取消</view>
+      <view class="modal-title">{{formTitle}}</view>
+      <view class="save-btn" bindtap="savePromotion">保存</view>
+    </view>
+    
+    <view class="modal-body">
+      <view class="form-group">
+        <view class="form-item">
+          <text class="form-label">活动名称 <text class="required">*</text></text>
+          <input class="form-input" placeholder="请输入活动名称" value="{{formData.title}}" bindinput="onInput" data-field="title" />
+        </view>
+        
+        <view class="form-item">
+          <text class="form-label">优惠类型</text>
+          <radio-group class="form-radio-group" bindchange="onInput" data-field="type">
+            <label class="radio-label" wx:for="{{typeOptions}}" wx:key="value">
+              <radio value="{{item.value}}" checked="{{formData.type === item.value}}" color="#07c160"/>
+              <text>{{item.name}}</text>
+            </label>
+          </radio-group>
+        </view>
+        
+        <view class="form-item">
+          <text class="form-label">{{formData.type === 'discount' ? '折扣力度' : '减免金额'}} <text class="required">*</text></text>
+          <input 
+            class="form-input" 
+            type="digit" 
+            placeholder="{{formData.type === 'discount' ? '请输入折扣(如8.5)' : '请输入金额'}}" 
+            value="{{formData.value}}" 
+            bindinput="onInput" 
+            data-field="value" 
+          />
+        </view>
+        
+        <view class="form-item">
+          <text class="form-label">使用门槛</text>
+          <input 
+            class="form-input" 
+            type="digit" 
+            placeholder="满多少元可用(0为无门槛)" 
+            value="{{formData.minSpend}}" 
+            bindinput="onInput" 
+            data-field="minSpend" 
+          />
+        </view>
+      </view>
+      
+      <view class="form-group">
+        <view class="form-item">
+          <text class="form-label">开始时间 <text class="required">*</text></text>
+          <picker mode="date" value="{{formData.startTime}}" bindchange="onDateChange" data-field="startTime">
+            <view class="picker-text {{!formData.startTime ? 'placeholder' : ''}}">
+              {{formData.startTime || '请选择开始时间'}}
+            </view>
+          </picker>
+        </view>
+        
+        <view class="form-item">
+          <text class="form-label">结束时间 <text class="required">*</text></text>
+          <picker mode="date" value="{{formData.endTime}}" bindchange="onDateChange" data-field="endTime">
+            <view class="picker-text {{!formData.endTime ? 'placeholder' : ''}}">
+              {{formData.endTime || '请选择结束时间'}}
+            </view>
+          </picker>
+        </view>
+      </view>
+      
+      <view class="form-group">
+        <view class="form-item" style="border-bottom: none;">
+          <text class="form-label">活动说明</text>
+        </view>
+        <textarea 
+          class="form-textarea" 
+          placeholder="请输入活动规则说明..." 
+          value="{{formData.description}}" 
+          bindinput="onInput" 
+          data-field="description"
+          style="width: 100%; height: 200rpx; padding: 0 0 30rpx 0; font-size: 28rpx;"
+        />
+      </view>
+    </view>
+  </view>
+</view>

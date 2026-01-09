@@ -1,0 +1,20 @@
+<view class="auth-modal {{show ? 'show' : ''}}">
+  <view class="auth-mask" bindtap="close"></view>
+  <view class="auth-content">
+    <view class="auth-header">
+      <text class="auth-title">需要登录</text>
+    </view>
+    <view class="auth-body">
+      <view class="auth-tips">
+        <text>为了提供更好的服务，请先登录</text>
+        <text class="auth-sub-tips">登录后即可体验完整功能</text>
+      </view>
+    </view>
+    <view class="auth-footer">
+      <button class="btn-cancel" bindtap="close">取消</button>
+      <button class="btn-login" bindtap="handleLogin">
+        立即登录
+      </button>
+    </view>
+  </view>
+</view>

@@ -1,0 +1,260 @@
+<!-- pages/merchant/finance/finance.wxml -->
+<view class="container">
+  <!-- 顶部操作栏 -->
+  <view class="standard-action-bar">
+    <text class="standard-back-btn" bindtap="navigateBack">←</text>
+    <text class="page-title">财务管理</text>
+    <button class="logout-btn" bindtap="logout">退出登录</button>
+  </view>
+
+  <!-- 财务概览 -->
+  <view class="finance-overview">
+    <view class="overview-card">
+      <text class="overview-title">今日收入</text>
+      <text class="overview-value">¥{{todayIncome}}</text>
+      <text class="overview-change {{todayIncomeChange >= 0 ? 'positive' : 'negative'}}">
+        {{todayIncomeChange >= 0 ? '+' : ''}}{{todayIncomeChange}}%
+      </text>
+    </view>
+    
+    <view class="overview-card">
+      <text class="overview-title">本月收入</text>
+      <text class="overview-value">¥{{monthIncome}}</text>
+      <text class="overview-change {{monthIncomeChange >= 0 ? 'positive' : 'negative'}}">
+        {{monthIncomeChange >= 0 ? '+' : ''}}{{monthIncomeChange}}%
+      </text>
+    </view>
+    
+    <view class="overview-card">
+      <text class="overview-title">累计收入</text>
+      <text class="overview-value">¥{{totalIncome}}</text>
+      <text class="overview-change {{totalIncomeChange >= 0 ? 'positive' : 'negative'}}">
+        {{totalIncomeChange >= 0 ? '+' : ''}}{{totalIncomeChange}}%
+      </text>
+    </view>
+    
+    <view class="overview-card">
+      <text class="overview-title">待结算金额</text>
+      <text class="overview-value">¥{{pendingSettlement}}</text>
+      <text class="overview-desc">预计1-3个工作日到账</text>
+    </view>
+  </view>
+
+  <!-- 销量数据可视化 -->
+  <view class="chart-section card">
+    <view class="section-header">
+      <text class="section-title">销量数据可视化</text>
+      <view class="chart-actions">
+        <button class="export-btn" bindtap="exportData">导出数据</button>
+        <button class="refresh-btn" bindtap="refreshData">刷新</button>
+      </view>
+    </view>
+    
+    <!-- 时间维度切换 -->
+    <view class="time-dimension">
+      <text 
+        class="dimension-item {{timeDimension === 'day' ? 'active' : ''}}" 
+        bindtap="changeTimeDimension" 
+        data-dimension="day"
+      >
+        日
+      </text>
+      <text 
+        class="dimension-item {{timeDimension === 'week' ? 'active' : ''}}" 
+        bindtap="changeTimeDimension" 
+        data-dimension="week"
+      >
+        周
+      </text>
+      <text 
+        class="dimension-item {{timeDimension === 'month' ? 'active' : ''}}" 
+        bindtap="changeTimeDimension" 
+        data-dimension="month"
+      >
+        月
+      </text>
+      <text 
+        class="dimension-item {{timeDimension === 'quarter' ? 'active' : ''}}" 
+        bindtap="changeTimeDimension" 
+        data-dimension="quarter"
+      >
+        季度
+      </text>
+      <text 
+        class="dimension-item {{timeDimension === 'year' ? 'active' : ''}}" 
+        bindtap="changeTimeDimension" 
+        data-dimension="year"
+      >
+        年
+      </text>
+    </view>
+  </view>
+  
+  <!-- 销量趋势图 -->
+  <view class="chart-section card">
+    <view class="section-header">
+      <text class="section-title">销量趋势</text>
+    </view>
+    <canvas 
+      canvas-id="salesTrendChart" 
+      class="sales-trend-chart" 
+      bindtouchstart="onChartTouchStart"
+      bindtouchmove="onChartTouchMove"
+      bindtouchend="onChartTouchEnd"
+    ></canvas>
+    
+    <!-- 同比/环比增长率 -->
+    <view class="growth-rate">
+      <view class="rate-item">
+        <text class="rate-label">同比增长率:</text>
+        <text class="rate-value {{yearOnYearGrowth >= 0 ? 'positive' : 'negative'}}">
+          {{yearOnYearGrowth >= 0 ? '+' : ''}}{{yearOnYearGrowth}}%
+        </text>
+      </view>
+      <view class="rate-item">
+        <text class="rate-label">环比增长率:</text>
+        <text class="rate-value {{monthOnMonthGrowth >= 0 ? 'positive' : 'negative'}}">
+          {{monthOnMonthGrowth >= 0 ? '+' : ''}}{{monthOnMonthGrowth}}%
+        </text>
+      </view>
+    </view>
+  </view>
+  
+  <!-- 业务线销量占比 -->
+  <view class="chart-section card">
+    <view class="section-header">
+      <text class="section-title">业务线销量占比</text>
+    </view>
+    <canvas 
+      canvas-id="businessLineChart" 
+      class="business-line-chart"
+    ></canvas>
+    
+    <!-- 业务线图例 -->
+    <view class="legend">
+      <view class="legend-item" wx:for="{{businessLines}}" wx:key="id">
+        <view class="legend-color" style="background-color: {{item.color}}"></view>
+        <text class="legend-name">{{item.name}}</text>
+        <text class="legend-value">¥{{item.sales}}</text>
+        <text class="legend-percentage">({{item.percentage}}%)</text>
+      </view>
+    </view>
+  </view>
+  
+  <!-- 异常数据预警 -->
+  <view class="alert-section card" wx:if="hasAlerts">
+    <view class="section-header">
+      <text class="section-title">异常数据预警</text>
+    </view>
+    <view class="alert-list">
+      <view class="alert-item" wx:for="{{alerts}}" wx:key="id">
+        <view class="alert-icon" style="background-color: {{item.level === 'high' ? '#ff4d4f' : item.level === 'medium' ? '#faad14' : '#1890ff'}}"></view>
+        <view class="alert-content">
+          <text class="alert-title">{{item.title}}</text>
+          <text class="alert-desc">{{item.description}}</text>
+          <text class="alert-time">{{item.time}}</text>
+        </view>
+      </view>
+    </view>
+  </view>
+  
+  <!-- 自定义查询 -->
+  <view class="custom-query-section card">
+    <view class="section-header">
+      <text class="section-title">自定义查询</text>
+    </view>
+    <view class="query-form">
+      <view class="form-row">
+        <text class="form-label">开始日期:</text>
+        <picker mode="date" value="{{startDate}}" bindchange="onStartDateChange">
+          <view class="picker">
+            {{startDate}}
+          </view>
+        </picker>
+      </view>
+      <view class="form-row">
+        <text class="form-label">结束日期:</text>
+        <picker mode="date" value="{{endDate}}" bindchange="onEndDateChange">
+          <view class="picker">
+            {{endDate}}
+          </view>
+        </picker>
+      </view>
+      <view class="form-row">
+        <text class="form-label">业务线:</text>
+        <picker mode="multiSelector" range="{{businessLineOptions}}" value="{{businessLineIndex}}" bindchange="onBusinessLineChange">
+          <view class="picker">
+            {{selectedBusinessLines.length > 0 ? selectedBusinessLines.join(', ') : '全部'}}
+          </view>
+        </picker>
+      </view>
+      <button class="query-btn" bindtap="executeQuery">执行查询</button>
+    </view>
+  </view>
+
+  <!-- 交易明细 -->
+  <view class="transaction-section card">
+    <view class="section-header">
+      <text class="section-title">交易明细</text>
+      <button class="view-all-btn" bindtap="viewAllTransactions">查看全部</button>
+    </view>
+    
+    <view class="transaction-list">
+      <view class="empty-state" wx:if="{{!isLoading && transactions.length === 0}}">
+        <text class="empty-icon">💸</text>
+        <text class="empty-text">暂无交易记录</text>
+      </view>
+      
+      <view class="loading-state" wx:if="{{isLoading}}">
+        <text class="loading-text">加载中...</text>
+      </view>
+      
+      <block wx:else>
+        <view class="transaction-item" wx:for="{{transactions}}" wx:key="id">
+          <view class="transaction-info">
+            <text class="transaction-type {{item.type === 'income' ? 'income' : 'expense'}}">
+              {{item.type === 'income' ? '收入' : '支出'}}
+            </text>
+            <text class="transaction-desc">{{item.description}}</text>
+            <text class="transaction-time">{{item.createdAt.split('T')[0]}}</text>
+          </view>
+          <text class="transaction-amount {{item.type === 'income' ? 'income' : 'expense'}}">
+            {{item.type === 'income' ? '+' : '-'}}¥{{item.amount}}
+          </text>
+        </view>
+      </block>
+    </view>
+  </view>
+
+  <!-- 结算记录 -->
+  <view class="settlement-section card">
+    <view class="section-header">
+      <text class="section-title">结算记录</text>
+      <button class="view-all-btn" bindtap="viewAllSettlements">查看全部</button>
+    </view>
+    
+    <view class="settlement-list">
+      <view class="empty-state" wx:if="{{!isLoading && settlements.length === 0}}">
+        <text class="empty-icon">💰</text>
+        <text class="empty-text">暂无结算记录</text>
+      </view>
+      
+      <view class="loading-state" wx:if="{{isLoading}}">
+        <text class="loading-text">加载中...</text>
+      </view>
+      
+      <block wx:else>
+        <view class="settlement-item" wx:for="{{settlements}}" wx:key="id">
+          <view class="settlement-info">
+            <text class="settlement-period">{{item.periodStart}} - {{item.periodEnd}}</text>
+            <text class="settlement-status {{item.status}}">
+              {{item.status === 'completed' ? '已完成' : item.status === 'processing' ? '处理中' : '待处理'}}
+            </text>
+            <text class="settlement-time">结算时间：{{item.settlementTime ? item.settlementTime.split('T')[0] : '未结算'}}</text>
+          </view>
+          <text class="settlement-amount">¥{{item.amount}}</text>
+        </view>
+      </block>
+    </view>
+  </view>
+</view>

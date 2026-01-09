@@ -1,0 +1,215 @@
+/* pages/merchant/setting/payment-setting/payment-setting.wxss */
+.container {
+  min-height: 100vh;
+  background-color: #f5f5f5;
+  padding: 20rpx;
+  box-sizing: border-box;
+}
+
+/* 鏍囧噯鎿嶄綔鏍忔牱寮?*/
+.standard-action-bar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 20rpx 0;
+  margin-bottom: 20rpx;
+  background-color: #fff;
+  border-radius: 12rpx;
+  box-shadow: 0 2rpx 10rpx rgba(0, 0, 0, 0.1);
+}
+
+.back-btn {
+  background-color: transparent;
+  border: none;
+  color: #333;
+  font-size: 32rpx;
+  padding: 20rpx;
+  margin: 0;
+  line-height: 1;
+  display: flex;
+  align-items: center;
+}
+
+.page-title {
+  font-size: 36rpx;
+  font-weight: bold;
+  color: #333;
+  flex: 1;
+  text-align: center;
+}
+
+.save-btn {
+  background-color: #07c160;
+  color: #fff;
+  font-size: 32rpx;
+  padding: 16rpx 32rpx;
+  margin: 0 20rpx;
+  border-radius: 24rpx;
+  border: none;
+  line-height: 1;
+}
+
+/* 娴姩淇濆瓨鎸夐挳鏍峰紡 */
+.floating-save-btn {
+  position: fixed;
+  bottom: 40rpx;
+  right: 40rpx;
+  display: flex;
+  align-items: center;
+  gap: 12rpx;
+  padding: 24rpx 36rpx;
+  background-color: #07c160;
+  color: #fff;
+  font-size: 32rpx;
+  border: none;
+  border-radius: 40rpx;
+  box-shadow: 0 8rpx 20rpx rgba(0, 0, 0, 0.2);
+  z-index: 1000;
+  transition: all 0.3s ease;
+}
+
+.floating-save-btn:hover {
+  background-color: #05b056;
+  transform: translateY(-4rpx);
+  box-shadow: 0 12rpx 28rpx rgba(0, 0, 0, 0.25);
+}
+
+.floating-save-btn:active {
+  transform: translateY(0);
+  box-shadow: 0 6rpx 16rpx rgba(0, 0, 0, 0.2);
+}
+
+.save-icon {
+  font-size: 36rpx;
+}
+
+/* 璁剧疆鍖哄潡鏍峰紡 */
+.setting-section {
+  margin-bottom: 24rpx;
+}
+
+.card {
+  background-color: #fff;
+  border-radius: 12rpx;
+  padding: 32rpx;
+  box-shadow: 0 2rpx 10rpx rgba(0, 0, 0, 0.1);
+}
+
+.section-title {
+  font-size: 32rpx;
+  font-weight: bold;
+  color: #333;
+  margin-bottom: 24rpx;
+  padding-bottom: 16rpx;
+  border-bottom: 2rpx solid #f0f0f0;
+}
+
+/* 琛ㄥ崟鏍峰紡 */
+.form-item {
+  margin-bottom: 32rpx;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.form-item.toggle-item {
+  align-items: center;
+  gap: 20rpx;
+}
+
+.form-label {
+  font-size: 30rpx;
+  color: #333;
+  flex: 1;
+  display: flex;
+  align-items: center;
+  gap: 12rpx;
+}
+
+.form-icon {
+  font-size: 36rpx;
+}
+
+.form-input {
+  flex: 1;
+  padding: 24rpx 32rpx;
+  font-size: 30rpx;
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+  font-weight: 400;
+  line-height: 1.6;
+  letter-spacing: 0.5rpx;
+  color: #333;
+  border: 2rpx solid #e0e0e0;
+  border-radius: 12rpx;
+  background-color: #fff;
+  box-sizing: border-box;
+  transition: all 0.3s ease;
+}
+
+/* 杈撳叆妗?placeholder 鏍峰紡 */
+.form-input::placeholder {
+  color: #999;
+  font-size: 28rpx;
+  font-weight: 300;
+  opacity: 0.8;
+}
+
+/* 杈撳叆妗嗚仛鐒︾姸鎬?*/
+.form-input:focus {
+  border-color: #07c160;
+  box-shadow: 0 0 0 4rpx rgba(7, 193, 96, 0.12);
+  background-color: #fff;
+  outline: none;
+}
+
+/* 杈撳叆妗嗙鐢ㄧ姸鎬?*/
+.form-input:disabled {
+  border-color: #f0f0f0;
+  background-color: #fafafa;
+  color: #999;
+  cursor: not-allowed;
+}
+
+/* 杈撳叆妗嗛敊璇姸鎬?*/
+.form-input.error {
+  border-color: #ff4d4f;
+  box-shadow: 0 0 0 4rpx rgba(255, 77, 79, 0.12);
+}
+
+/* 鏀粯娓犻亾鏍峰紡 */
+.payment-channel {
+  margin-bottom: 24rpx;
+  padding: 20rpx;
+  background-color: #f5f5f5;
+  border-radius: 8rpx;
+}
+
+.channel-title {
+  font-size: 28rpx;
+  font-weight: bold;
+  color: #333;
+  margin-bottom: 16rpx;
+}
+
+.configure-btn {
+  width: 100%;
+  padding: 16rpx;
+  font-size: 26rpx;
+  color: #07c160;
+  background-color: transparent;
+  border: 2rpx dashed #07c160;
+  border-radius: 6rpx;
+}
+
+/* 鍝嶅簲寮忔牱寮?*/
+@media (max-width: 375rpx) {
+  .form-item {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 12rpx;
+  }
+  
+  .form-label {
+    margin-bottom: 12rpx;
+  }
+}

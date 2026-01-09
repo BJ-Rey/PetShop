@@ -1,0 +1,82 @@
+<!-- pages/login/login.wxml -->
+<view class="container">
+  <view class="login-wrapper">
+    <!-- 标题 -->
+    <view class="login-title">欢迎光临猫咪专属商城</view>
+    
+    <!-- 登录表单 -->
+    <view class="login-form">
+      <!-- 手机号输入 -->
+      <view class="form-item">
+        <text class="form-label">手机号</text>
+        <view class="phone-input-wrapper">
+          <input 
+            type="number" 
+            placeholder="请输入手机号" 
+            class="form-input" 
+            value="{{phoneNumber}}"
+            bindinput="onPhoneInput"
+            maxlength="11"
+          />
+          <button 
+            class="send-code-btn {{canSendCode ? 'active' : ''}}"
+            disabled="{{!canSendCode}}"
+            bindtap="sendVerificationCode"
+          >
+            {{countdown > 0 ? (countdown + 's后重发') : '获取验证码'}}
+          </button>
+        </view>
+      </view>
+      
+      <!-- 验证码输入 -->
+      <view class="form-item">
+        <text class="form-label">验证码</text>
+        <input 
+          type="number" 
+          placeholder="请输入验证码" 
+          class="form-input" 
+          value="{{verificationCode}}"
+          bindinput="onVerificationCodeInput"
+          maxlength="6"
+        />
+      </view>
+      
+      <!-- 登录按钮 -->
+      <button class="login-btn" bindtap="handleLogin" disabled="{{loading}}">
+        {{loading ? '登录中...' : '登录'}}
+      </button>
+      
+      <button class="home-btn" bindtap="handleBackHome" style="margin-top: 20rpx; background-color: #f5f5f5; color: #666; font-size: 28rpx; border: none;">
+        暂不登录，返回首页
+      </button>
+      
+      <!-- 登录说明 -->
+      <view class="login-note">
+        <checkbox-group bindchange="onAgreementChange">
+          <label class="agreement-checkbox">
+            <checkbox value="agreed" checked="{{isAgreed}}" color="#07c160" />
+            <text>我已阅读并同意</text>
+            <text class="agreement-link" catchtap="showUserAgreement">《用户协议》</text>
+            <text>和</text>
+            <text class="agreement-link" catchtap="showPrivacyPolicy">《隐私政策》</text>
+          </label>
+        </checkbox-group>
+      </view>
+    </view>
+  </view>
+
+  <!-- 协议内容弹窗 -->
+  <view class="modal-mask" wx:if="{{showAgreementModal}}" bindtap="hideAgreementModal"></view>
+  <view class="agreement-modal" wx:if="{{showAgreementModal}}">
+    <view class="modal-header">
+      <text class="modal-title">{{agreementTitle}}</text>
+      <text class="close-btn" bindtap="hideAgreementModal">×</text>
+    </view>
+    <scroll-view scroll-y="true" class="modal-content">
+      <text class="agreement-text">{{agreementContent}}</text>
+    </scroll-view>
+    <view class="modal-footer">
+      <button class="confirm-btn" bindtap="hideAgreementModal">我知道了</button>
+    </view>
+  </view>
+</view>

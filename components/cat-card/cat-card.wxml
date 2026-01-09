@@ -1,0 +1,36 @@
+<!-- components/cat-card/cat-card.wxml -->
+<view class="cat-card {{isSkeleton ? 'skeleton' : ''}}" bindtap="onTap">
+  <view class="image-wrapper">
+    <image 
+      class="cat-image" 
+      src="{{cat.image}}" 
+      mode="aspectFill" 
+      lazy-load 
+      binderror="onImageError"
+      wx:if="{{!isSkeleton}}"
+    />
+    <view class="skeleton-image" wx:else></view>
+    
+    <view class="tag" wx:if="{{!isSkeleton && cat.status !== 'available'}}">
+      {{cat.statusText}}
+    </view>
+  </view>
+  
+  <view class="info">
+    <view class="name-row">
+      <text class="name skeleton-rect">{{cat.name}}</text>
+      <text class="price skeleton-rect">¥{{cat.price}}</text>
+    </view>
+    
+    <view class="tags-row skeleton-rect">
+      <text class="tag-item">{{cat.breed}}</text>
+      <text class="tag-item">{{cat.age}}</text>
+      <text class="tag-item">{{cat.gender === 'male' ? '公' : '母'}}</text>
+    </view>
+    
+    <view class="bottom-row skeleton-rect">
+      <text class="location">📍 {{cat.location || '同城'}}</text>
+      <text class="views">{{cat.views || 0}}浏览</text>
+    </view>
+  </view>
+</view>

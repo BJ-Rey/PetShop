@@ -1,0 +1,6 @@
+{
+  "navigationStyle": "custom",
+  "usingComponents": {
+    "auth-modal": "/components/auth-modal/auth-modal"
+  }
+}

@@ -1,0 +1,143 @@
+<!-- pages/search/result/result.wxml -->
+<view class="container">
+  <!-- 顶部搜索栏 -->
+  <view class="search-bar">
+    <view class="search-input-wrapper">
+      <text class="search-icon">🔍</text>
+      <input 
+        class="search-input" 
+        placeholder="搜索宠物、商家、服务或商品" 
+        value="{{keyword}}" 
+        bindinput="onSearchInput"
+        bindconfirm="onSearch"
+      />
+      <text class="clear-btn" wx:if="{{keyword}}" bindtap="clearSearch">×</text>
+    </view>
+    <button class="search-btn" bindtap="onSearch">搜索</button>
+  </view>
+
+  <!-- 搜索建议列表 -->
+  <view class="suggestions-list" wx:if="{{showSuggestions && suggestions.length > 0}}">
+    <view class="suggestion-item" wx:for="{{suggestions}}" wx:key="*this" bindtap="onSuggestionTap" data-keyword="{{item}}">
+      <text class="suggestion-icon">🔍</text>
+      <text class="suggestion-text">{{item}}</text>
+    </view>
+  </view>
+
+  <!-- 搜索结果统计 -->
+  <view class="result-stats" wx:if="{{!isLoading}}">
+    <text>共找到 {{totalResults}} 条结果</text>
+  </view>
+
+  <!-- 结果类型切换 -->
+  <scroll-view scroll-x="true" class="result-type-tabs" enable-flex="true">
+    <view class="tab-item {{activeType === 'all' ? 'active' : ''}}" bindtap="switchResultType" data-type="all">全部</view>
+    <view class="tab-item {{activeType === 'pet' ? 'active' : ''}}" bindtap="switchResultType" data-type="pet">宠物</view>
+    <view class="tab-item {{activeType === 'product' ? 'active' : ''}}" bindtap="switchResultType" data-type="product">商品</view>
+    <view class="tab-item {{activeType === 'service' ? 'active' : ''}}" bindtap="switchResultType" data-type="service">服务</view>
+    <view class="tab-item {{activeType === 'merchant' ? 'active' : ''}}" bindtap="switchResultType" data-type="merchant">商家</view>
+  </scroll-view>
+
+  <!-- 加载状态 -->
+  <view class="loading-state" wx:if="{{isLoading && currentPage === 1}}">
+    <text class="loading-text">加载中...</text>
+  </view>
+
+  <!-- 空状态 -->
+  <view class="empty-state" wx:if="{{!isLoading && currentData.length === 0}}">
+    <text class="empty-icon">🔍</text>
+    <text class="empty-title">暂无搜索结果</text>
+    <text class="empty-desc">换个关键词试试吧</text>
+  </view>
+
+  <!-- 搜索结果列表 -->
+  <view class="result-list" wx:else>
+    <!-- 宠物结果 -->
+    <block wx:if="{{activeType === 'all' || activeType === 'pet'}}">
+      <view class="section-title" wx:if="{{activeType === 'all'}}">宠物</view>
+      <view class="pet-grid" wx:if="{{results.pets && results.pets.length > 0}}">
+        <view class="pet-card" wx:for="{{results.pets}}" wx:key="id" bindtap="navigateToPetDetail" data-id="{{item.id}}">
+          <image class="pet-avatar" src="{{item.avatar}}" mode="aspectFill"></image>
+          <view class="pet-info">
+            <text class="pet-name">{{item.name}}</text>
+            <text class="pet-meta">{{item.breed}} • {{item.age}} • {{item.gender === 'male' ? '公' : '母'}}</text>
+            <text class="pet-price">¥{{item.price}}</text>
+          </view>
+        </view>
+      </view>
+      <view class="empty-section" wx:else>暂无相关宠物</view>
+    </block>
+
+    <!-- 商品结果 -->
+    <block wx:if="{{activeType === 'all' || activeType === 'product'}}">
+      <view class="section-title" wx:if="{{activeType === 'all'}}">商品</view>
+      <view class="product-grid" wx:if="{{results.products && results.products.length > 0}}">
+        <view class="product-card" wx:for="{{results.products}}" wx:key="id" bindtap="navigateToProductDetail" data-id="{{item.id}}">
+          <image class="product-image" src="{{item.image}}" mode="aspectFill"></image>
+          <view class="product-info">
+            <text class="product-name">{{item.name}}</text>
+            <text class="product-price">¥{{item.price}}</text>
+            <text class="product-sales">销量: {{item.sales}}</text>
+          </view>
+        </view>
+      </view>
+      <view class="empty-section" wx:else>暂无相关商品</view>
+    </block>
+
+    <!-- 服务结果 -->
+    <block wx:if="{{activeType === 'all' || activeType === 'service'}}">
+      <view class="section-title" wx:if="{{activeType === 'all'}}">服务</view>
+      <view class="service-list" wx:if="{{results.services && results.services.length > 0}}">
+        <view class="service-item" wx:for="{{results.services}}" wx:key="id" bindtap="navigateToServiceDetail" data-id="{{item.id}}">
+          <image class="service-image" src="{{item.image}}" mode="aspectFill"></image>
+          <view class="service-info">
+            <view class="service-header">
+              <text class="service-name">{{item.name}}</text>
+              <text class="service-price">¥{{item.price}}</text>
+            </view>
+            <text class="service-description">{{item.description}}</text>
+            <text class="service-merchant">{{item.merchantName}}</text>
+          </view>
+        </view>
+      </view>
+      <view class="empty-section" wx:else>暂无相关服务</view>
+    </block>
+
+    <!-- 商家结果 -->
+    <block wx:if="{{activeType === 'all' || activeType === 'merchant'}}">
+      <view class="section-title" wx:if="{{activeType === 'all'}}">商家</view>
+      <view class="merchant-list" wx:if="{{results.merchants && results.merchants.length > 0}}">
+        <view class="merchant-item" wx:for="{{results.merchants}}" wx:key="id" bindtap="navigateToMerchantDetail" data-id="{{item.id}}">
+          <image class="merchant-avatar" src="{{item.logo}}" mode="aspectFill"></image>
+          <view class="merchant-info">
+            <view class="merchant-header">
+              <text class="merchant-name">{{item.name}}</text>
+              <view class="merchant-rating">
+                <text class="rating-star">⭐</text>
+                <text>{{item.rating}}</text>
+              </view>
+            </view>
+            <text class="merchant-address">{{item.address}}</text>
+            <text class="merchant-service">{{item.services.join(' • ')}}</text>
+          </view>
+        </view>
+      </view>
+      <view class="empty-section" wx:else>暂无相关商家</view>
+    </block>
+  </view>
+
+  <!-- 加载更多 -->
+  <view class="load-more" wx:if="{{!isLoading && hasMore}}">
+    <text class="load-more-text" bindtap="loadMore">加载更多</text>
+  </view>
+
+  <!-- 正在加载更多 -->
+  <view class="loading-more" wx:if="{{isLoading && currentPage > 1}}">
+    <text class="loading-more-text">正在加载...</text>
+  </view>
+
+  <!-- 没有更多数据 -->
+  <view class="no-more" wx:if="{{!isLoading && !hasMore && totalResults > 0}}">
+    <text class="no-more-text">没有更多数据了</text>
+  </view>
+</view>

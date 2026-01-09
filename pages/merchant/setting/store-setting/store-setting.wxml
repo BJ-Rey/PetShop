@@ -1,0 +1,100 @@
+<!-- pages/merchant/setting/store-setting/store-setting.wxml -->
+<view class="container">
+  <!-- 顶部操作栏 -->
+  <view class="standard-action-bar">
+    <text class="standard-back-btn" bindtap="goBack">←</text>
+    <text class="page-title">店铺设置</text>
+  </view>
+
+  <!-- 悬浮保存按钮 -->
+  <view class="floating-save-btn" bindtap="saveStoreSetting">
+    <text class="save-icon">💾</text>
+    <text>保存</text>
+  </view>
+
+  <!-- 表单内容 -->
+  <form class="form-container" bindsubmit="saveStoreSetting">
+    <!-- 店铺名称 -->
+    <view class="form-item">
+      <text class="form-label">店铺名称 <text class="required">*</text></text>
+      <input 
+        class="form-input" 
+        name="storeName" 
+        placeholder="请输入店铺名称" 
+        value="{{storeInfo.name}}" 
+        bindinput="onInputChange" 
+        data-field="name"
+        maxlength="50"
+      />
+      <text class="error-text">{{errors.name}}</text>
+    </view>
+
+    <!-- 店铺描述 -->
+    <view class="form-item">
+      <text class="form-label">店铺描述</text>
+      <textarea 
+        class="form-textarea" 
+        name="description" 
+        placeholder="请输入店铺描述" 
+        value="{{storeInfo.description}}" 
+        bindinput="onInputChange" 
+        data-field="description"
+        maxlength="200"
+        auto-height
+      />
+      <text class="error-text">{{errors.description}}</text>
+    </view>
+
+    <!-- 店铺公告 -->
+    <view class="form-item">
+      <text class="form-label">店铺公告</text>
+      <textarea 
+        class="form-textarea" 
+        name="announcement" 
+        placeholder="请输入店铺公告" 
+        value="{{storeInfo.announcement}}" 
+        bindinput="onInputChange" 
+        data-field="announcement"
+        maxlength="300"
+        auto-height
+      />
+      <text class="error-text">{{errors.announcement}}</text>
+    </view>
+
+    <!-- 主营类目 -->
+    <view class="form-item">
+      <text class="form-label">主营类目 <text class="required">*</text></text>
+      <picker 
+        class="form-picker" 
+        name="mainCategory" 
+        range="{{categories}}" 
+        value="{{selectedCategoryIndex}}"
+        bindchange="onCategoryChange"
+      >
+        <view class="picker-text">{{storeInfo.mainCategory || '请选择主营类目'}}</view>
+      </picker>
+      <text class="error-text">{{errors.mainCategory}}</text>
+    </view>
+
+    <!-- 店铺状态 -->
+    <view class="form-item">
+      <text class="form-label">店铺状态</text>
+      <view class="status-switch">
+        <text class="status-text">{{storeInfo.status === 'open' ? '营业中' : '已关闭'}}</text>
+        <switch 
+          checked="{{storeInfo.status === 'open'}}" 
+          bindchange="toggleStatus"
+        />
+      </view>
+    </view>
+
+    <!-- 营业时间显示 -->
+    <view class="form-item">
+      <text class="form-label">营业时间</text>
+      <view class="business-hours-display" bindtap="editBusinessHours">
+        <text class="hours-text">{{businessHoursText}}</text>
+        <text class="edit-arrow">→</text>
+      </view>
+    </view>
+  </form>
+</view>

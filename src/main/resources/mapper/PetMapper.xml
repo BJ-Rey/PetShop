@@ -1,0 +1,49 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.tencent.wxcloudrun.dao.PetMapper">
+    <resultMap id="PetMap" type="com.tencent.wxcloudrun.model.Pet">
+        <id property="id" column="id"/>
+        <result property="name" column="name"/>
+        <result property="breed" column="breed"/>
+        <result property="age" column="age"/>
+        <result property="gender" column="gender"/>
+        <result property="price" column="price"/>
+        <result property="deposit" column="deposit"/>
+        <result property="status" column="status"/>
+        <result property="description" column="description"/>
+        <result property="avatar" column="avatar"/>
+        <result property="healthStatus" column="health_status"/>
+        <result property="merchantId" column="merchant_id"/>
+        <result property="createdAt" column="created_at"/>
+        <result property="updatedAt" column="updated_at"/>
+    </resultMap>
+
+    <select id="getPetById" resultMap="PetMap">
+        SELECT * FROM pets WHERE id = #{id}
+    </select>
+
+    <select id="getPets" resultMap="PetMap">
+        SELECT * FROM pets LIMIT #{limit} OFFSET #{offset}
+    </select>
+
+    <insert id="createPet" parameterType="com.tencent.wxcloudrun.model.Pet" useGeneratedKeys="true" keyProperty="id">
+        INSERT INTO pets (name, breed, age, gender, price, deposit, status, description, avatar, health_status, merchant_id)
+        VALUES (#{name}, #{breed}, #{age}, #{gender}, #{price}, #{deposit}, #{status}, #{description}, #{avatar}, #{healthStatus}, #{merchantId})
+    </insert>
+
+    <update id="updatePet" parameterType="com.tencent.wxcloudrun.model.Pet">
+        UPDATE pets
+        SET name = #{name}, breed = #{breed}, age = #{age}, gender = #{gender}, price = #{price},
+            deposit = #{deposit}, status = #{status}, description = #{description}, avatar = #{avatar},
+            health_status = #{healthStatus}, merchant_id = #{merchantId}
+        WHERE id = #{id}
+    </update>
+
+    <delete id="deletePet">
+        DELETE FROM pets WHERE id = #{id}
+    </delete>
+
+    <select id="countPets" resultType="java.lang.Integer">
+        SELECT COUNT(*) FROM pets
+    </select>
+</mapper>

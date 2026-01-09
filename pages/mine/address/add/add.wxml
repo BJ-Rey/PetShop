@@ -1,0 +1,52 @@
+<!--pages/mine/address/add/add.wxml-->
+<view class="container">
+  <!-- 顶部操作栏 -->
+  <view class="standard-action-bar">
+    <text class="standard-back-btn" bindtap="navigateBack">←</text>
+    <text class="page-title">新增地址</text>
+    <button class="save-btn" bindtap="saveAddress">保存</button>
+  </view>
+
+  <!-- 地址表单 -->
+  <form class="address-form">
+    <!-- 收货人 -->
+    <view class="form-item">
+      <text class="label">收货人</text>
+      <input type="text" placeholder="请输入收货人姓名" value="{{address.name}}" bindinput="onInputChange" data-field="name" />
+    </view>
+
+    <!-- 手机号 -->
+    <view class="form-item">
+      <text class="label">手机号</text>
+      <input type="number" placeholder="请输入手机号码" value="{{address.phone}}" bindinput="onInputChange" data-field="phone" />
+    </view>
+
+    <!-- 所在地区 -->
+    <view class="form-item">
+      <text class="label">所在地区</text>
+      <picker mode="region" bindchange="onRegionChange" value="{{[address.province, address.city, address.district]}}">
+        <view class="region-picker">
+          <text class="region-text" wx:if="{{address.province !== '请选择'}}">{{address.province}} {{address.city}} {{address.district}}</text>
+          <text class="region-text placeholder" wx:else>请选择所在地区</text>
+          <text class="arrow">→</text>
+        </view>
+      </picker>
+    </view>
+
+    <!-- 详细地址 -->
+    <view class="form-item">
+      <text class="label">详细地址</text>
+      <input type="text" placeholder="请输入详细地址" value="{{address.address}}" bindinput="onInputChange" data-field="address" />
+    </view>
+
+    <!-- 设为默认地址 -->
+    <view class="form-item checkbox-item">
+      <view class="checkbox-wrapper" bindtap="toggleDefault">
+        <view class="checkbox {{address.isDefault ? 'checked' : ''}}">
+          <text wx:if="{{address.isDefault}}" class="checkbox-icon">✓</text>
+        </view>
+        <text class="checkbox-label">设为默认地址</text>
+      </view>
+    </view>
+  </form>
+</view>

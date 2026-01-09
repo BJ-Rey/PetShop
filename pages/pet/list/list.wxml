@@ -1,0 +1,47 @@
+<!--pages/pet/list/list.wxml-->
+<view class="container">
+  <!-- 顶部操作栏 (仅在我的宠物模式显示) -->
+  <view class="standard-action-bar" wx:if="{{isMyPetsMode}}">
+    <text class="standard-back-btn" bindtap="navigateBack">←</text>
+    <text class="page-title">我的宠物</text>
+    <text class="add-btn" bindtap="navigateToAdd">添加</text>
+  </view>
+
+  <!-- 列表区域 -->
+  <view class="pet-list">
+    <block wx:if="{{pets.length > 0}}">
+      <view class="pet-item-wrapper" wx:for="{{pets}}" wx:key="id">
+        <!-- 可滑动区域 (仅我的宠物模式支持滑动删除) -->
+        <view class="pet-item {{isMyPetsMode ? 'slide-item' : ''}}" 
+              bindtouchstart="{{isMyPetsMode ? 'touchStart' : ''}}" 
+              bindtouchmove="{{isMyPetsMode ? 'touchMove' : ''}}" 
+              bindtouchend="{{isMyPetsMode ? 'touchEnd' : ''}}" 
+              data-index="{{index}}"
+              style="transform: translateX({{item.translateX}}px);">
+              
+          <image src="{{item.avatar}}" class="pet-avatar" mode="aspectFill"></image>
+          <view class="pet-info">
+            <view class="pet-header">
+              <text class="pet-name">{{item.name}}</text>
+              <text class="pet-gender">{{item.gender === 'male' ? '♂' : '♀'}}</text>
+            </view>
+            <view class="pet-desc">{{item.breed}} | {{item.age}}</view>
+          </view>
+          
+          <!-- 编辑按钮 (我的宠物模式) -->
+          <view class="edit-btn" catchtap="editPet" data-id="{{item.id}}" wx:if="{{isMyPetsMode}}">✎</view>
+        </view>
+        
+        <!-- 删除按钮背景 -->
+        <view class="delete-action" catchtap="deletePet" data-id="{{item.id}}" data-index="{{index}}" wx:if="{{isMyPetsMode}}">删除</view>
+      </view>
+    </block>
+    
+    <!-- 空状态 -->
+    <view class="empty-state" wx:else>
+      <image src="/images/empty.png" mode="aspectFit" class="empty-icon"></image>
+      <text>暂无宠物信息</text>
+      <button class="add-pet-btn" bindtap="navigateToAdd" wx:if="{{isMyPetsMode}}">添加宠物</button>
+    </view>
+  </view>
+</view>

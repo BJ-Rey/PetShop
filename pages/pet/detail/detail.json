@@ -1,0 +1,8 @@
+{
+  "navigationStyle": "custom",
+  "usingComponents": {
+    "global-cart": "/components/global-cart/global-cart",
+    "pet-status-tag": "/components/pet-status-tag/pet-status-tag",
+    "auth-modal": "/components/auth-modal/auth-modal"
+  }
+}

@@ -1,0 +1,16 @@
+package com.tencent.wxcloudrun.dao;
+
+import com.tencent.wxcloudrun.model.Pet;
+import org.apache.ibatis.annotations.Mapper;
+import org.apache.ibatis.annotations.Param;
+import java.util.List;
+
+@Mapper
+public interface PetMapper {
+    Pet getPetById(Integer id);
+    List<Pet> getPets(@Param("offset") int offset, @Param("limit") int limit);
+    void createPet(Pet pet);
+    void updatePet(Pet pet);
+    void deletePet(Integer id);
+    Integer countPets();
+}

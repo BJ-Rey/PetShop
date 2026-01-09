@@ -1,0 +1,309 @@
+<!-- pages/merchant/service/manage/manage.wxml -->
+<view class="container">
+  <!-- 顶部操作栏 -->
+  <view class="standard-action-bar">
+    <text class="standard-back-btn" bindtap="navigateBack">←</text>
+    <text class="page-title">服务管理</text>
+    <button class="logout-btn" bindtap="logout">退出登录</button>
+  </view>
+
+  <!-- 搜索栏 -->
+  <view class="search-bar">
+    <input 
+      class="search-input" 
+      placeholder="搜索服务名称、类型或商家" 
+      bindinput="onSearch"
+      value="{{filter.keyword}}"
+    />
+    <button class="add-btn" type="primary" bindtap="addService">+ 添 加</button>
+  </view>
+
+  <!-- 筛选栏 -->
+  <view class="filter-bar">
+    <view class="filter-row">
+      <!-- 状态筛选 -->
+      <view class="filter-item collapsed">
+        <view class="filter-header" bindtap="toggleFilter" data-type="status">
+          <text class="filter-label">状态：</text>
+          <text class="filter-value">{{filter.status === 'all' ? '全部' : filter.status === 'published' ? '已上架' : '已下架'}}</text>
+          <text class="filter-arrow {{expandedFilter === 'status' ? 'up' : 'down'}}">▼</text>
+        </view>
+        <view class="filter-options" wx:if="{{expandedFilter === 'status'}}">
+          <view 
+            class="filter-option {{filter.status === 'all' ? 'active' : ''}}" 
+            data-type="status" 
+            data-value="all"
+            bindtap="changeFilter"
+          >
+            全部
+          </view>
+          <view 
+            class="filter-option {{filter.status === 'published' ? 'active' : ''}}" 
+            data-type="status" 
+            data-value="published"
+            bindtap="changeFilter"
+          >
+            已上架
+          </view>
+          <view 
+            class="filter-option {{filter.status === 'unpublished' ? 'active' : ''}}" 
+            data-type="status" 
+            data-value="unpublished"
+            bindtap="changeFilter"
+          >
+            已下架
+          </view>
+        </view>
+      </view>
+      
+      <!-- 服务类型筛选 -->
+      <view class="filter-item collapsed">
+        <view class="filter-header" bindtap="toggleFilter" data-type="category">
+          <text class="filter-label">分类：</text>
+          <text class="filter-value">{{filter.category === 'all' ? '全部' : filter.category === 'grooming' ? '美容' : filter.category === 'boarding' ? '寄养' : filter.category === 'training' ? '训练' : filter.category === 'medical' ? '医疗' : '其他'}}</text>
+          <text class="filter-arrow {{expandedFilter === 'category' ? 'up' : 'down'}}">▼</text>
+        </view>
+        <view class="filter-options" wx:if="{{expandedFilter === 'category'}}">
+          <view 
+            class="filter-option {{filter.category === 'all' ? 'active' : ''}}" 
+            data-type="category" 
+            data-value="all"
+            bindtap="changeFilter"
+          >
+            全部
+          </view>
+          <view 
+            class="filter-option {{filter.category === 'grooming' ? 'active' : ''}}" 
+            data-type="category" 
+            data-value="grooming"
+            bindtap="changeFilter"
+          >
+            美容
+          </view>
+          <view 
+            class="filter-option {{filter.category === 'boarding' ? 'active' : ''}}" 
+            data-type="category" 
+            data-value="boarding"
+            bindtap="changeFilter"
+          >
+            寄养
+          </view>
+          <view 
+            class="filter-option {{filter.category === 'training' ? 'active' : ''}}" 
+            data-type="category" 
+            data-value="training"
+            bindtap="changeFilter"
+          >
+            训练
+          </view>
+          <view 
+            class="filter-option {{filter.category === 'medical' ? 'active' : ''}}" 
+            data-type="category" 
+            data-value="medical"
+            bindtap="changeFilter"
+          >
+            医疗
+          </view>
+          <view 
+            class="filter-option {{filter.category === 'photography' ? 'active' : ''}}" 
+            data-type="category" 
+            data-value="photography"
+            bindtap="changeFilter"
+          >
+            摄影
+          </view>
+        </view>
+      </view>
+    </view>
+  </view>
+
+  <!-- 排序栏 -->
+  <view class="sort-bar">
+    <view 
+      class="sort-item {{sortField === 'createdAt' ? 'active' : ''}}" 
+      data-field="createdAt"
+      bindtap="changeSort"
+    >
+      <text>创建时间</text>
+      <text class="sort-icon">{{sortField === 'createdAt' ? (sortOrder === 'desc' ? '↓' : '↑') : ''}}</text>
+    </view>
+    <view 
+      class="sort-item {{sortField === 'sales' ? 'active' : ''}}" 
+      data-field="sales"
+      bindtap="changeSort"
+    >
+      <text>销量</text>
+      <text class="sort-icon">{{sortField === 'sales' ? (sortOrder === 'desc' ? '↓' : '↑') : ''}}</text>
+    </view>
+    <view 
+      class="sort-item {{sortField === 'price' ? 'active' : ''}}" 
+      data-field="price"
+      bindtap="changeSort"
+    >
+      <text>价格</text>
+      <text class="sort-icon">{{sortField === 'price' ? (sortOrder === 'desc' ? '↓' : '↑') : ''}}</text>
+    </view>
+  </view>
+
+  <!-- 批量操作栏 -->
+  <view class="batch-action-bar" wx:if="{{services.length > 0}}">
+    <view class="batch-select">
+      <checkbox-group bindchange="toggleAllSelect">
+        <label class="checkbox-label">
+          <checkbox value="all" checked="{{isAllSelected}}" />
+          <text>全选</text>
+        </label>
+      </checkbox-group>
+      <text class="selected-count" wx:if="{{selectedServiceIds.length > 0}}">({{selectedServiceIds.length}} 项)</text>
+    </view>
+    <view class="batch-buttons">
+      <!-- 基础批量操作按钮 -->
+      <button class="batch-btn" bindtap="batchPublish" wx:if="{{selectedServiceIds.length > 0}}">批量上架</button>
+      <button class="batch-btn" bindtap="batchUnpublish" wx:if="{{selectedServiceIds.length > 0}}">批量下架</button>
+      <button class="batch-btn delete" bindtap="batchDelete" wx:if="{{selectedServiceIds.length > 0}}">批量删除</button>
+      
+      <!-- 更多批量操作菜单 -->
+      <view class="more-actions" wx:if="{{selectedServiceIds.length > 0}}">
+        <button class="batch-btn more-btn" bindtap="toggleMoreActions">更多</button>
+        <view class="more-actions-menu" wx:if="{{showMoreActions}}">
+          <view class="more-action-item" bindtap="batchUpdateCategory">批量更新分类</view>
+          <view class="more-action-item" bindtap="batchUpdatePrice">批量更新价格</view>
+        </view>
+      </view>
+    </view>
+  </view>
+  
+  <!-- 批量更新分类弹窗 -->
+  <view class="modal-mask" wx:if="{{showUpdateCategoryModal}}" bindtap="closeUpdateCategoryModal"></view>
+  <view class="modal-content" wx:if="{{showUpdateCategoryModal}}">
+    <view class="modal-header">
+      <text class="modal-title">批量更新分类</text>
+      <text class="modal-close" bindtap="closeUpdateCategoryModal">×</text>
+    </view>
+    <view class="modal-body">
+      <view class="form-item">
+        <text class="form-label">选择分类</text>
+        <picker 
+          class="form-picker" 
+          range="{{categories}}" 
+          range-key="name"
+          value="{{selectedUpdateCategoryIndex}}"
+          bindchange="onUpdateCategoryChange"
+        >
+          <view class="picker-text">{{selectedUpdateCategory}}</view>
+        </picker>
+      </view>
+    </view>
+    <view class="modal-footer">
+      <button class="modal-btn cancel" bindtap="closeUpdateCategoryModal">取消</button>
+      <button class="modal-btn confirm" bindtap="confirmBatchUpdateCategory">确认更新</button>
+    </view>
+  </view>
+  
+  <!-- 批量更新价格弹窗 -->
+  <view class="modal-mask" wx:if="{{showUpdatePriceModal}}" bindtap="closeUpdatePriceModal"></view>
+  <view class="modal-content" wx:if="{{showUpdatePriceModal}}">
+    <view class="modal-header">
+      <text class="modal-title">批量更新价格</text>
+      <text class="modal-close" bindtap="closeUpdatePriceModal">×</text>
+    </view>
+    <view class="modal-body">
+      <view class="form-item">
+        <text class="form-label">更新方式</text>
+        <radio-group class="radio-group" bindchange="onPriceUpdateTypeChange" value="{{priceUpdateType}}">
+          <label class="radio-item">
+            <radio value="percentage" />按百分比
+          </label>
+          <label class="radio-item">
+            <radio value="fixed" />按固定金额
+          </label>
+        </radio-group>
+      </view>
+      <view class="form-item">
+        <text class="form-label">更新值</text>
+        <input 
+          class="form-input" 
+          placeholder="请输入更新值" 
+          type="digit"
+          value="{{priceUpdateValue}}"
+          bindinput="onPriceUpdateValueInput"
+        />
+        <text class="input-tip">{{priceUpdateType === 'percentage' ? '(例如：10表示+10%，-10表示-10%)' : '(例如：10表示+10元，-10表示-10元)'}}</text>
+      </view>
+    </view>
+    <view class="modal-footer">
+      <button class="modal-btn cancel" bindtap="closeUpdatePriceModal">取消</button>
+      <button class="modal-btn confirm" bindtap="confirmBatchUpdatePrice">确认更新</button>
+    </view>
+  </view>
+
+  <!-- 服务列表 -->
+  <view class="product-list">
+    <view class="empty-state" wx:if="{{!isLoading && services.length === 0}}">
+      <text class="empty-icon">🛁</text>
+      <text class="empty-text">暂无服务数据</text>
+      <button class="empty-btn" type="primary" bindtap="addService">添加服务</button>
+    </view>
+    
+    <view class="loading-state" wx:if="{{isLoading}}">
+      <text class="loading-text">加载中...</text>
+    </view>
+    
+    <block wx:else>
+      <view class="product-item card" wx:for="{{services}}" wx:key="id">
+        <checkbox-group bindchange="toggleSelect" data-id="{{item.id}}">
+          <label class="checkbox-label">
+            <checkbox value="{{item.id}}" checked="{{selectedServiceIds.indexOf(item.id) > -1}}" />
+          </label>
+        </checkbox-group>
+        <image class="product-image" src="{{item.image}}"></image>
+        
+        <view class="product-info">
+          <text class="product-name">{{item.name}}</text>
+          <text class="product-category">{{item.category === 'grooming' ? '美容' : item.category === 'boarding' ? '寄养' : item.category === 'training' ? '训练' : item.category === 'medical' ? '医疗' : '其他'}}</text>
+          
+          <view class="product-price">
+            <text class="current-price">¥{{item.price}}</text>
+            <text class="original-price" wx:if="{{item.originalPrice > item.price}}">¥{{item.originalPrice}}</text>
+          </view>
+          
+          <view class="product-meta">
+            <text class="product-stock">{{item.duration}}</text>
+            <text class="product-sales">销量：{{item.sales}}</text>
+          </view>
+        </view>
+        
+        <view class="product-status">
+          <text class="status-tag {{item.status === 'published' ? 'published' : 'unpublished'}}">
+            {{item.status === 'published' ? '已上架' : '已下架'}}
+          </text>
+        </view>
+        
+        <view class="product-actions">
+          <button 
+            class="action-btn edit-btn" 
+            bindtap="editService" 
+            data-id="{{item.id}}"
+          >
+            编辑
+          </button>
+          <button 
+            class="action-btn {{item.status === 'published' ? 'unpublish-btn' : 'publish-btn'}}" 
+            bindtap="toggleServiceStatus" 
+            data-id="{{item.id}}"
+          >
+            {{item.status === 'published' ? '下架' : '上架'}}
+          </button>
+          <button 
+            class="action-btn delete-btn" 
+            bindtap="deleteService" 
+            data-id="{{item.id}}" 
+            data-name="{{item.name}}"
+          >
+            删除
+          </button>
+        </view>
+      </view>
+    </block>
+  </view>
+</view>

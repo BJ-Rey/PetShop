@@ -1,0 +1,146 @@
+<!--pages/mall/list/list.wxml-->
+<view class="container">
+  <auth-modal id="auth-modal" />
+  <global-cart />
+  <!-- 顶部操作栏 -->
+  <view class="standard-action-bar">
+    <text class="standard-back-btn" bindtap="navigateBack">←</text>
+    <text class="page-title">猫咪商城</text>
+  </view>
+
+  <!-- 搜索 -->
+  <view class="top-bar">
+    <view class="search-box">
+      <input type="text" placeholder="搜索猫咪或商品" bindinput="onSearchInput" bindconfirm="onSearch" value="{{searchKeyword}}" />
+      <button class="search-btn" bindtap="onSearch">搜索</button>
+    </view>
+  </view>
+
+  <!-- 筛选按钮 -->
+  <view class="filter-buttons" wx:if="{{!isSearching}}">
+    <view class="filter-btn {{currentFilter === 'cat' ? 'active' : ''}}" bindtap="switchFilter" data-filter="cat">猫咪</view>
+    <view class="filter-btn {{currentFilter === 'product' ? 'active' : ''}}" bindtap="switchFilter" data-filter="product">用品</view>
+  </view>
+
+  <!-- 非搜索状态显示内容 -->
+  <block wx:if="{{!isSearching}}">
+    <!-- 推荐商品轮播 -->
+    <view class="banner-section">
+      <swiper indicator-dots="{{indicatorDots}}" autoplay="{{autoplay}}" interval="{{interval}}" duration="{{duration}}">
+        <block wx:for="{{bannerList}}" wx:key="id">
+          <swiper-item>
+            <image src="{{item.image}}" class="banner-image" mode="aspectFill" bindtap="navigateToBannerLink" data-link="{{item.link}}"></image>
+          </swiper-item>
+        </block>
+      </swiper>
+    </view>
+
+    <!-- 热门商品 (仅在查看用品时显示，或者一直显示？用户没说，暂保留但仅在用品Tab显示比较合理，但用户说猫咪页面要整合，所以猫咪Tab下可能不需要热门商品，或者显示热门猫咪。为简化，仅在用品Tab显示) -->
+    <view class="hot-products" wx:if="{{currentFilter === 'product' && hotProducts.length > 0}}">
+      <view class="section-header">
+        <text class="section-title">热门商品</text>
+        <text class="more" bindtap="navigateToAllProducts">查看全部</text>
+      </view>
+      <scroll-view scroll-x="true" class="hot-products-scroll" enable-flex>
+        <block wx:for="{{hotProducts}}" wx:key="id">
+          <view class="hot-product-item" bindtap="navigateToProductDetail" data-id="{{item.id}}">
+            <image src="{{item.image}}" class="product-image"></image>
+            <text class="product-name">{{item.name}}</text>
+            <text class="product-price">¥{{item.price}}</text>
+            <text class="product-sales">销量 {{item.sales}}</text>
+          </view>
+        </block>
+      </scroll-view>
+    </view>
+
+    <!-- 列表展示区域 -->
+    <view class="product-list">
+      <view class="section-header">
+        <text class="section-title">{{currentFilter === 'cat' ? '精选猫咪' : '全部商品'}}</text>
+      </view>
+      
+      <!-- 猫咪列表 -->
+      <view class="product-grid" wx:if="{{currentFilter === 'cat'}}">
+        <block wx:if="{{pets.length > 0}}">
+          <block wx:for="{{pets}}" wx:key="id">
+            <view class="product-card" bindtap="navigateToPetDetail" data-id="{{item.id}}">
+              <image src="{{item.avatar}}" class="product-card-image" mode="aspectFill"></image>
+              <pet-status-tag status="{{item.status}}" statusText="{{item.statusText}}" style="position: absolute; top: 15rpx; left: 15rpx; z-index: 10;"></pet-status-tag>
+              <view class="product-card-info">
+                <text class="product-card-name">{{item.name}}</text>
+                <view class="product-card-meta">
+                   <text class="pet-gender">{{item.gender === 'male' ? '公' : '母'}}</text>
+                   <text class="pet-age">{{item.age}}</text>
+                </view>
+                <view class="product-card-price">
+                  <text class="current-price">¥{{item.price}}</text>
+                  <text class="deposit-info">定金 ¥{{item.deposit}}</text>
+                </view>
+                <block wx:if="{{!item.isOrdered}}">
+                    <button class="buy-btn" catchtap="navigateToPetDetail" data-id="{{item.id}}">下定</button>
+                </block>
+                <block wx:else>
+                    <button class="buy-btn" catchtap="showContactModal" data-petid="{{item.id}}">联系商家</button>
+                </block>
+              </view>
+            </view>
+          </block>
+        </block>
+        <!-- 空状态 -->
+        <view class="empty" wx:else>
+            <text>暂无猫咪信息</text>
+        </view>
+      </view>
+
+      <!-- 商品列表 -->
+      <view class="product-grid" wx:if="{{currentFilter === 'product'}}">
+        <block wx:for="{{products}}" wx:key="id">
+          <view class="product-card" bindtap="navigateToProductDetail" data-id="{{item.id}}">
+            <image src="{{item.image}}" class="product-card-image" mode="aspectFill"></image>
+            <view class="product-card-info">
+              <text class="product-card-name">{{item.name}}</text>
+              <view class="product-card-meta">
+                <text class="product-card-rating">{{item.rating}} ★</text>
+                <text class="product-card-sales">销量 {{item.sales}}</text>
+              </view>
+              <view class="product-card-price">
+                <text class="current-price">¥{{item.price}}</text>
+                <text class="original-price" wx:if="{{item.originalPrice > item.price}}">¥{{item.originalPrice}}</text>
+              </view>
+            </view>
+          </view>
+        </block>
+      </view>
+    </view>
+  </block>
+
+  <!-- 联系商家模态框 -->
+  <view class="modal-mask" wx:if="{{showContactModal}}" bindtap="hideContactModal"></view>
+  <view class="contact-modal" wx:if="{{showContactModal}}">
+    <view class="modal-header">
+      <text class="modal-title">联系商家</text>
+      <text class="close-btn" bindtap="hideContactModal">×</text>
+    </view>
+    <view class="modal-content">
+      <!-- 微信二维码 -->
+      <view class="contact-method">
+        <text class="method-title">微信联系</text>
+        <view class="qrcode-container">
+          <image src="{{merchantInfo.wechatQrcode || 'https://via.placeholder.com/200'}}"></image>
+          <text class="qrcode-tip">扫描二维码添加商家微信</text>
+        </view>
+      </view>
+      <!-- 电话号码 -->
+      <view class="contact-method">
+        <text class="method-title">电话联系</text>
+        <view class="phone-container">
+          <text class="phone-number">{{merchantInfo.phone}}</text>
+          <button class="call-btn" bindtap="callMerchant">
+            <text class="call-icon">📞</text>
+            <text>拨打</text>
+          </button>
+        </view>
+      </view>
+    </view>
+  </view>
+</view>

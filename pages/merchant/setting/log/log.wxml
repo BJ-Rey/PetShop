@@ -1,0 +1,217 @@
+<!-- pages/merchant/setting/log/log.wxml -->
+<wxs module="utils">
+  module.exports.formatDate = function(dateString) {
+    if (!dateString) return '';
+    var date = getDate(dateString);
+    var year = date.getFullYear();
+    var month = date.getMonth() + 1;
+    var day = date.getDate();
+    var hour = date.getHours();
+    var minute = date.getMinutes();
+    var second = date.getSeconds();
+    
+    if (month < 10) month = '0' + month;
+    if (day < 10) day = '0' + day;
+    if (hour < 10) hour = '0' + hour;
+    if (minute < 10) minute = '0' + minute;
+    if (second < 10) second = '0' + second;
+    
+    return year + '-' + month + '-' + day + ' ' + hour + ':' + minute + ':' + second;
+  }
+  
+  module.exports.getTypeText = function(type) {
+    var map = {
+      'add': '添加',
+      'edit': '编辑',
+      'delete': '删除',
+      'publish': '上下架',
+      'login': '登录/退出'
+    };
+    return map[type] || '未知';
+  }
+  
+  module.exports.getModuleText = function(moduleName) {
+    var map = {
+      'product': '商品管理',
+      'service': '服务管理',
+      'order': '订单管理',
+      'finance': '财务管理',
+      'setting': '系统设置'
+    };
+    return map[moduleName] || '未知模块';
+  }
+</wxs>
+
+<view class="container">
+  <!-- 顶部操作栏 -->
+  <view class="standard-action-bar">
+    <text class="standard-back-btn" bindtap="navigateBack">←</text>
+    <text class="page-title">操作日志</text>
+    <button class="logout-btn" bindtap="logout">退出登录</button>
+  </view>
+
+  <!-- 搜索和筛选栏 -->
+  <view class="search-filter-bar">
+    <input 
+      class="search-input" 
+      placeholder="搜索操作描述或操作人员" 
+      bindinput="onSearch" 
+      value="{{filter.keyword}}"
+    />
+    <button class="filter-btn" bindtap="toggleFilterPanel">
+      <text class="filter-icon">🔍</text>
+      <text class="filter-text">筛选</text>
+    </button>
+  </view>
+
+  <!-- 筛选面板 -->
+  <view class="filter-panel" wx:if="{{showFilterPanel}}">
+    <view class="filter-section">
+      <text class="filter-title">操作类型</text>
+      <view class="filter-options">
+        <view 
+          class="filter-option {{filter.type === 'all' ? 'active' : ''}}" 
+          bindtap="changeFilter" 
+          data-type="type"
+          data-value="all"
+        >
+          全部
+        </view>
+        <view 
+          class="filter-option {{filter.type === 'add' ? 'active' : ''}}" 
+          bindtap="changeFilter" 
+          data-type="type"
+          data-value="add"
+        >
+          添加
+        </view>
+        <view 
+          class="filter-option {{filter.type === 'edit' ? 'active' : ''}}" 
+          bindtap="changeFilter" 
+          data-type="type"
+          data-value="edit"
+        >
+          编辑
+        </view>
+        <view 
+          class="filter-option {{filter.type === 'delete' ? 'active' : ''}}" 
+          bindtap="changeFilter" 
+          data-type="type"
+          data-value="delete"
+        >
+          删除
+        </view>
+        <view 
+          class="filter-option {{filter.type === 'publish' ? 'active' : ''}}" 
+          bindtap="changeFilter" 
+          data-type="type"
+          data-value="publish"
+        >
+          上架/下架
+        </view>
+        <view 
+          class="filter-option {{filter.type === 'login' ? 'active' : ''}}" 
+          bindtap="changeFilter" 
+          data-type="type"
+          data-value="login"
+        >
+          登录/退出
+        </view>
+      </view>
+    </view>
+    
+    <view class="filter-section">
+      <text class="filter-title">操作模块</text>
+      <view class="filter-options">
+        <view 
+          class="filter-option {{filter.module === 'all' ? 'active' : ''}}" 
+          bindtap="changeFilter" 
+          data-type="module"
+          data-value="all"
+        >
+          全部
+        </view>
+        <view 
+          class="filter-option {{filter.module === 'product' ? 'active' : ''}}" 
+          bindtap="changeFilter" 
+          data-type="module"
+          data-value="product"
+        >
+          商品管理
+        </view>
+        <view 
+          class="filter-option {{filter.module === 'service' ? 'active' : ''}}" 
+          bindtap="changeFilter" 
+          data-type="module"
+          data-value="service"
+        >
+          服务管理
+        </view>
+        <view 
+          class="filter-option {{filter.module === 'order' ? 'active' : ''}}" 
+          bindtap="changeFilter" 
+          data-type="module"
+          data-value="order"
+        >
+          订单管理
+        </view>
+        <view 
+          class="filter-option {{filter.module === 'finance' ? 'active' : ''}}" 
+          bindtap="changeFilter" 
+          data-type="module"
+          data-value="finance"
+        >
+          财务管理
+        </view>
+        <view 
+          class="filter-option {{filter.module === 'setting' ? 'active' : ''}}" 
+          bindtap="changeFilter" 
+          data-type="module"
+          data-value="setting"
+        >
+          系统设置
+        </view>
+      </view>
+    </view>
+    
+    <view class="filter-actions">
+      <button class="reset-btn" bindtap="resetFilter">重置</button>
+      <button class="confirm-btn" type="primary" bindtap="applyFilter">确认</button>
+    </view>
+  </view>
+
+  <!-- 日志列表 -->
+  <view class="log-list">
+    <view class="empty-state" wx:if="{{!isLoading && logs.length === 0}}">
+      <text class="empty-icon">📋</text>
+      <text class="empty-text">暂无操作日志</text>
+    </view>
+    
+    <view class="loading-state" wx:if="{{isLoading}}">
+      <text class="loading-text">加载中...</text>
+    </view>
+    
+    <block wx:else>
+      <view class="log-item card" wx:for="{{logs}}" wx:key="id">
+        <view class="log-header">
+          <view class="log-meta">
+            <text class="log-operator">{{item.operator}}</text>
+            <text class="log-time">{{utils.formatDate(item.createdAt)}}</text>
+          </view>
+          <view class="log-type-badge {{item.type}}">
+            {{utils.getTypeText(item.type)}}
+          </view>
+        </view>
+        
+        <view class="log-content">
+          <text class="log-description">{{item.description}}</text>
+          <view class="log-details">
+            <text class="log-module">模块：{{utils.getModuleText(item.module)}}</text>
+            <text class="log-ip">IP：{{item.ip}}</text>
+          </view>
+          <text class="log-extra" wx:if="{{item.extra}}">{{item.extra}}</text>
+        </view>
+      </view>
+    </block>
+  </view>
+</view>

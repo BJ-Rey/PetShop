@@ -1,0 +1,97 @@
+/* pages/service/contact/contact.wxss */
+.container {
+  padding: 30rpx;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.qr-section {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  margin-top: 50rpx;
+  margin-bottom: 80rpx;
+}
+
+.qr-code {
+  width: 300rpx;
+  height: 300rpx;
+  background-color: #f0f0f0; /* Placeholder color */
+  margin-bottom: 20rpx;
+}
+
+.tip {
+  font-size: 28rpx;
+  color: #666;
+}
+
+.contact-section {
+  width: 100%;
+  margin-bottom: 60rpx;
+  display: flex;
+  justify-content: center;
+}
+
+.emergency-btn {
+  width: 80%;
+}
+
+.phone-info {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 30rpx;
+  background-color: #f9f9f9;
+  border-radius: 10rpx;
+  width: 80%;
+}
+
+.phone-label {
+  font-size: 30rpx;
+  color: #333;
+  margin-bottom: 10rpx;
+}
+
+.phone-number {
+  font-size: 40rpx;
+  font-weight: bold;
+  color: #e64340;
+  margin-bottom: 10rpx;
+}
+
+.call-hint {
+  font-size: 24rpx;
+  color: #999;
+}
+
+.history-section {
+  width: 100%;
+}
+
+.history-title {
+  font-size: 32rpx;
+  font-weight: bold;
+  margin-bottom: 20rpx;
+  padding-left: 20rpx;
+  border-left: 8rpx solid #e64340;
+}
+
+.history-list {
+  background-color: #fff;
+  border-radius: 10rpx;
+  padding: 0 20rpx;
+}
+
+.history-item {
+  display: flex;
+  justify-content: space-between;
+  padding: 20rpx 0;
+  border-bottom: 1rpx solid #eee;
+  font-size: 28rpx;
+  color: #666;
+}
+
+.history-item:last-child {
+  border-bottom: none;
+}

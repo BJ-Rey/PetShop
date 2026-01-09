@@ -1,0 +1,60 @@
+<!--pages/mine/orders/orders.wxml-->
+<view class="container">
+  <!-- 顶部操作栏 -->
+  <view class="standard-action-bar">
+    <text class="standard-back-btn" bindtap="navigateBack">←</text>
+    <text class="page-title">{{status === '' ? '全部订单' : orderStatusMap[status]}}</text>
+  </view>
+
+  <!-- 订单状态筛选 -->
+  <view class="order-status-filter">
+    <view class="filter-item {{status === '' ? 'active' : ''}}" bindtap="switchOrderStatus" data-status="">
+      全部
+    </view>
+    <view class="filter-item {{status === 'pending' ? 'active' : ''}}" bindtap="switchOrderStatus" data-status="pending">
+      待付款
+    </view>
+    <view class="filter-item {{status === 'shipping' ? 'active' : ''}}" bindtap="switchOrderStatus" data-status="shipping">
+      待发货
+    </view>
+    <view class="filter-item {{status === 'delivering' ? 'active' : ''}}" bindtap="switchOrderStatus" data-status="delivering">
+      待收货
+    </view>
+    <view class="filter-item {{status === 'completed' ? 'active' : ''}}" bindtap="switchOrderStatus" data-status="completed">
+      已完成
+    </view>
+  </view>
+
+  <!-- 订单列表 -->
+  <view class="order-list">
+    <view class="order-item" wx:for="{{orders}}" wx:key="id">
+      <view class="order-header">
+        <text class="order-id">订单号：{{item.id}}</text>
+        <text class="order-status">{{item.statusText}}</text>
+      </view>
+      <view class="order-content">
+        <image src="{{item.image}}" class="product-image" mode="aspectFill"></image>
+        <view class="product-info">
+          <text class="product-name">{{item.productName}}</text>
+          <text class="product-sku">{{item.sku}}</text>
+        </view>
+        <text class="product-price">¥{{item.price}}</text>
+      </view>
+      <view class="order-footer">
+        <text class="order-total">共{{item.quantity}}件商品，总价：¥{{item.totalPrice}}</text>
+        <view class="order-actions">
+          <button class="action-btn" wx:if="{{item.status === 'pending'}}" bindtap="payOrder" data-id="{{item.id}}">立即付款</button>
+          <button class="action-btn" wx:if="{{item.status === 'delivering'}}" bindtap="confirmReceive" data-id="{{item.id}}">确认收货</button>
+          <button class="action-btn" wx:if="{{item.status === 'completed'}}" bindtap="evaluateOrder" data-id="{{item.id}}">评价</button>
+          <button class="action-btn" bindtap="viewOrderDetail" data-id="{{item.id}}">查看详情</button>
+        </view>
+      </view>
+    </view>
+  </view>
+
+  <!-- 空状态 -->
+  <view class="empty" wx:if="{{orders.length === 0}}">
+    <text class="empty-icon">📦</text>
+    <text class="empty-text">暂无订单</text>
+  </view>
+</view>

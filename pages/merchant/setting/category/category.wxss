@@ -1,0 +1,220 @@
+/* pages/merchant/setting/category/category.wxss */
+.container {
+  padding: 20rpx;
+  padding-bottom: 120rpx;
+}
+
+.standard-action-bar {
+  display: flex;
+  align-items: center;
+  height: 88rpx;
+  background-color: #fff;
+  padding: 0 30rpx;
+  position: sticky;
+  top: 0;
+  z-index: 100;
+  box-shadow: 0 2rpx 10rpx rgba(0, 0, 0, 0.05);
+  margin: -20rpx -20rpx 20rpx -20rpx;
+}
+
+.standard-back-btn {
+  font-size: 36rpx;
+  color: #333;
+  padding: 10rpx 20rpx 10rpx 0;
+}
+
+.page-title {
+  font-size: 34rpx;
+  font-weight: bold;
+  color: #333;
+  flex: 1;
+  text-align: center;
+  margin-right: 40rpx; /* Balance the back button */
+}
+
+.category-list {
+  background-color: #fff;
+  border-radius: 12rpx;
+  overflow: hidden;
+}
+
+.category-item {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 30rpx;
+  border-bottom: 1rpx solid #f5f5f5;
+}
+
+.category-item:last-child {
+  border-bottom: none;
+}
+
+.category-info {
+  flex: 1;
+  display: flex;
+  align-items: center;
+}
+
+.drag-handle {
+  color: #ccc;
+  font-size: 40rpx;
+  margin-right: 20rpx;
+  touch-action: none;
+}
+
+.category-name {
+  font-size: 30rpx;
+  color: #333;
+  font-weight: 500;
+}
+
+.category-count {
+  font-size: 24rpx;
+  color: #999;
+  margin-left: 10rpx;
+}
+
+.category-actions {
+  display: flex;
+  align-items: center;
+}
+
+.action-btn {
+  width: 60rpx;
+  height: 60rpx;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-left: 20rpx;
+  background-color: #f5f5f5;
+  border-radius: 50%;
+  font-size: 28rpx;
+}
+
+.edit-btn {
+  color: #07c160;
+}
+
+.delete-btn {
+  color: #ff3b30;
+}
+
+.add-category-btn {
+  position: fixed;
+  bottom: 40rpx;
+  left: 30rpx;
+  right: 30rpx;
+  height: 88rpx;
+  background-color: #07c160;
+  color: #fff;
+  border-radius: 44rpx;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 32rpx;
+  font-weight: bold;
+  box-shadow: 0 6rpx 20rpx rgba(7, 193, 96, 0.3);
+  z-index: 99;
+}
+
+.add-category-btn:active {
+  transform: scale(0.98);
+}
+
+.empty-state {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 100rpx 0;
+}
+
+.empty-icon {
+  font-size: 80rpx;
+  margin-bottom: 20rpx;
+  color: #ccc;
+}
+
+.empty-text {
+  font-size: 28rpx;
+  color: #999;
+}
+
+/* Modal Styles */
+.modal-mask {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: rgba(0, 0, 0, 0.5);
+  z-index: 1000;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.modal-content {
+  width: 600rpx;
+  background-color: #fff;
+  border-radius: 16rpx;
+  overflow: hidden;
+}
+
+.modal-header {
+  padding: 30rpx;
+  text-align: center;
+  font-size: 32rpx;
+  font-weight: bold;
+  border-bottom: 1rpx solid #f5f5f5;
+}
+
+.modal-body {
+  padding: 40rpx 30rpx;
+}
+
+.input-group {
+  margin-bottom: 0;
+}
+
+.modal-input {
+  height: 80rpx;
+  background-color: #f5f5f5;
+  border-radius: 8rpx;
+  padding: 0 20rpx;
+  font-size: 28rpx;
+  width: 100%;
+  box-sizing: border-box;
+}
+
+.modal-footer {
+  display: flex;
+  border-top: 1rpx solid #f5f5f5;
+}
+
+.modal-btn {
+  flex: 1;
+  height: 100rpx;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 30rpx;
+  background-color: #fff;
+  border-radius: 0;
+  border: none;
+}
+
+.modal-btn::after {
+  border: none;
+}
+
+.cancel-btn {
+  color: #666;
+  border-right: 1rpx solid #f5f5f5;
+}
+
+.confirm-btn {
+  color: #07c160;
+  font-weight: 500;
+}

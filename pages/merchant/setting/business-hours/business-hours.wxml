@@ -1,0 +1,207 @@
+<!-- pages/merchant/setting/business-hours/business-hours.wxml -->
+<view class="container">
+  <!-- 顶部操作栏 -->
+  <view class="standard-action-bar">
+    <text class="standard-back-btn" bindtap="goBack">←</text>
+    <text class="page-title">营业时间设置</text>
+  </view>
+
+  <!-- 悬浮保存按钮 -->
+  <view class="floating-save-btn" bindtap="saveBusinessHours">
+    <text class="save-icon">💾</text>
+    <text>保存</text>
+  </view>
+
+  <!-- 模式选择 -->
+  <view class="setting-section card">
+    <view class="section-title">设置模式</view>
+    <view class="mode-selector">
+      <button 
+        class="mode-btn {{selectedMode === 'same' ? 'active' : ''}}" 
+        bindtap="selectMode" 
+        data-mode="same"
+      >
+        统一设置
+      </button>
+      <button 
+        class="mode-btn {{selectedMode === 'differentiated' ? 'active' : ''}}" 
+        bindtap="selectMode" 
+        data-mode="differentiated"
+      >
+        差异化设置
+      </button>
+    </view>
+  </view>
+
+  <!-- 统一设置模式 -->
+  <view class="setting-section card" wx:if="{{selectedMode === 'same'}}">
+    <view class="section-title">统一营业时间</view>
+    
+    <!-- 营业状态 -->
+    <view class="form-item">
+      <text class="form-label">营业状态</text>
+      <view class="status-switch">
+        <text class="status-text">{{sameModeStatus === 'open' ? '营业中' : '休息'}}</text>
+        <switch 
+          checked="{{sameModeStatus === 'open'}}" 
+          bindchange="toggleSameModeStatus"
+        />
+      </view>
+    </view>
+
+    <!-- 营业时间列表 -->
+    <view class="time-slots" wx:if="{{sameModeStatus === 'open'}}">
+      <view class="time-slot" wx:for="{{sameModeTimeSlots}}" wx:key="index">
+        <view class="time-slot-header">
+          <text class="slot-label">时段 {{index + 1}}</text>
+          <button 
+            class="delete-slot-btn" 
+            wx:if="{{sameModeTimeSlots.length > 1}}" 
+            bindtap="deleteSameModeTimeSlot" 
+            data-index="{{index}}"
+          >
+            删除
+          </button>
+        </view>
+        <view class="time-picker-container">
+          <picker 
+            class="time-picker" 
+            mode="time" 
+            value="{{item.start}}" 
+            bindchange="updateSameModeTimeSlot" 
+            data-index="{{index}}" 
+            data-field="start"
+          >
+            <view class="picker-text">开始时间：{{item.start}}</view>
+          </picker>
+          <text class="time-separator">至</text>
+          <picker 
+            class="time-picker" 
+            mode="time" 
+            value="{{item.end}}" 
+            bindchange="updateSameModeTimeSlot" 
+            data-index="{{index}}" 
+            data-field="end"
+          >
+            <view class="picker-text">结束时间：{{item.end}}</view>
+          </picker>
+        </view>
+      </view>
+      
+      <!-- 添加时段按钮 -->
+      <button class="add-slot-btn" bindtap="addSameModeTimeSlot">+ 添加营业时段</button>
+    </view>
+  </view>
+
+  <!-- 差异化设置模式 -->
+  <view class="setting-section card" wx:if="{{selectedMode === 'differentiated'}}">
+    <view class="section-title">差异化营业时间</view>
+    
+    <!-- 工作日类型选择 -->
+    <view class="workday-tabs">
+      <button 
+        class="tab-btn {{selectedWorkdayType === 'weekday' ? 'active' : ''}}" 
+        bindtap="selectWorkdayType" 
+        data-type="weekday"
+      >
+        工作日
+      </button>
+      <button 
+        class="tab-btn {{selectedWorkdayType === 'weekend' ? 'active' : ''}}" 
+        bindtap="selectWorkdayType" 
+        data-type="weekend"
+      >
+        周末
+      </button>
+      <button 
+        class="tab-btn {{selectedWorkdayType === 'holiday' ? 'active' : ''}}" 
+        bindtap="selectWorkdayType" 
+        data-type="holiday"
+      >
+        节假日
+      </button>
+    </view>
+
+    <!-- 选中类型的设置 -->
+    <view class="workday-settings">
+      <!-- 营业状态 -->
+      <view class="form-item">
+        <text class="form-label">{{selectedWorkdayType === 'weekday' ? '工作日' : selectedWorkdayType === 'weekend' ? '周末' : '节假日'}} 状态</text>
+        <view class="status-switch">
+          <text class="status-text">{{workdaySettings[selectedWorkdayType].status === 'open' ? '营业中' : '休息'}}</text>
+          <switch 
+            checked="{{workdaySettings[selectedWorkdayType].status === 'open'}}" 
+            bindchange="toggleWorkdayStatus"
+          />
+        </view>
+      </view>
+
+      <!-- 营业时间列表 -->
+      <view class="time-slots" wx:if="{{workdaySettings[selectedWorkdayType].status === 'open'}}">
+        <view class="time-slot" wx:for="{{workdaySettings[selectedWorkdayType].timeSlots}}" wx:key="index">
+          <view class="time-slot-header">
+            <text class="slot-label">时段 {{index + 1}}</text>
+            <button 
+              class="delete-slot-btn" 
+              wx:if="{{workdaySettings[selectedWorkdayType].timeSlots.length > 1}}" 
+              bindtap="deleteWorkdayTimeSlot" 
+              data-index="{{index}}"
+            >
+              删除
+            </button>
+          </view>
+          <view class="time-picker-container">
+            <picker 
+              class="time-picker" 
+              mode="time" 
+              value="{{item.start}}" 
+              bindchange="updateWorkdayTimeSlot" 
+              data-index="{{index}}" 
+              data-field="start"
+            >
+              <view class="picker-text">开始时间：{{item.start}}</view>
+            </picker>
+            <text class="time-separator">至</text>
+            <picker 
+              class="time-picker" 
+              mode="time" 
+              value="{{item.end}}" 
+              bindchange="updateWorkdayTimeSlot" 
+              data-index="{{index}}" 
+              data-field="end"
+            >
+              <view class="picker-text">结束时间：{{item.end}}</view>
+            </picker>
+          </view>
+        </view>
+        
+        <!-- 添加时段按钮 -->
+        <button class="add-slot-btn" bindtap="addWorkdayTimeSlot">+ 添加营业时段</button>
+      </view>
+    </view>
+
+    <!-- 节假日管理 -->
+    <view class="holiday-management" wx:if="{{selectedWorkdayType === 'holiday'}}">
+      <view class="section-subtitle">节假日管理</view>
+      <button class="manage-holiday-btn" bindtap="manageHolidays">管理节假日</button>
+      <view class="holiday-list" wx:if="{{holidayList.length > 0}}">
+        <view class="holiday-item" wx:for="{{holidayList}}" wx:key="date">
+          <text class="holiday-date">{{item.date}}</text>
+          <text class="holiday-name">{{item.name}}</text>
+        </view>
+      </view>
+    </view>
+  </view>
+
+  <!-- 预览 -->
+  <view class="setting-section card">
+    <view class="section-title">预览</view>
+    <view class="preview-container">
+      <view class="preview-item" wx:for="{{previewDays}}" wx:key="day">
+        <text class="preview-day">{{item.day}}</text>
+        <text class="preview-status">{{item.status === 'open' ? '营业' : '休息'}}</text>
+        <text class="preview-time" wx:if="{{item.status === 'open'}}">{{item.time}}</text>
+      </view>
+    </view>
+  </view>
+</view>

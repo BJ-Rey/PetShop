@@ -1,0 +1,300 @@
+/* pages/merchant/setting/store-setting/store-setting.wxss */
+
+/* 容器样式 */
+.container {
+  padding: env(safe-area-inset-top) 30rpx 30rpx;
+  box-sizing: border-box;
+  background-color: #f5f5f5;
+  min-height: 100vh;
+  font-size: 28rpx;
+  color: #333;
+}
+
+/* 标准操作栏 */
+.standard-action-bar {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 30rpx;
+  padding: 0 10rpx;
+}
+
+.back-btn {
+  background-color: transparent;
+  color: #333;
+  font-size: 28rpx;
+  border: none;
+  padding: 10rpx 20rpx;
+  margin: 0;
+}
+
+.page-title {
+  font-size: 36rpx;
+  font-weight: bold;
+  color: #333;
+  text-align: center;
+  flex: 1;
+  margin: 0 20rpx;
+}
+
+.save-btn {
+  background-color: #1aad19;
+  color: #fff;
+  padding: 15rpx 30rpx;
+  border-radius: 40rpx;
+  font-size: 28rpx;
+  border: none;
+  box-shadow: 0 4rpx 12rpx rgba(26, 173, 25, 0.3);
+  transition: all 0.3s ease;
+  height: 80rpx;
+  line-height: 50rpx;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.save-btn:active {
+  background-color: #179715;
+  transform: scale(0.95);
+}
+
+/* 表单容器 */
+.form-container {
+  background-color: #fff;
+  border-radius: 16rpx;
+  padding: 30rpx;
+  box-shadow: 0 2rpx 12rpx rgba(0, 0, 0, 0.08);
+  margin-bottom: 30rpx;
+}
+
+/* 表单项 */
+.form-item {
+  margin-bottom: 40rpx;
+  position: relative;
+}
+
+.form-label {
+  display: block;
+  font-size: 28rpx;
+  font-weight: 500;
+  color: #333;
+  margin-bottom: 15rpx;
+}
+
+.required {
+  color: #ff3b30;
+}
+
+/* 输入框基础样式 */
+.form-input,
+.form-textarea {
+  width: 100%;
+  padding: 24rpx 32rpx;
+  border: 2rpx solid #e0e0e0;
+  border-radius: 12rpx;
+  font-size: 30rpx;
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+  font-weight: 400;
+  line-height: 1.6;
+  letter-spacing: 0.5rpx;
+  color: #333;
+  box-sizing: border-box;
+  background-color: #fff;
+  transition: all 0.3s ease;
+}
+
+/* 输入框 placeholder 样式 */
+.form-input::placeholder,
+.form-textarea::placeholder {
+  color: #999;
+  font-size: 28rpx;
+  font-weight: 300;
+  opacity: 0.8;
+}
+
+/* 输入框聚焦状态 */
+.form-input:focus,
+.form-textarea:focus {
+  border-color: #07c160;
+  box-shadow: 0 0 0 4rpx rgba(7, 193, 96, 0.12);
+  background-color: #fff;
+  outline: none;
+}
+
+/* 输入框禁用状态 */
+.form-input:disabled,
+.form-textarea:disabled {
+  border-color: #f0f0f0;
+  background-color: #fafafa;
+  color: #999;
+  cursor: not-allowed;
+}
+
+/* 输入框错误状态 */
+.form-input.error,
+.form-textarea.error {
+  border-color: #ff4d4f;
+  box-shadow: 0 0 0 4rpx rgba(255, 77, 79, 0.12);
+}
+
+/* 多行文本框样式 */
+.form-textarea {
+  min-height: 180rpx;
+  max-height: 360rpx;
+  padding: 24rpx 32rpx;
+  line-height: 1.8;
+  resize: vertical;
+  text-align: left;
+  vertical-align: top;
+}
+
+/* 选择器 */
+.form-picker {
+  width: 100%;
+  padding: 24rpx 32rpx;
+  border: 2rpx solid #e0e0e0;
+  border-radius: 12rpx;
+  font-size: 30rpx;
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+  font-weight: 400;
+  line-height: 1.6;
+  letter-spacing: 0.5rpx;
+  color: #333;
+  box-sizing: border-box;
+  background-color: #fff;
+  transition: all 0.3s ease;
+}
+
+.form-picker:active {
+  border-color: #07c160;
+  box-shadow: 0 0 0 4rpx rgba(7, 193, 96, 0.12);
+  background-color: #fff;
+}
+
+.picker-text {
+  color: #333;
+}
+
+/* 错误文本 */
+.error-text {
+  display: block;
+  font-size: 24rpx;
+  color: #ff3b30;
+  margin-top: 10rpx;
+}
+
+/* 状态切换 */
+.status-switch {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 20rpx 0;
+}
+
+.status-text {
+  font-size: 28rpx;
+  color: #333;
+}
+
+/* 营业时间显示 */
+.business-hours-display {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 20rpx 30rpx;
+  border: 2rpx solid #e0e0e0;
+  border-radius: 12rpx;
+  background-color: #fff;
+  transition: all 0.3s ease;
+}
+
+.business-hours-display:active {
+  border-color: #1aad19;
+  box-shadow: 0 0 0 4rpx rgba(26, 173, 25, 0.1);
+}
+
+.hours-text {
+  color: #333;
+  font-size: 28rpx;
+  flex: 1;
+}
+
+.edit-arrow {
+  color: #999;
+  font-size: 32rpx;
+}
+
+/* 浮动保存按钮样式 */
+.floating-save-btn {
+  position: fixed;
+  bottom: 40rpx;
+  right: 40rpx;
+  display: flex;
+  align-items: center;
+  gap: 12rpx;
+  padding: 24rpx 36rpx;
+  background-color: #07c160;
+  color: #fff;
+  font-size: 32rpx;
+  border: none;
+  border-radius: 40rpx;
+  box-shadow: 0 8rpx 20rpx rgba(0, 0, 0, 0.2);
+  z-index: 1000;
+  transition: all 0.3s ease;
+}
+
+.floating-save-btn:hover {
+  background-color: #05b056;
+  transform: translateY(-4rpx);
+  box-shadow: 0 12rpx 28rpx rgba(0, 0, 0, 0.25);
+}
+
+.floating-save-btn:active {
+  transform: translateY(0);
+  box-shadow: 0 6rpx 16rpx rgba(0, 0, 0, 0.2);
+}
+
+.save-icon {
+  font-size: 36rpx;
+}
+
+/* 响应式设计 */
+@media (max-width: 375px) {
+  .container {
+    padding: env(safe-area-inset-top) 20rpx 20rpx;
+  }
+  
+  .standard-action-bar {
+    margin-bottom: 20rpx;
+  }
+  
+  .page-title {
+    font-size: 32rpx;
+  }
+  
+  .form-container {
+    padding: 20rpx;
+  }
+  
+  .form-item {
+    margin-bottom: 30rpx;
+  }
+  
+  .form-input,
+  .form-textarea,
+  .form-picker {
+    padding: 15rpx 25rpx;
+    font-size: 26rpx;
+  }
+  
+  .floating-save-btn {
+    bottom: 30rpx;
+    right: 30rpx;
+    padding: 20rpx 30rpx;
+    font-size: 28rpx;
+  }
+  
+  .save-icon {
+    font-size: 32rpx;
+  }
+}

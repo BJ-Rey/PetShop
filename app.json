@@ -1,0 +1,97 @@
+{
+  "pages": [
+    "pages/index/index",
+    "pages/login/login",
+    "pages/pet/list/list",
+    "pages/pet/detail/detail",
+    "pages/pet/add/add",
+    "pages/service/list/list",
+    "pages/service/appointment/appointment",
+    "pages/mine/mine",
+    "pages/mall/list/list",
+    "pages/mall/detail/detail",
+    "pages/cart/cart",
+    "pages/order/list/list",
+    "pages/order/detail/detail",
+    "pages/comment/add/add",
+    "pages/aftersale/apply/apply",
+    "pages/search/result/result",
+    "pages/mine/address/address",
+    "pages/mine/address/add/add",
+    "pages/mine/address/edit/edit",
+    "pages/service/detail/detail",
+    "pages/service/contact/contact"
+  ],
+  "subPackages": [
+    {
+      "root": "pages/merchant",
+      "pages": [
+        "dashboard/dashboard",
+        "pet/upload/upload",
+        "pet/manage/manage",
+        "pet/manage/manage-new",
+        "pet/manage/manage-simple",
+        "pet/detail/detail",
+        "pet/edit/edit",
+        "order/order",
+        "order/detail/detail",
+        "product/manage/manage",
+        "product/add/add",
+        "product/edit/edit",
+        "service/manage/manage",
+        "service/add/add",
+        "service/edit/edit",
+        "finance/finance",
+        "finance/transaction-list/transaction-list",
+        "setting/setting",
+        "setting/permission/permission",
+        "setting/log/log"
+      ]
+    }
+  ],
+  "preloadRule": {
+    "pages/mine/mine": {
+      "network": "all",
+      "packages": ["pages/merchant"]
+    }
+  },
+  "usingComponents": {
+    "global-cart": "/components/global-cart/global-cart",
+    "auth-modal": "/components/auth-modal/auth-modal"
+  },
+  "window": {
+    "backgroundTextStyle": "light",
+    "navigationBarBackgroundColor": "#fff",
+    "navigationBarTitleText": "猫咪专属商城",
+    "navigationBarTextStyle": "black",
+    "navigationStyle": "custom",
+    "backgroundColor": "#f5f5f5",
+    "enablePullDownRefresh": true,
+    "onReachBottomDistance": 50
+  },
+  "tabBar": {
+    "color": "#999",
+    "selectedColor": "#1aad19",
+    "borderStyle": "black",
+    "backgroundColor": "#fff",
+    "list": [
+      {
+        "pagePath": "pages/index/index",
+        "text": "首页"
+      },
+      {
+      "pagePath": "pages/mall/list/list",
+      "text": "商城"
+    },
+    {
+      "pagePath": "pages/service/list/list",
+      "text": "服务"
+    },
+      {
+        "pagePath": "pages/mine/mine",
+        "text": "我的"
+      }
+    ]
+  },
+  "sitemapLocation": "sitemap.json"
+}

@@ -1,0 +1,4 @@
+<!--components/pet-status-tag/pet-status-tag.wxml-->
+<view class="pet-status {{status}}" catchtap="onTap">
+  <text class="status-text">{{statusText}}</text>
+</view>

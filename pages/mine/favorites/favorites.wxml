@@ -1,0 +1,104 @@
+<!--pages/mine/favorites/favorites.wxml-->
+<view class="container">
+  <!-- 顶部操作栏 -->
+  <view class="standard-action-bar">
+    <text class="standard-back-btn" bindtap="navigateBack">←</text>
+    <text class="page-title">我的收藏</text>
+  </view>
+
+  <!-- 收藏分类 -->
+  <view class="tab-bar">
+    <view class="tab-btn {{activeTab === 'services' ? 'active' : ''}}" bindtap="switchTab" data-tab="services">服务</view>
+    <view class="tab-btn {{activeTab === 'products' ? 'active' : ''}}" bindtap="switchTab" data-tab="products">商品</view>
+    <view class="tab-btn {{activeTab === 'pets' ? 'active' : ''}}" bindtap="switchTab" data-tab="pets">宠物</view>
+  </view>
+
+  <!-- 排序控制 -->
+  <view class="sort-bar">
+    <view class="sort-item {{sortType === 'time' ? 'active' : ''}}" bindtap="switchSort" data-type="time">按时间</view>
+    <view class="sort-item {{sortType === 'name' ? 'active' : ''}}" bindtap="switchSort" data-type="name">按名称</view>
+  </view>
+
+  <!-- 通用列表渲染 -->
+  <view class="favorites-list-container">
+    <!-- 服务列表 -->
+    <view class="favorites-list" wx:if="{{activeTab === 'services'}}">
+      <block wx:if="{{services.length > 0}}">
+        <view wx:for="{{services}}" wx:key="id" class="favorite-item">
+          <image src="{{item.image}}" class="item-image" mode="aspectFill"></image>
+          <view class="item-info">
+            <text class="item-name">{{item.name}}</text>
+            <text class="item-description">{{item.description}}</text>
+            <view class="item-meta">
+              <text class="item-price">¥{{item.price}}</text>
+              <text class="item-merchant">{{item.merchantName}}</text>
+            </view>
+          </view>
+          <view class="item-actions">
+            <button class="action-btn" bindtap="navigateToServiceDetail" data-id="{{item.id}}">详情</button>
+            <button class="remove-btn" bindtap="handleRemove" data-id="{{item.id}}">取消</button>
+          </view>
+        </view>
+      </block>
+      <view class="empty-state" wx:else>
+        <text class="empty-text">暂无服务收藏</text>
+        <button class="btn btn-primary" bindtap="navigateToServiceList">去看看</button>
+      </view>
+    </view>
+
+    <!-- 商品列表 -->
+    <view class="favorites-list" wx:elif="{{activeTab === 'products'}}">
+      <block wx:if="{{products.length > 0}}">
+        <view wx:for="{{products}}" wx:key="id" class="favorite-item">
+          <image src="{{item.image}}" class="item-image" mode="aspectFill"></image>
+          <view class="item-info" bindtap="navigateToProductDetail" data-id="{{item.id}}">
+            <text class="item-name">{{item.name}}</text>
+            <text class="item-description">{{item.description}}</text>
+            <view class="item-meta">
+              <text class="item-price">¥{{item.price}}</text>
+              <text class="item-sales">销量 {{item.sales}}</text>
+            </view>
+          </view>
+           <view class="item-actions">
+            <button class="remove-btn" bindtap="handleRemove" data-id="{{item.id}}">取消</button>
+          </view>
+        </view>
+      </block>
+      <view class="empty-state" wx:else>
+        <text class="empty-text">暂无商品收藏</text>
+        <button class="btn btn-primary" bindtap="navigateToMallList">去看看</button>
+      </view>
+    </view>
+
+    <!-- 宠物列表 -->
+    <view class="favorites-list" wx:elif="{{activeTab === 'pets'}}">
+      <block wx:if="{{pets.length > 0}}">
+        <view wx:for="{{pets}}" wx:key="id" class="favorite-item">
+          <image src="{{item.image}}" class="item-image" mode="aspectFill"></image>
+          <view class="item-info" bindtap="navigateToPetDetail" data-id="{{item.id}}">
+            <text class="item-name">{{item.name}}</text>
+            <text class="item-description">{{item.description}}</text>
+            <view class="item-meta">
+              <text class="item-price">¥{{item.price}}</text>
+              <view class="pet-meta">
+                <text class="meta-item">{{item.breed}}</text>
+                <text class="meta-item">{{item.age}}</text>
+                <text class="meta-item">{{item.gender === 'male' ? '公' : '母'}}</text>
+              </view>
+            </view>
+          </view>
+           <view class="item-actions">
+            <button class="remove-btn" bindtap="handleRemove" data-id="{{item.id}}">取消</button>
+          </view>
+        </view>
+      </block>
+      <view class="empty-state" wx:else>
+        <text class="empty-text">暂无宠物收藏</text>
+        <button class="btn btn-primary" bindtap="navigateToPetList">去看看</button>
+      </view>
+    </view>
+    
+    <view class="loading-more" wx:if="{{hasMore}}">加载中...</view>
+    <view class="no-more" wx:else>没有更多了</view>
+  </view>
+</view>

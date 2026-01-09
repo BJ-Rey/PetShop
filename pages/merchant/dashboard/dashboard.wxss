@@ -1,0 +1,301 @@
+/* pages/merchant/dashboard/dashboard.wxss */
+
+/* 容器样式 */
+.container {
+  padding: 20rpx;
+  box-sizing: border-box;
+  background-color: #f5f5f5;
+  min-height: 100vh;
+}
+
+/* 卡片样式 */
+.card {
+  background-color: #fff;
+  border-radius: 16rpx;
+  padding: 30rpx;
+  margin-bottom: 30rpx;
+  box-shadow: 0 2rpx 12rpx rgba(0, 0, 0, 0.08);
+  transition: all 0.3s ease;
+}
+
+.card:active {
+  transform: translateY(-4rpx);
+  box-shadow: 0 8rpx 20rpx rgba(0, 0, 0, 0.15);
+}
+
+/* 标准操作栏 */
+.standard-action-bar {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 30rpx;
+  padding: 0 10rpx;
+}
+
+.page-title {
+  font-size: 36rpx;
+  font-weight: bold;
+  color: #333;
+}
+
+.logout-btn {
+  font-size: 28rpx;
+  color: #666;
+  background-color: transparent;
+  padding: 0;
+  margin: 0;
+  min-width: auto;
+  height: auto;
+  line-height: normal;
+}
+
+.logout-btn:hover {
+  color: #ff3b30;
+}
+
+/* 商家信息卡片 */
+.merchant-card {
+  display: flex;
+  flex-direction: column;
+}
+
+.merchant-header {
+  display: flex;
+  align-items: center;
+  margin-bottom: 20rpx;
+}
+
+.merchant-logo {
+  width: 120rpx;
+  height: 120rpx;
+  border-radius: 50%;
+  margin-right: 25rpx;
+  object-fit: cover;
+  border: 4rpx solid #1aad19;
+  box-shadow: 0 4rpx 12rpx rgba(26, 173, 25, 0.2);
+}
+
+.merchant-basic-info {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+}
+
+.merchant-name {
+  font-size: 36rpx;
+  font-weight: bold;
+  color: #333;
+  margin-bottom: 10rpx;
+}
+
+.merchant-phone, .merchant-address {
+  font-size: 28rpx;
+  color: #666;
+  margin-bottom: 8rpx;
+}
+
+.merchant-description {
+  font-size: 28rpx;
+  color: #999;
+  line-height: 1.5;
+  margin-bottom: 25rpx;
+}
+
+/* 商家统计信息 */
+.merchant-stats {
+  display: flex;
+  justify-content: space-around;
+  padding-top: 25rpx;
+  border-top: 2rpx solid #f0f0f0;
+}
+
+.stat-item {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.stat-value {
+  font-size: 48rpx;
+  font-weight: bold;
+  color: #1aad19;
+  margin-bottom: 8rpx;
+}
+
+.stat-label {
+  font-size: 24rpx;
+  color: #666;
+}
+
+/* 功能菜单区域 */
+.menu-section {
+  margin-bottom: 30rpx;
+}
+
+.section-title {
+  font-size: 32rpx;
+  font-weight: bold;
+  color: #333;
+  margin-bottom: 25rpx;
+  padding: 0 10rpx;
+}
+
+/* 功能菜单网格布局 */
+.menu-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(240rpx, 1fr));
+  gap: 25rpx;
+  padding: 0 10rpx;
+}
+
+/* 功能菜单项样式 */
+.menu-item {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 30rpx 20rpx;
+  text-align: center;
+  cursor: pointer;
+}
+
+.menu-icon {
+  font-size: 64rpx;
+  margin-bottom: 20rpx;
+}
+
+.menu-name {
+  font-size: 30rpx;
+  font-weight: 500;
+  color: #333;
+  margin-bottom: 15rpx;
+}
+
+.menu-description {
+  font-size: 24rpx;
+  color: #999;
+  line-height: 1.4;
+  display: -webkit-box;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 2;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+/* 最近动态 */
+.activity-section {
+  margin-bottom: 30rpx;
+}
+
+.activity-list {
+  display: flex;
+  flex-direction: column;
+  gap: 20rpx;
+}
+
+.activity-item {
+  display: flex;
+  flex-direction: column;
+  gap: 10rpx;
+  padding-bottom: 20rpx;
+  border-bottom: 2rpx solid #f0f0f0;
+}
+
+.activity-item:last-child {
+  border-bottom: none;
+  padding-bottom: 0;
+}
+
+.activity-time {
+  font-size: 24rpx;
+  color: #999;
+}
+
+.activity-content {
+  font-size: 28rpx;
+  color: #666;
+  line-height: 1.5;
+}
+
+/* 响应式设计 */
+@media (max-width: 375px) {
+  .menu-grid {
+    grid-template-columns: repeat(2, 1fr);
+    gap: 20rpx;
+  }
+  
+  .menu-item {
+    padding: 25rpx 15rpx;
+  }
+  
+  .menu-icon {
+    font-size: 56rpx;
+    margin-bottom: 15rpx;
+  }
+  
+  .menu-name {
+    font-size: 28rpx;
+    margin-bottom: 12rpx;
+  }
+  
+  .menu-description {
+    font-size: 22rpx;
+  }
+  
+  .merchant-logo {
+    width: 100rpx;
+    height: 100rpx;
+    margin-right: 20rpx;
+  }
+  
+  .merchant-name {
+    font-size: 32rpx;
+  }
+  
+  .merchant-phone, .merchant-address {
+    font-size: 26rpx;
+  }
+  
+  .stat-value {
+    font-size: 40rpx;
+  }
+  
+  .stat-label {
+    font-size: 22rpx;
+  }
+}
+
+@media (min-width: 768px) {
+  .menu-grid {
+    grid-template-columns: repeat(3, 1fr);
+    gap: 30rpx;
+  }
+  
+  .container {
+    max-width: 1200rpx;
+    margin: 0 auto;
+    padding: 30rpx;
+  }
+  
+  .merchant-card {
+    flex-direction: row;
+    align-items: center;
+  }
+  
+  .merchant-header {
+    margin-bottom: 0;
+    margin-right: 40rpx;
+  }
+  
+  .merchant-description {
+    margin-bottom: 0;
+    margin-right: 40rpx;
+  }
+  
+  .merchant-stats {
+    border-top: none;
+    border-left: 2rpx solid #f0f0f0;
+    padding-top: 0;
+    padding-left: 40rpx;
+    margin-left: auto;
+  }
+}

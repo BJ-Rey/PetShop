@@ -1,0 +1,43 @@
+.global-cart-btn {
+  position: fixed;
+  right: 30rpx;
+  bottom: 120rpx; /* 调整高度避免遮挡底部导航栏 */
+  width: 100rpx;
+  height: 100rpx;
+  background: #1aad19;
+  border-radius: 50%;
+  box-shadow: 0 4rpx 16rpx rgba(26, 173, 25, 0.4);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 999;
+  transition: all 0.2s ease;
+}
+
+.cart-hover {
+    transform: scale(0.9);
+    background: #179b16;
+}
+
+.cart-icon-text {
+  font-size: 50rpx;
+  color: #fff;
+  line-height: 1;
+}
+
+.cart-count {
+  position: absolute;
+  top: -5rpx;
+  right: -5rpx;
+  background: #e64340;
+  color: #fff;
+  font-size: 24rpx;
+  min-width: 36rpx;
+  height: 36rpx;
+  border-radius: 18rpx;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0 6rpx;
+  box-sizing: border-box;
+}

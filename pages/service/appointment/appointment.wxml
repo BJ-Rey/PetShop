@@ -1,0 +1,159 @@
+<!--pages/service/appointment/appointment.wxml-->
+<wxs module="utils">
+  function includes(arr, item) {
+    return arr.indexOf(item) > -1;
+  }
+  module.exports.includes = includes;
+</wxs>
+<view class="container">
+  <!-- 顶部操作栏 -->
+  <view class="standard-action-bar">
+    <text class="standard-back-btn" bindtap="navigateBack">←</text>
+    <text class="page-title">{{petId ? '预约看宠' : '服务预约'}}</text>
+  </view>
+
+  <!-- 服务信息 (服务预约时显示) -->
+  <view class="service-info-section card" wx:if="{{!petId}}">
+    <image src="{{service.image}}" class="service-image" mode="aspectFill"></image>
+    <view class="service-details">
+      <text class="service-name">{{service.name}}</text>
+      <text class="service-description">{{service.description}}</text>
+      <view class="service-meta">
+        <text class="service-price">¥{{service.price}}</text>
+        <text class="service-duration">{{service.duration}}</text>
+        <text class="service-merchant">{{service.merchantName}}</text>
+      </view>
+    </view>
+  </view>
+
+  <!-- 宠物信息 (预约看宠时显示) -->
+  <view class="service-info-section card" wx:if="{{petId}}">
+      <view class="service-details" style="padding: 20rpx;">
+          <text class="service-name" style="font-size: 32rpx; font-weight: bold;">预约看宠</text>
+          <text class="service-description" style="color: #666; margin-top: 10rpx;">商家：{{merchantName}}</text>
+          <view class="service-meta" style="margin-top: 15rpx;">
+              <text class="service-price" style="color: #1aad19;">免费预约</text>
+          </view>
+      </view>
+  </view>
+
+  <!-- 预约时间选择 -->
+  <view class="appointment-time-section card">
+    <view class="section-title">预约时间</view>
+    <view class="time-selector-modern">
+      <!-- 日期选择 -->
+      <view class="date-selector-modern">
+        <view class="selector-header">
+          <text class="selector-title">选择日期</text>
+          <text class="date-display">{{formattedDate}}</text>
+        </view>
+        <picker mode="date" value="{{selectedDate}}" start="{{startDate}}" end="{{endDate}}" bindchange="onDateChange" class="calendar-picker">
+          <view class="calendar-placeholder">
+            <text class="calendar-icon">📅</text>
+            <text class="picker-hint">点击选择日期</text>
+          </view>
+        </picker>
+        
+        <!-- 可用日期提示 -->
+        <view class="available-dates-hint" style="margin-top: 20rpx; font-size: 24rpx; color: #666;">
+            <text>近期推荐日期：</text>
+            <scroll-view scroll-x="true" style="white-space: nowrap; margin-top: 10rpx;">
+                <block wx:for="{{availableDates}}" wx:key="*this">
+                    <text style="display: inline-block; padding: 5rpx 15rpx; background: #e0f7fa; color: #0277bd; border-radius: 8rpx; margin-right: 10rpx;">{{item}}</text>
+                </block>
+            </scroll-view>
+        </view>
+
+        <!-- 添加提示文案 -->
+        <view class="appointment-hint">
+          <text class="hint-icon">💡</text>
+          <text class="hint-text">预约仅选择日期，具体服务时间需与商家沟通后确定</text>
+        </view>
+      </view>
+    </view>
+  </view>
+
+  <!-- 宠物选择 (仅服务预约时显示，预约看宠不需要选择自己的宠物) -->
+  <view class="pet-select-section card" wx:if="{{!petId}}">
+    <view class="section-title">选择宠物 (可多选)</view>
+    
+    <!-- 加载中 -->
+    <view class="loading-state" wx:if="{{isLoadingPets}}">
+        <view class="loading-spinner"></view>
+        <text>加载宠物档案...</text>
+    </view>
+
+    <!-- 加载失败 -->
+    <view class="error-state" wx:elif="{{loadPetsError}}">
+        <text>加载失败</text>
+        <button class="btn btn-small btn-default" bindtap="retryLoadPets">重试</button>
+    </view>
+
+    <!-- 宠物列表 -->
+    <block wx:elif="{{pets.length > 0}}">
+      <!-- 宠物缩略图滚动选择 -->
+      <scroll-view scroll-x="true" class="pet-scroll-container" enable-flex>
+        <view class="pet-thumbnail-list">
+          <block wx:for="{{displayPets}}" wx:key="id">
+            <view class="pet-thumbnail-item {{utils.includes(selectedPetIds, item.id) ? 'active' : ''}}" 
+                  bindtap="selectPet" 
+                  data-pet-id="{{item.id}}">
+              <image src="{{item.avatar}}" class="pet-thumbnail" mode="aspectFill"></image>
+              <text class="pet-thumbnail-name">{{item.name}}</text>
+              <view class="select-indicator" wx:if="{{utils.includes(selectedPetIds, item.id)}}">✓</view>
+            </view>
+          </block>
+          <view class="pet-thumbnail-item add-pet" bindtap="navigateToAddPet">
+            <view class="add-pet-icon">+</view>
+            <text class="pet-thumbnail-name">添加</text>
+          </view>
+        </view>
+      </scroll-view>
+      
+      <!-- 当前选中的宠物信息 -->
+      <view class="selected-pet-info" wx:if="{{selectedPets.length > 0}}">
+        <text class="info-label">已选择 {{selectedPets.length}} 只宠物:</text>
+        <view class="selected-pets-tags">
+            <text class="pet-tag" wx:for="{{selectedPets}}" wx:key="id">{{item.name}}</text>
+        </view>
+      </view>
+    </block>
+    
+    <!-- 无宠物 -->
+    <block wx:else>
+      <view class="no-pets">
+        <text>您还没有添加宠物</text>
+        <button class="btn btn-primary" bindtap="navigateToAddPet">立即创建宠物档案</button>
+      </view>
+    </block>
+  </view>
+
+  <!-- 联系人信息 -->
+  <view class="contact-info-section card">
+    <view class="section-title">联系人信息</view>
+    <view class="form-item">
+      <text class="form-label">联系人姓名：</text>
+      <input type="text" placeholder="请输入联系人姓名" value="{{contact.name}}" bindinput="onNameInput" class="form-input" />
+    </view>
+    <view class="form-item">
+      <text class="form-label">联系电话：</text>
+      <input type="number" placeholder="请输入联系电话" value="{{contact.phone}}" bindinput="onPhoneInput" class="form-input" />
+    </view>
+  </view>
+
+  <!-- 备注信息 -->
+  <view class="remark-section card">
+    <view class="section-title">备注信息（选填）</view>
+    <textarea placeholder="请输入备注信息" value="{{remark}}" bindinput="onRemarkInput" class="remark-textarea" maxlength="200" />
+  </view>
+
+  <!-- 预约提交 -->
+  <view class="submit-section">
+    <button class="btn btn-primary submit-btn" bindtap="submitAppointment" wx:if="{{petId || pets.length > 0}}">
+      提交预约
+    </button>
+    <button class="btn btn-primary submit-btn" bindtap="navigateToAddPet" wx:else>
+      添加宠物后预约
+    </button>
+  </view>
+</view>

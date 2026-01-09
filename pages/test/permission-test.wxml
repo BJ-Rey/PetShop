@@ -1,0 +1,56 @@
+<!-- pages/test/permission-test.wxml -->
+<view class="container">
+  <!-- 顶部操作栏 -->
+  <view class="standard-action-bar">
+    <text class="standard-back-btn" bindtap="navigateBack">←</text>
+    <text class="page-title">权限测试</text>
+  </view>
+
+  <!-- 测试页面内容 -->
+  <view class="test-content">
+    <view class="role-info">
+      <view class="section-title">当前用户角色</view>
+      <view class="role-display">
+        <text class="role-text">{{currentRole === 'merchant' ? '🛍️ 商家' : currentRole === 'user' ? '👤 普通用户' : '👥 游客'}}</text>
+      </view>
+      <view class="permission-status">
+        <text class="permission-text">{{hasPermission ? '✅ 拥有商家权限' : '❌ 没有商家权限'}}</text>
+      </view>
+    </view>
+
+    <view class="test-actions">
+      <view class="section-title">权限测试</view>
+      
+      <button class="test-btn" bindtap="testMerchantPermission">
+        测试商家权限
+      </button>
+      
+      <button class="test-btn" bindtap="testUserPermission">
+        测试普通用户权限
+      </button>
+      
+      <button class="test-btn" bindtap="goToMerchantDashboard">
+        跳转到商家首页
+      </button>
+      
+      <button class="test-btn" bindtap="refreshRole">
+        刷新角色信息
+      </button>
+    </view>
+
+    <view class="test-result">
+      <view class="section-title">测试结果</view>
+      <view class="result-text">{{testResult || '请点击测试按钮开始测试'}}</view>
+    </view>
+
+    <view class="test-instructions">
+      <view class="section-title">测试说明</view>
+      <view class="instructions-text">
+        <text>1. 商家测试账号：18247122807，验证码：123456</text>
+        <text>2. 普通用户测试账号：13848836315，验证码：123456</text>
+        <text>3. 点击相应按钮进行权限测试</text>
+        <text>4. 跳转到商家首页验证商家权限</text>
+      </view>
+    </view>
+  </view>
+</view>

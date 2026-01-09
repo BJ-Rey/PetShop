@@ -1,0 +1,116 @@
+/* pages/pet/add/add.wxss */
+.container {
+  padding: 20rpx;
+  background-color: #f5f5f5;
+  min-height: 100vh;
+}
+
+.card {
+  background: #fff;
+  border-radius: 16rpx;
+  padding: 30rpx;
+  box-shadow: 0 2rpx 8rpx rgba(0,0,0,0.05);
+}
+
+.form-item {
+  margin-bottom: 40rpx;
+}
+
+.label {
+  font-size: 28rpx;
+  color: #333;
+  margin-bottom: 15rpx;
+  font-weight: bold;
+}
+
+.required {
+  color: #ff4d4f;
+}
+
+input {
+  border: 1rpx solid #eee;
+  padding: 20rpx;
+  border-radius: 8rpx;
+  font-size: 28rpx;
+}
+
+.picker {
+  border: 1rpx solid #eee;
+  padding: 20rpx;
+  border-radius: 8rpx;
+  font-size: 28rpx;
+  color: #666;
+}
+
+.radio-group {
+  display: flex;
+  gap: 40rpx;
+}
+
+.radio {
+  font-size: 28rpx;
+}
+
+/* 图片上传 */
+.image-list {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 20rpx;
+}
+
+.image-wrapper {
+  width: 160rpx;
+  height: 160rpx;
+  position: relative;
+}
+
+.image-wrapper image {
+  width: 100%;
+  height: 100%;
+  border-radius: 8rpx;
+}
+
+.delete-btn {
+  position: absolute;
+  top: -10rpx;
+  right: -10rpx;
+  background: rgba(0,0,0,0.5);
+  color: #fff;
+  width: 40rpx;
+  height: 40rpx;
+  border-radius: 50%;
+  text-align: center;
+  line-height: 38rpx;
+  font-size: 30rpx;
+}
+
+.add-btn {
+  width: 160rpx;
+  height: 160rpx;
+  border: 2rpx dashed #ddd;
+  border-radius: 8rpx;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 60rpx;
+  color: #ddd;
+}
+
+/* 提交按钮 */
+.submit-section {
+  margin-top: 60rpx;
+}
+
+.submit-btn {
+  background: linear-gradient(135deg, #FFA726 0%, #FF7043 100%);
+  color: #fff;
+  border-radius: 8px; /* 统一圆角 */
+  padding: 12px 0; /* 统一内边距 */
+  font-size: 16px; /* 统一字体 */
+  font-weight: bold;
+  box-shadow: 0 4rpx 12rpx rgba(255, 167, 38, 0.3);
+}
+
+.submit-btn:active {
+  opacity: 0.9;
+}

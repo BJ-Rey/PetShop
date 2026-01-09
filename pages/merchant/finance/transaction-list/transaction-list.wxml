@@ -1,0 +1,242 @@
+<!-- pages/merchant/finance/transaction-list/transaction-list.wxml -->
+<wxs module="utils">
+  module.exports.formatDate = function(dateString) {
+    if (!dateString) return '';
+    var date = getDate(dateString);
+    var year = date.getFullYear();
+    var month = date.getMonth() + 1;
+    var day = date.getDate();
+    var hour = date.getHours();
+    var minute = date.getMinutes();
+    
+    if (month < 10) month = '0' + month;
+    if (day < 10) day = '0' + day;
+    if (hour < 10) hour = '0' + hour;
+    if (minute < 10) minute = '0' + minute;
+    
+    return year + '-' + month + '-' + day + ' ' + hour + ':' + minute;
+  }
+</wxs>
+
+<view class="container">
+  <!-- 顶部操作栏 -->
+  <view class="standard-action-bar">
+    <text class="standard-back-btn" bindtap="navigateBack">←</text>
+    <text class="page-title">交易明细</text>
+    <button class="logout-btn" bindtap="logout">退出登录</button>
+  </view>
+
+  <!-- 搜索和筛选栏 -->
+  <view class="search-filter-bar">
+    <input 
+      class="search-input" 
+      placeholder="搜索交易描述" 
+      bindinput="onSearch" 
+      value="{{filter.keyword}}"
+    />
+    <button class="filter-btn" bindtap="toggleFilterPanel">
+      <text class="filter-icon">🔍</text>
+      <text class="filter-text">筛选</text>
+    </button>
+  </view>
+
+  <!-- 筛选面板 -->
+  <view class="filter-panel" wx:if="{{showFilterPanel}}">
+    <view class="filter-section">
+      <text class="filter-title">交易类型</text>
+      <view class="filter-options">
+        <view 
+          class="filter-option {{filter.type === 'all' ? 'active' : ''}}" 
+          bindtap="changeFilter" 
+          data-type="type"
+          data-value="all"
+        >
+          全部
+        </view>
+        <view 
+          class="filter-option {{filter.type === 'income' ? 'active' : ''}}" 
+          bindtap="changeFilter" 
+          data-type="type"
+          data-value="income"
+        >
+          收入
+        </view>
+        <view 
+          class="filter-option {{filter.type === 'expense' ? 'active' : ''}}" 
+          bindtap="changeFilter" 
+          data-type="type"
+          data-value="expense"
+        >
+          支出
+        </view>
+      </view>
+    </view>
+    
+    <view class="filter-section">
+      <text class="filter-title">时间范围</text>
+      <view class="filter-options">
+        <view 
+          class="filter-option {{filter.timeRange === 'today' ? 'active' : ''}}" 
+          bindtap="changeFilter" 
+          data-type="timeRange"
+          data-value="today"
+        >
+          今天
+        </view>
+        <view 
+          class="filter-option {{filter.timeRange === 'week' ? 'active' : ''}}" 
+          bindtap="changeFilter" 
+          data-type="timeRange"
+          data-value="week"
+        >
+          本周
+        </view>
+        <view 
+          class="filter-option {{filter.timeRange === 'month' ? 'active' : ''}}" 
+          bindtap="changeFilter" 
+          data-type="timeRange"
+          data-value="month"
+        >
+          本月
+        </view>
+        <view 
+          class="filter-option {{filter.timeRange === 'quarter' ? 'active' : ''}}" 
+          bindtap="changeFilter" 
+          data-type="timeRange"
+          data-value="quarter"
+        >
+          本季度
+        </view>
+      </view>
+    </view>
+    
+    <view class="filter-section">
+      <text class="filter-title">交易状态</text>
+      <view class="filter-options">
+        <view 
+          class="filter-option {{filter.status === 'all' ? 'active' : ''}}" 
+          bindtap="changeFilter" 
+          data-type="status"
+          data-value="all"
+        >
+          全部
+        </view>
+        <view 
+          class="filter-option {{filter.status === 'completed' ? 'active' : ''}}" 
+          bindtap="changeFilter" 
+          data-type="status"
+          data-value="completed"
+        >
+          已完成
+        </view>
+        <view 
+          class="filter-option {{filter.status === 'processing' ? 'active' : ''}}" 
+          bindtap="changeFilter" 
+          data-type="status"
+          data-value="processing"
+        >
+          处理中
+        </view>
+        <view 
+          class="filter-option {{filter.status === 'failed' ? 'active' : ''}}" 
+          bindtap="changeFilter" 
+          data-type="status"
+          data-value="failed"
+        >
+          失败
+        </view>
+      </view>
+    </view>
+    
+    <view class="filter-actions">
+      <button class="reset-btn" bindtap="resetFilter">重置</button>
+      <button class="confirm-btn" type="primary" bindtap="applyFilter">确认</button>
+    </view>
+  </view>
+
+  <!-- 统计概览 -->
+  <view class="stats-section">
+    <view class="stat-item">
+      <text class="stat-label">总笔数</text>
+      <text class="stat-value">{{stats.totalCount}}</text>
+    </view>
+    <view class="stat-item">
+      <text class="stat-label">总收入</text>
+      <text class="stat-value income">+¥{{stats.totalIncome}}</text>
+    </view>
+    <view class="stat-item">
+      <text class="stat-label">总支出</text>
+      <text class="stat-value expense">-¥{{stats.totalExpense}}</text>
+    </view>
+    <view class="stat-item">
+      <text class="stat-label">净收入</text>
+      <text class="stat-value {{stats.netIncome >= 0 ? 'income' : 'expense'}}">
+        {{stats.netIncome >= 0 ? '+' : ''}}¥{{stats.netIncome}}
+      </text>
+    </view>
+  </view>
+
+  <!-- 排序栏 -->
+  <view class="sort-bar">
+    <view 
+      class="sort-item {{sortField === 'createdAt' ? 'active' : ''}}" 
+      bindtap="changeSort" 
+      data-field="createdAt"
+    >
+      <text>时间</text>
+      <text class="sort-icon">{{sortField === 'createdAt' ? (sortOrder === 'desc' ? '↓' : '↑') : ''}}</text>
+    </view>
+    <view 
+      class="sort-item {{sortField === 'amount' ? 'active' : ''}}" 
+      bindtap="changeSort" 
+      data-field="amount"
+    >
+      <text>金额</text>
+      <text class="sort-icon">{{sortField === 'amount' ? (sortOrder === 'desc' ? '↓' : '↑') : ''}}</text>
+    </view>
+  </view>
+
+  <!-- 交易列表 -->
+  <view class="transaction-list">
+    <view class="empty-state" wx:if="{{!isLoading && transactions.length === 0}}">
+      <text class="empty-icon">💸</text>
+      <text class="empty-text">暂无交易记录</text>
+    </view>
+    
+    <view class="loading-state" wx:if="{{isLoading}}">
+      <text class="loading-text">加载中...</text>
+    </view>
+    
+    <block wx:else>
+      <view class="transaction-item card" wx:for="{{transactions}}" wx:key="id">
+        <view class="transaction-header">
+          <view class="transaction-type-badge {{item.type === 'income' ? 'income' : 'expense'}}">
+            {{item.type === 'income' ? '收入' : '支出'}}
+          </view>
+          <view class="transaction-status-badge {{item.status}}">
+            {{item.status === 'completed' ? '已完成' : item.status === 'processing' ? '处理中' : '失败'}}
+          </view>
+        </view>
+        
+        <view class="transaction-content">
+          <text class="transaction-desc">{{item.description}}</text>
+          <text class="transaction-amount {{item.type === 'income' ? 'income' : 'expense'}}">
+            {{item.type === 'income' ? '+' : '-'}}¥{{item.amount}}
+          </text>
+        </view>
+        
+        <view class="transaction-footer">
+          <text class="transaction-time">{{utils.formatDate(item.createdAt)}}</text>
+          <button class="detail-btn" bindtap="viewTransactionDetail" data-id="{{item.id}}">
+            详情
+          </button>
+        </view>
+      </view>
+    </block>
+  </view>
+
+  <!-- 导出按钮 -->
+  <view class="export-section" wx:if="{{transactions.length > 0}}">
+    <button class="export-btn" type="primary" bindtap="exportTransactions">导出交易记录</button>
+  </view>
+</view>

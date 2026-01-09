@@ -1,0 +1,85 @@
+<!-- pages/merchant/setting/upload-logo/upload-logo.wxml -->
+<view class="container">
+  <!-- 顶部操作栏 -->
+  <view class="standard-action-bar">
+    <text class="standard-back-btn" bindtap="goBack">←</text>
+    <text class="page-title">上传商家LOGO</text>
+  </view>
+
+  <!-- 悬浮保存按钮 -->
+  <view class="floating-save-btn" bindtap="saveLogo" wx:if="{{logoPath}}">
+    <text class="save-icon">💾</text>
+    <text>保存</text>
+  </view>
+
+  <!-- 上传说明 -->
+  <view class="upload-guide">
+    <text class="guide-title">LOGO上传说明</text>
+    <text class="guide-content">1. 请上传清晰的店铺LOGO图片</text>
+    <text class="guide-content">2. 支持JPG、PNG格式，大小不超过2MB</text>
+    <text class="guide-content">3. 建议尺寸：200x200像素</text>
+    <text class="guide-content">4. 图片将自动裁剪为正方形</text>
+  </view>
+
+  <!-- LOGO预览区域 -->
+  <view class="logo-preview-area">
+    <view class="preview-container">
+      <!-- 现有LOGO或默认LOGO -->
+      <image 
+        class="logo-preview" 
+        src="{{logoPath || defaultLogo}}" 
+        mode="aspectFill"
+        wx:if="{{!cropping}}"
+      ></image>
+      
+      <!-- 裁剪预览 -->
+      <view class="crop-container" wx:if="{{cropping}}">
+        <canvas 
+          class="crop-canvas" 
+          canvas-id="cropperCanvas" 
+          style="width: {{cropSize}}px; height: {{cropSize}}px;"
+        ></canvas>
+        <image 
+          class="crop-image" 
+          src="{{tempImagePath}}" 
+          mode="aspectFill" 
+          style="width: {{imageWidth}}px; height: {{imageHeight}}px; left: {{imageLeft}}px; top: {{imageTop}}px; transform: scale({{scale}});"
+        ></image>
+      </view>
+      
+      <!-- 上传按钮 -->
+      <view class="upload-overlay" wx:if="{{!cropping}}" bindtap="chooseImage">
+        <text class="upload-text">点击上传LOGO</text>
+        <text class="upload-subtext">或拖拽图片到此处</text>
+      </view>
+      
+      <!-- 裁剪工具栏 -->
+      <view class="crop-toolbar" wx:if="{{cropping}}">
+        <button class="crop-btn" bindtap="cancelCrop">取消</button>
+        <button class="crop-btn" bindtap="resetCrop">重置</button>
+        <button class="crop-btn confirm" bindtap="confirmCrop">确认裁剪</button>
+      </view>
+    </view>
+    
+    <!-- 操作按钮 -->
+    <view class="action-buttons" wx:if="{{!cropping && logoPath}}">
+      <button class="action-btn" bindtap="chooseImage">重新上传</button>
+      <button class="action-btn" bindtap="removeLogo">删除LOGO</button>
+    </view>
+  </view>
+
+  <!-- 裁剪控制区域 -->
+    <view class="crop-controls" wx:if="{{cropping}}">
+      <text class="control-title">调整图片</text>
+      <view class="slider-container">
+        <text class="slider-label">缩放：{{scaledValue}}</text>
+        <slider 
+          min="0.5" 
+          max="2" 
+          step="0.1" 
+          value="{{scale}}" 
+          bindchange="onScaleChange"
+        ></slider>
+      </view>
+    </view>
+</view>

@@ -1,0 +1,96 @@
+<!--pages/aftersale/apply/apply.wxml-->
+<view class="container">
+  <!-- 页面标题 -->
+  <view class="page-header">
+    <text class="standard-back-btn" bindtap="navigateBack">←</text>
+    <text class="title">售后申请</text>
+  </view>
+
+  <!-- 订单和商品信息 -->
+  <view class="order-product-section card">
+    <text class="order-no">订单号：{{order.orderNo}}</text>
+    <view class="product-item">
+      <image src="{{product.image}}" class="product-image" mode="aspectFill"></image>
+      <view class="product-info">
+        <text class="product-name">{{product.name}}</text>
+        <text class="product-sku">{{product.sku}}</text>
+        <text class="product-price">¥{{product.price}}</text>
+      </view>
+    </view>
+  </view>
+
+  <!-- 售后类型 -->
+  <view class="aftersale-type-section card">
+    <text class="section-title">售后类型</text>
+    <view class="type-options">
+      <view class="type-option {{aftersaleType === 'refund' ? 'active' : ''}}" bindtap="selectAftersaleType" data-type="refund">
+        <text class="type-icon">💸</text>
+        <text class="type-name">仅退款</text>
+      </view>
+      <view class="type-option {{aftersaleType === 'exchange' ? 'active' : ''}}" bindtap="selectAftersaleType" data-type="exchange">
+        <text class="type-icon">🔄</text>
+        <text class="type-name">换货</text>
+      </view>
+      <view class="type-option {{aftersaleType === 'refund_exchange' ? 'active' : ''}}" bindtap="selectAftersaleType" data-type="refund_exchange">
+        <text class="type-icon">🔄💸</text>
+        <text class="type-name">退款退货</text>
+      </view>
+    </view>
+  </view>
+
+  <!-- 售后原因 -->
+  <view class="reason-section card">
+    <text class="section-title">售后原因</text>
+    <picker mode="selector" range="{{reasons}}" range-key="name" value="{{selectedReasonIndex}}" bindchange="onReasonChange">
+      <view class="picker-text">{{selectedReason.name}}</view>
+    </picker>
+  </view>
+
+  <!-- 退款金额 -->
+  <view class="refund-amount-section card" wx:if="{{aftersaleType === 'refund' || aftersaleType === 'refund_exchange'}}">
+    <text class="section-title">退款金额</text>
+    <view class="amount-input">
+      <text class="amount-label">¥</text>
+      <input type="number" placeholder="请输入退款金额" value="{{refundAmount}}" bindinput="onAmountInput" class="amount-input" />
+      <text class="max-amount" bindtap="setFullAmount">
+        全额退款（¥{{product.price}}）
+      </text>
+    </view>
+  </view>
+
+  <!-- 售后说明 -->
+  <view class="description-section card">
+    <text class="section-title">售后说明</text>
+    <textarea placeholder="请详细描述您的售后问题，以便我们更好地为您处理..." 
+              value="{{description}}" 
+              bindinput="onDescriptionInput" 
+              class="description-textarea" 
+              maxlength="500" 
+              auto-height="true"></textarea>
+    <text class="description-count">{{description.length}}/500</text>
+  </view>
+
+  <!-- 图片上传 -->
+  <view class="image-upload-section card">
+    <text class="section-title">上传凭证（最多9张）</text>
+    <view class="image-uploader">
+      <block wx:for="{{uploadedImages}}" wx:key="index">
+        <view class="uploaded-image">
+          <image src="{{item}}" mode="aspectFill"></image>
+          <text class="delete-image" bindtap="deleteImage" data-index="{{index}}">×</text>
+        </view>
+      </block>
+      <view class="upload-btn" bindtap="chooseImage" wx:if="{{uploadedImages.length < 9}}">
+        <text class="upload-icon">+</text>
+        <text class="upload-text">上传图片</text>
+      </view>
+    </view>
+  </view>
+
+  <!-- 提交按钮 -->
+  <view class="submit-section">
+    <button class="btn btn-primary submit-btn" bindtap="submitAftersale">
+      提交售后申请
+    </button>
+  </view>
+</view>

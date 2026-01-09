@@ -1,0 +1,5 @@
+{
+  "usingComponents": {
+    "global-cart": "/components/global-cart/global-cart"
+  }
+}

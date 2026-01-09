@@ -1,0 +1,27 @@
+<!--pages/service/contact/contact.wxml-->
+<view class="container">
+  <view class="qr-section">
+    <image class="qr-code" src="/images/service-qr.png" mode="aspectFit"></image>
+    <text class="tip">长按识别二维码添加客服微信</text>
+  </view>
+
+  <view class="contact-section">
+    <button class="emergency-btn" type="warn" bindtap="handleEmergency" wx:if="{{!showPhone}}">紧急联系</button>
+    
+    <view class="phone-info" wx:if="{{showPhone}}" bindtap="makeCall">
+      <text class="phone-label">商家电话：</text>
+      <text class="phone-number">{{phoneNumber}}</text>
+      <text class="call-hint">(点击拨打)</text>
+    </view>
+  </view>
+
+  <view class="history-section" wx:if="{{history.length > 0}}">
+    <view class="history-title">联系记录</view>
+    <view class="history-list">
+      <view class="history-item" wx:for="{{history}}" wx:key="time">
+        <text class="time">{{item.time}}</text>
+        <text class="action">{{item.action}}</text>
+      </view>
+    </view>
+  </view>
+</view>

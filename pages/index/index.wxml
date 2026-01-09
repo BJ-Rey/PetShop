@@ -1,0 +1,67 @@
+<!--index.wxml-->
+<view class="container">
+  <auth-modal id="auth-modal" />
+  <global-cart />
+
+  <!-- 轮播图 -->
+  <swiper class="swiper" indicator-dots="{{indicatorDots}}" autoplay="{{autoplay}}" interval="{{interval}}" duration="{{duration}}" bindtouchstart="onSwiperTouchStart" bindtouchend="onSwiperTouchEnd">
+    <block wx:for="{{imgUrls}}" wx:key="index">
+      <swiper-item>
+        <image src="{{item}}" class="slide-image" mode="aspectFill"></image>
+      </swiper-item>
+    </block>
+  </swiper>
+
+
+  <!-- 推荐猫咪 -->
+  <view class="section">
+    <view class="section-header">
+      <text class="section-title">推荐猫咪</text>
+      <text class="more" bindtap="navigateToPetList">查看更多</text>
+    </view>
+    <scroll-view scroll-x="true" class="pet-scroll">
+      <block wx:for="{{recommendedPets}}" wx:key="id">
+        <view class="pet-card" bindtap="navigateToPetDetail" data-id="{{item.id}}">
+          <image src="{{item.avatar}}" class="pet-avatar" mode="aspectFill"></image>
+          <text class="pet-name">{{item.name}}</text>
+          <text class="pet-breed">{{item.breed}}</text>
+          <text class="pet-age">{{item.age}}</text>
+          <text class="pet-merchant" wx:if="{{item.merchantName}}">来自：{{item.merchantName}}</text>
+        </view>
+      </block>
+    </scroll-view>
+  </view>
+
+  <!-- 热门服务 -->
+  <view class="section">
+    <view class="section-header">
+      <text class="section-title">热门服务</text>
+      <view class="more" bindtap="navigateToServiceList">查看更多 ></view>
+    </view>
+    <view class="service-grid">
+      <view class="service-card" wx:for="{{hotServices}}" wx:key="id" bindtap="navigateToServiceDetail" data-id="{{item.id}}" hover-class="service-card-hover" hover-stay-time="100">
+        <image src="{{item.image}}" class="service-image" mode="aspectFill"></image>
+        <text class="service-name">{{item.name}}</text>
+        <text class="service-price">¥{{item.price}}</text>
+      </view>
+    </view>
+  </view>
+
+  <!-- 精选商品 -->
+  <view class="section">
+    <view class="section-header">
+      <text class="section-title">精选商品</text>
+      <text class="more" bindtap="navigateToMallList">查看更多</text>
+    </view>
+    <view class="product-grid">
+      <block wx:for="{{selectedProducts}}" wx:key="id">
+        <view class="product-card" bindtap="navigateToProductDetail" data-id="{{item.id}}">
+          <image src="{{item.image}}" class="product-image" mode="aspectFill"></image>
+          <text class="product-name">{{item.name}}</text>
+          <text class="product-price">¥{{item.price}}</text>
+          <text class="product-sales">销量{{item.sales}}</text>
+        </view>
+      </block>
+    </view>
+  </view>
+</view>

@@ -1,0 +1,68 @@
+<!--pages/pet/add/add.wxml-->
+<view class="container">
+  <!-- 顶部操作栏 -->
+  <view class="standard-action-bar">
+    <text class="standard-back-btn" bindtap="navigateBack">←</text>
+    <text class="page-title">添加宠物</text>
+  </view>
+
+  <form bindsubmit="submitForm">
+    <view class="form-section card">
+      <!-- 宠物图片 -->
+      <view class="form-item image-upload">
+        <view class="label">宠物照片 (最多3张)</view>
+        <view class="image-list">
+          <block wx:for="{{images}}" wx:key="*this">
+            <view class="image-wrapper">
+              <image src="{{item}}" mode="aspectFill" bindtap="previewImage" data-src="{{item}}"></image>
+              <view class="delete-btn" bindtap="deleteImage" data-index="{{index}}">×</view>
+            </view>
+          </block>
+          <view class="add-btn" bindtap="chooseImage" wx:if="{{images.length < 3}}">
+            <text>+</text>
+          </view>
+        </view>
+      </view>
+
+      <!-- 宠物名称 -->
+      <view class="form-item">
+        <view class="label">宠物名称 <text class="required">*</text></view>
+        <input name="name" placeholder="请输入宠物名称 (2-10个字符)" value="{{formData.name}}" bindinput="onNameInput" />
+      </view>
+
+      <!-- 品种 -->
+      <view class="form-item">
+        <view class="label">品种 <text class="required">*</text></view>
+        <picker bindchange="bindBreedChange" value="{{breedIndex}}" range="{{breeds}}">
+          <view class="picker">
+            {{breedIndex !== null ? breeds[breedIndex] : '请选择品种'}}
+          </view>
+        </picker>
+      </view>
+
+      <!-- 性别 -->
+      <view class="form-item">
+        <view class="label">性别 <text class="required">*</text></view>
+        <radio-group class="radio-group" bindchange="onGenderChange">
+          <label class="radio">
+            <radio value="male" checked="{{formData.gender === 'male'}}" color="#FFA726"/> 公
+          </label>
+          <label class="radio">
+            <radio value="female" checked="{{formData.gender === 'female'}}" color="#FFA726"/> 母
+          </label>
+        </radio-group>
+      </view>
+      
+      <!-- 年龄 -->
+      <view class="form-item">
+        <view class="label">年龄</view>
+        <input name="age" placeholder="例如：2岁" value="{{formData.age}}" bindinput="onAgeInput" />
+      </view>
+    </view>
+
+    <!-- 提交按钮 -->
+    <view class="submit-section">
+      <button class="submit-btn" form-type="submit" loading="{{isSubmitting}}">保存</button>
+    </view>
+  </form>
+</view>

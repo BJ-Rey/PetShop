@@ -1,0 +1,91 @@
+<!-- pages/merchant/customer/customer.wxml -->
+<view class="container">
+  <!-- 顶部操作栏 -->
+  <view class="standard-action-bar">
+    <text class="standard-back-btn" bindtap="navigateBack">返回</text>
+    <text class="page-title">客户管理</text>
+    <button class="logout-btn" bindtap="logout">退出登录</button>
+  </view>
+
+  <!-- 搜索栏 -->
+  <view class="search-bar">
+    <input 
+      class="search-input" 
+      placeholder="搜索客户名称或手机号" 
+      bindinput="onSearch"
+      value="{{keyword}}"
+    />
+  </view>
+
+  <!-- 客户列表 -->
+  <view class="customer-list">
+    <view class="empty-state" wx:if="{{!isLoading && customers.length === 0}}">
+      <text class="empty-icon">👥</text>
+      <text class="empty-text">暂无客户数据</text>
+    </view>
+    
+    <view class="loading-state" wx:if="{{isLoading}}">
+      <text class="loading-text">加载中...</text>
+    </view>
+    
+    <block wx:else>
+      <view class="customer-item card" wx:for="{{customers}}" wx:key="id">
+        <!-- 客户基本信息 -->
+        <view class="customer-info">
+          <image class="customer-avatar" src="{{item.avatar || 'https://example.com/default-avatar.png'}}"></image>
+          
+          <view class="customer-details">
+            <view class="customer-header">
+              <text class="customer-name">{{item.name}}</text>
+              <text class="customer-type">{{item.type === 'vip' ? 'VIP客户' : '普通客户'}}</text>
+            </view>
+            
+            <text class="customer-phone">{{item.phone}}</text>
+            <text class="customer-email">{{item.email || '未设置邮箱'}}</text>
+          </view>
+        </view>
+        
+        <!-- 客户统计信息 -->
+        <view class="customer-stats">
+          <view class="stat-item">
+            <text class="stat-value">{{item.orderCount}}</text>
+            <text class="stat-label">订单数</text>
+          </view>
+          <view class="stat-item">
+            <text class="stat-value">¥{{item.totalSpent}}</text>
+            <text class="stat-label">总消费</text>
+          </view>
+          <view class="stat-item">
+            <text class="stat-value">{{item.lastOrderDate}}</text>
+            <text class="stat-label">最近订单</text>
+          </view>
+        </view>
+        
+        <!-- 操作按钮 -->
+        <view class="customer-actions">
+          <button 
+            class="action-btn view-btn" 
+            bindtap="viewCustomerDetail" 
+            data-id="{{item.id}}"
+          >
+            查看详情
+          </button>
+          <button 
+            class="action-btn edit-btn" 
+            bindtap="editCustomer" 
+            data-id="{{item.id}}"
+          >
+            编辑
+          </button>
+          <button 
+            class="action-btn message-btn" 
+            bindtap="sendMessage" 
+            data-id="{{item.id}}"
+          >
+            发送消息
+          </button>
+        </view>
+      </view>
+    </block>
+  </view>
+</view>

@@ -1,0 +1,39 @@
+# WeChat Mini Program
+node_modules/
+miniprogram_npm/
+unpackage/
+dist/
+.DS_Store
+project.private.config.json
+sitemap.json
+debug.log
+
+# Java / Maven
+target/
+*.class
+*.jar
+*.war
+*.ear
+.settings/
+.classpath
+.project
+.mvn/
+
+# IDE / Editor
+.idea/
+.vscode/
+*.swp
+*.ntvs*
+*.njsproj
+*.sln
+*.suo
+*.user
+
+# Logs
+*.log
+logs/
+
+# System
+Thumbs.db
+ehthumbs.db
+Desktop.ini

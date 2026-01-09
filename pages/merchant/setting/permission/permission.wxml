@@ -1,0 +1,79 @@
+<!-- pages/merchant/setting/permission/permission.wxml -->
+<wxs module="utils">
+  module.exports.getPermissionName = function(permissionCode) {
+    var map = {
+      'manage_pets': '宠物管理',
+      'manage_products': '商品管理',
+      'manage_orders': '订单管理',
+      'manage_finance': '财务管理',
+      'manage_settings': '系统设置',
+      'view_reports': '查看报表'
+    };
+    return map[permissionCode] || permissionCode;
+  }
+</wxs>
+
+<view class="container">
+  <!-- 顶部操作栏 -->
+  <view class="standard-action-bar">
+    <text class="standard-back-btn" bindtap="navigateBack">←</text>
+    <text class="page-title">角色与权限管理</text>
+    <button class="logout-btn" bindtap="logout">退出登录</button>
+  </view>
+
+  <!-- 操作栏 -->
+  <view class="operation-bar">
+    <button class="add-btn" type="primary" bindtap="addRole">添加角色</button>
+  </view>
+
+  <!-- 角色列表 -->
+  <view class="role-list">
+    <view class="empty-state" wx:if="{{!isLoading && roles.length === 0}}">
+      <text class="empty-icon">🔑</text>
+      <text class="empty-text">暂无角色数据</text>
+      <button class="empty-btn" type="primary" bindtap="addRole">添加角色</button>
+    </view>
+    
+    <view class="loading-state" wx:if="{{isLoading}}">
+      <text class="loading-text">加载中...</text>
+    </view>
+    
+    <block wx:else>
+      <view class="role-item card" wx:for="{{roles}}" wx:key="id">
+        <view class="role-header">
+          <view class="role-info">
+            <text class="role-name">{{item.name}}</text>
+            <text class="role-desc">{{item.description}}</text>
+          </view>
+          <view class="role-action">
+            <button 
+              class="action-btn edit-btn" 
+              bindtap="editRole" 
+              data-id="{{item.id}}"
+            >
+              编辑
+            </button>
+            <button 
+              class="action-btn delete-btn" 
+              bindtap="deleteRole" 
+              data-id="{{item.id}}" 
+              data-name="{{item.name}}"
+              wx:if="{{item.id !== 1}}"
+            >
+              删除
+            </button>
+          </view>
+        </view>
+        
+        <view class="role-permissions">
+          <text class="permission-title">权限列表：</text>
+          <view class="permission-tags">
+            <text class="permission-tag" wx:for="{{item.permissions}}" wx:for-item="permission" wx:key="permission">
+              {{utils.getPermissionName(permission)}}
+            </text>
+          </view>
+        </view>
+      </view>
+    </block>
+  </view>
+</view>

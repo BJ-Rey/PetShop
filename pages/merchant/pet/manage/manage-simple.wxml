@@ -1,0 +1,121 @@
+<!-- pages/merchant/pet/manage/manage-simple.wxml -->
+<view class="container">
+  <!-- 顶部操作栏 -->
+  <view class="standard-action-bar">
+    <text class="standard-back-btn" bindtap="goBack">←</text>
+    <text class="page-title">宠物管理</text>
+  </view>
+
+  <!-- 搜索栏 -->
+  <view class="search-bar">
+    <input 
+      class="search-input" 
+      placeholder="搜索宠物名称、品种.." 
+      value="{{filters.keyword}}" 
+      bindinput="onSearchInput"
+      bindconfirm="onSearchConfirm"
+    />
+    <button class="add-btn" type="primary" bindtap="addPet">+ 添加宠物</button>
+  </view>
+  
+  <!-- 筛选器 -->
+  <view class="filter-bar">
+    <!-- 状态筛选 -->
+    <view class="filter-item">
+      <text class="filter-label">状态</text>
+      <view class="filter-options">
+        <view 
+          class="filter-option {{filters.status === 'all' ? 'active' : ''}}" 
+          bindtap="changeFilter" 
+          data-type="status" 
+          data-value="all"
+        >全部</view>
+        <view 
+          class="filter-option {{filters.status === 'published' ? 'active' : ''}}" 
+          bindtap="changeFilter" 
+          data-type="status" 
+          data-value="published"
+        >已上架</view>
+        <view 
+          class="filter-option {{filters.status === 'unpublished' ? 'active' : ''}}" 
+          bindtap="changeFilter" 
+          data-type="status" 
+          data-value="unpublished"
+        >已下架</view>
+      </view>
+    </view>
+    
+    <!-- 下定状态筛选 -->
+    <view class="filter-item">
+      <text class="filter-label">下定状态</text>
+      <view class="filter-options">
+        <view 
+          class="filter-option {{filters.hasOrder === 'all' ? 'active' : ''}}" 
+          bindtap="changeFilter" 
+          data-type="hasOrder" 
+          data-value="all"
+        >全部</view>
+        <view 
+          class="filter-option {{filters.hasOrder === 'true' ? 'active' : ''}}" 
+          bindtap="changeFilter" 
+          data-type="hasOrder" 
+          data-value="true"
+        >有人下定</view>
+        <view 
+          class="filter-option {{filters.hasOrder === 'false' ? 'active' : ''}}" 
+          bindtap="changeFilter" 
+          data-type="hasOrder" 
+          data-value="false"
+        >无人下定</view>
+      </view>
+    </view>
+  </view>
+
+  <!-- 加载状态 -->
+  <view class="loading" wx:if="{{isLoading}}">
+    <text>加载中...</text>
+  </view>
+
+  <!-- 空状态 -->
+  <view class="empty" wx:elif="{{pets.length === 0}}">
+    <text class="empty-icon">🐶</text>
+    <text class="empty-text">暂无宠物数据</text>
+    <button class="empty-btn" type="primary" bindtap="addPet">添加宠物</button>
+  </view>
+
+  <!-- 宠物列表 -->
+  <view class="pet-list" wx:else>
+    <view class="pet-item" wx:for="{{pets}}" wx:key="id">
+      <!-- 宠物基本信息 -->
+      <view class="pet-info">
+        <image src="{{item.avatar}}" class="pet-avatar" mode="aspectFill"></image>
+        <view class="pet-details">
+          <view class="pet-header">
+            <text class="pet-name">{{item.name}}</text>
+            <view class="status-container">
+              <text class="pet-status {{item.status}}">
+                {{item.status === 'published' ? '已上架' : '已下架'}}
+              </text>
+              <text class="pet-status has-order" wx:if="{{item.hasOrder}}">
+                有人下定
+              </text>
+            </view>
+          </view>
+          <text class="pet-meta">{{item.breed}} - {{item.age}} - {{item.gender === 'male' ? '公' : '母'}} - {{item.color}}</text>
+          <view class="pet-price-container">
+            <view class="pet-price">¥{{item.price}}</view>
+            <view class="pet-deposit">定金：¥{{item.deposit}}</view>
+          </view>
+        </view>
+      </view>
+      
+      <!-- 操作区域 -->
+      <view class="pet-actions">
+        <view class="action-buttons">
+          <button class="action-btn edit-btn" bindtap="editPet" data-id="{{item.id}}">编辑</button>
+          <button class="action-btn view-btn" bindtap="viewPetDetail" data-id="{{item.id}}">查看详情</button>
+        </view>
+      </view>
+    </view>
+  </view>
+</view>

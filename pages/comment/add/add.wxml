@@ -1,0 +1,72 @@
+<!--pages/comment/add/add.wxml-->
+<view class="container">
+  <!-- 页面标题 -->
+  <view class="page-header">
+    <text class="standard-back-btn" bindtap="navigateBack">←</text>
+    <text class="title">写评价</text>
+  </view>
+
+  <!-- 订单信息 -->
+  <view class="order-info-section card">
+    <text class="order-no">订单号：{{order.orderNo}}</text>
+    <view class="product-item">
+      <image src="{{product.image}}" class="product-image" mode="aspectFill"></image>
+      <view class="product-info">
+        <text class="product-name">{{product.name}}</text>
+        <text class="product-sku">{{product.sku}}</text>
+        <text class="product-price">¥{{product.price}}</text>
+      </view>
+    </view>
+  </view>
+
+  <!-- 评分 -->
+  <view class="rating-section card">
+    <text class="section-title">评分</text>
+    <view class="rating-content">
+      <view class="stars">
+        <text class="star {{rating >= 1 ? 'active' : ''}}" bindtap="setRating" data-rating="1">★</text>
+        <text class="star {{rating >= 2 ? 'active' : ''}}" bindtap="setRating" data-rating="2">★</text>
+        <text class="star {{rating >= 3 ? 'active' : ''}}" bindtap="setRating" data-rating="3">★</text>
+        <text class="star {{rating >= 4 ? 'active' : ''}}" bindtap="setRating" data-rating="4">★</text>
+        <text class="star {{rating >= 5 ? 'active' : ''}}" bindtap="setRating" data-rating="5">★</text>
+      </view>
+      <text class="rating-text">{{ratingText}}</text>
+    </view>
+  </view>
+
+  <!-- 评论内容 -->
+  <view class="comment-content-section card">
+    <text class="section-title">评论内容</text>
+    <textarea placeholder="请输入您的评价内容，分享您的使用体验..." 
+              value="{{content}}" 
+              bindinput="onContentInput" 
+              class="comment-textarea" 
+              maxlength="500" 
+              auto-height="true"></textarea>
+    <text class="content-count">{{content.length}}/500</text>
+  </view>
+
+  <!-- 图片上传 -->
+  <view class="image-upload-section card">
+    <text class="section-title">上传图片（最多9张）</text>
+    <view class="image-uploader">
+      <block wx:for="{{uploadedImages}}" wx:key="index">
+        <view class="uploaded-image">
+          <image src="{{item}}" mode="aspectFill"></image>
+          <text class="delete-image" bindtap="deleteImage" data-index="{{index}}">×</text>
+        </view>
+      </block>
+      <view class="upload-btn" bindtap="chooseImage" wx:if="{{uploadedImages.length < 9}}">
+        <text class="upload-icon">+</text>
+        <text class="upload-text">上传图片</text>
+      </view>
+    </view>
+  </view>
+
+  <!-- 提交按钮 -->
+  <view class="submit-section">
+    <button class="btn btn-primary submit-btn" bindtap="submitComment">
+      提交评价
+    </button>
+  </view>
+</view>

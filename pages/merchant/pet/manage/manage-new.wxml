@@ -1,0 +1,230 @@
+<!-- pages/merchant/pet/manage/manage-new.wxml -->
+<wxs module="utils">
+  module.exports.formatDate = function(dateString) {
+    if (!dateString) return '';
+    var date = getDate(dateString);
+    var year = date.getFullYear();
+    var month = date.getMonth() + 1;
+    var day = date.getDate();
+    
+    if (month < 10) month = '0' + month;
+    if (day < 10) day = '0' + day;
+    
+    return year + '-' + month + '-' + day;
+  }
+</wxs>
+
+<view class="container">
+  <!-- 顶部操作栏 -->
+  <view class="standard-action-bar">
+    <text class="standard-back-btn" bindtap="navigateBack">←</text>
+    <text class="page-title">宠物管理</text>
+  </view>
+
+  <!-- 筛选与搜索区域 -->
+  <view class="filter-search-bar">
+    <!-- 搜索框 -->
+    <view class="search-box">
+      <text class="search-icon">🔍</text>
+      <input 
+        type="text" 
+        placeholder="搜索宠物名称、品种..." 
+        value="{{searchKeyword}}"
+        bindinput="onSearchInput"
+        class="search-input"
+      />
+      <text 
+        class="clear-btn" 
+        wx:if="{{searchKeyword}}"
+        bindtap="clearSearch"
+      >
+        ×
+      </text>
+    </view>
+    
+    <!-- 状态筛选 -->
+    <view class="status-filter">
+      <picker 
+        mode="selector" 
+        range="{{statusOptions}}" 
+        range-key="name" 
+        value="{{selectedStatusIndex}}" 
+        bindchange="onStatusChange"
+      >
+        <view class="filter-picker">
+          <text>状态：{{statusOptions[selectedStatusIndex].name}}</text>
+          <text class="picker-arrow">▼</text>
+        </view>
+      </picker>
+    </view>
+  </view>
+
+  <!-- 排序栏 -->
+  <view class="sort-bar">
+    <text class="sort-label">排序：</text>
+    <view class="sort-options">
+      <view 
+        class="sort-option {{sortField === 'sort' ? 'active' : ''}}" 
+        bindtap="changeSortField" 
+        data-field="sort"
+      >
+        <text>排序优先级</text>
+        <text class="sort-arrow {{sortField === 'sort' ? (sortOrder === 'asc' ? 'asc' : 'desc') : ''}}">
+          {{sortField === 'sort' ? (sortOrder === 'asc' ? '↑' : '↓') : '↕'}}
+        </text>
+      </view>
+      <view 
+        class="sort-option {{sortField === 'createdAt' ? 'active' : ''}}" 
+        bindtap="changeSortField" 
+        data-field="createdAt"
+      >
+        <text>创建时间</text>
+        <text class="sort-arrow {{sortField === 'createdAt' ? (sortOrder === 'asc' ? 'asc' : 'desc') : ''}}">
+          {{sortField === 'createdAt' ? (sortOrder === 'asc' ? '↑' : '↓') : '↕'}}
+        </text>
+      </view>
+      <view 
+        class="sort-option {{sortField === 'updatedAt' ? 'active' : ''}}" 
+        bindtap="changeSortField" 
+        data-field="updatedAt"
+      >
+        <text>更新时间</text>
+        <text class="sort-arrow {{sortField === 'updatedAt' ? (sortOrder === 'asc' ? 'asc' : 'desc') : ''}}">
+          {{sortField === 'updatedAt' ? (sortOrder === 'asc' ? '↑' : '↓') : '↕'}}
+        </text>
+      </view>
+    </view>
+  </view>
+
+  <!-- 添加宠物按钮 -->
+  <view class="add-pet-section">
+    <button class="btn btn-primary" bindtap="navigateToAddPet">
+      <text class="btn-icon">+</text>
+      <text>添加宠物</text>
+    </button>
+  </view>
+
+  <!-- 加载状态 -->
+  <view class="loading-state" wx:if="{{isLoading}}">
+    <text class="loading-text">加载中...</text>
+  </view>
+
+  <!-- 空状态 -->
+  <view class="empty-state" wx:elif="{{pets.length === 0}}">
+    <text class="empty-icon">🐶</text>
+    <text class="empty-title">暂无宠物数据</text>
+    <text class="empty-desc">点击下方按钮添加您的第一个宠物吧</text>
+    <button class="btn btn-primary" bindtap="navigateToAddPet">
+      <text class="btn-icon">+</text>
+      <text>添加宠物</text>
+    </button>
+  </view>
+
+  <!-- 宠物列表 -->
+  <view class="pet-list" wx:else>
+    <view class="pet-card" wx:for="{{pets}}" wx:key="id">
+      <!-- 宠物基本信息 -->
+      <view class="pet-info">
+        <image src="{{item.avatar}}" class="pet-avatar" mode="aspectFill"></image>
+        <view class="pet-details">
+          <view class="pet-header">
+            <text class="pet-name">{{item.name}}</text>
+            <view class="pet-status {{item.status}}">
+              <text class="status-dot"></text>
+              <text class="status-text">{{item.status === 'published' ? '已上架' : '已下架'}}</text>
+            </view>
+          </view>
+          <text class="pet-meta">
+            {{item.breed}} • {{item.age}} • {{item.gender === 'male' ? '公' : '母'}} • {{item.color}}
+          </text>
+          <view class="pet-price-info">
+            <text class="price-item">价格: ¥{{item.price}}</text>
+            <text class="deposit-item">定金: ¥{{item.deposit}}</text>
+          </view>
+          <view class="pet-time-info">
+            <text class="time-item">创建: {{utils.formatDate(item.createdAt)}}</text>
+            <text class="time-item">更新: {{utils.formatDate(item.updatedAt)}}</text>
+          </view>
+        </view>
+      </view>
+      
+      <!-- 操作区域 -->
+      <view class="pet-actions">
+        <!-- 排序编辑 -->
+        <view class="sort-edit-section">
+          <text class="sort-label">排序:</text>
+          <view class="sort-input-wrapper">
+            <input 
+              type="number" 
+              value="{{item.sort}}" 
+              class="sort-input" 
+              bindinput="onSortInput" 
+              data-id="{{item.id}}"
+              min="0"
+              max="9999"
+            />
+            <text class="sort-hint">数字越大，排序越靠前</text>
+          </view>
+        </view>
+        
+        <!-- 操作按钮组 -->
+        <view class="action-buttons-group">
+          <!-- 上下架按钮 -->
+          <button 
+            class="btn {{item.status === 'published' ? 'btn-warning' : 'btn-success'}} status-btn"
+            bindtap="togglePetStatus"
+            data-id="{{item.id}}"
+            data-status="{{item.status}}"
+          >
+            {{item.status === 'published' ? '下架' : '上架'}}
+          </button>
+          
+          <!-- 编辑按钮 -->
+          <button 
+            class="btn btn-primary edit-btn"
+            bindtap="navigateToEditPet"
+            data-id="{{item.id}}"
+          >
+            编辑
+          </button>
+          
+          <!-- 删除按钮 -->
+          <button 
+            class="btn btn-danger delete-btn"
+            bindtap="showDeleteConfirm"
+            data-id="{{item.id}}"
+            data-name="{{item.name}}"
+          >
+            删除
+          </button>
+          
+          <!-- 查看详情按钮 -->
+          <button 
+            class="btn btn-default view-btn"
+            bindtap="navigateToPetDetail"
+            data-id="{{item.id}}"
+          >
+            详情
+          </button>
+        </view>
+      </view>
+    </view>
+  </view>
+
+  <!-- 删除确认弹窗 -->
+  <view class="modal-overlay" wx:if="{{showDeleteModal}}" bindtap="hideDeleteModal"></view>
+  <view class="modal" wx:if="{{showDeleteModal}}">
+    <view class="modal-header">
+      <text class="modal-title">确认删除</text>
+      <text class="modal-close" bindtap="hideDeleteModal">×</text>
+    </view>
+    <view class="modal-content">
+      <text class="modal-message">确定要删除宠物「{{deletePetName}}」吗？</text>
+      <text class="modal-warning">此操作不可恢复，删除后该宠物的所有信息将被永久删除。</text>
+    </view>
+    <view class="modal-actions">
+      <button class="btn btn-default" bindtap="hideDeleteModal">取消</button>
+      <button class="btn btn-danger" bindtap="confirmDeletePet">删除</button>
+    </view>
+  </view>
+</view>

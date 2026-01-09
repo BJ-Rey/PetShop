@@ -1,0 +1,175 @@
+<!-- pages/merchant/setting/edit-basic-info/edit-basic-info.wxml -->
+<view class="container">
+  <!-- 顶部操作栏 -->
+  <view class="standard-action-bar">
+    <text class="standard-back-btn" bindtap="goBack">←</text>
+    <text class="page-title">编辑商家基本信息</text>
+  </view>
+
+  <!-- 保存状态提示 -->
+  <view class="save-status {{saveStatus === 'saved' ? 'saved' : saveStatus === 'saving' ? 'saving' : 'unsaved'}}" wx:if="{{showSaveStatus}}">
+    <text class="status-icon">{{saveStatus === 'saved' ? '✅' : saveStatus === 'saving' ? '🔄' : '⚠️'}}</text>
+    <text class="status-text">{{saveStatus === 'saved' ? '已保存' : saveStatus === 'saving' ? '保存中..' : '有未保存的修改'}}</text>
+  </view>
+
+  <!-- 悬浮保存按钮 -->
+  <view class="floating-save-btn" bindtap="saveMerchantInfo" data-form-type="submit">
+    <text class="save-icon">💾</text>
+    <text>保存</text>
+  </view>
+
+  <!-- 表单内容 -->
+  <form class="form-container" bindsubmit="saveMerchantInfo">
+    <!-- 基本信息卡片 -->
+    <view class="info-card">
+      <text class="card-title">基本信息</text>
+      <view class="card-content">
+        <!-- 商家名称 -->
+        <view class="form-item">
+          <text class="form-label">商家名称 <text class="required">*</text></text>
+          <input 
+            class="form-input" 
+            name="name" 
+            placeholder="请输入商家名称" 
+            value="{{merchantInfo.name}}" 
+            bindinput="onInputChange" 
+            data-field="name"
+            maxlength="50"
+          />
+          <text class="error-text">{{errors.name}}</text>
+        </view>
+
+        <!-- 商家描述 -->
+        <view class="form-item">
+          <text class="form-label">商家描述</text>
+          <textarea 
+            class="form-textarea" 
+            name="description" 
+            placeholder="请输入商家描述" 
+            value="{{merchantInfo.description}}" 
+            bindinput="onInputChange" 
+            data-field="description"
+            maxlength="200"
+            auto-height
+            style="height: 120rpx; min-height: 120rpx;"
+          />
+          <text class="text-count">{{merchantInfo.description.length || 0}}/200</text>
+          <text class="error-text">{{errors.description}}</text>
+        </view>
+      </view>
+    </view>
+
+    <!-- 联系方式卡片 -->
+    <view class="info-card">
+      <text class="card-title">联系方式</text>
+      <view class="card-content">
+        <!-- 联系方式 -->
+        <view class="form-item">
+          <text class="form-label">联系电话 <text class="required">*</text></text>
+          <input 
+            class="form-input" 
+            name="phone" 
+            placeholder="请输入手机号码" 
+            value="{{merchantInfo.phone}}" 
+            bindinput="onInputChange" 
+            data-field="phone"
+            type="number"
+            maxlength="11"
+          />
+          <text class="error-text">{{errors.phone}}</text>
+        </view>
+
+        <!-- 联系人 -->
+        <view class="form-item">
+          <text class="form-label">联系人</text>
+          <input 
+            class="form-input" 
+            name="contactPerson" 
+            placeholder="请输入联系人姓名" 
+            value="{{merchantInfo.contactPerson}}" 
+            bindinput="onInputChange" 
+            data-field="contactPerson"
+            maxlength="20"
+          />
+          <text class="error-text">{{errors.contactPerson}}</text>
+        </view>
+
+        <!-- 联系邮箱 -->
+        <view class="form-item">
+          <text class="form-label">联系邮箱</text>
+          <input 
+            class="form-input" 
+            name="email" 
+            placeholder="请输入联系邮箱" 
+            value="{{merchantInfo.email}}" 
+            bindinput="onInputChange" 
+            data-field="email"
+            type="text"
+            maxlength="50"
+          />
+          <text class="error-text">{{errors.email}}</text>
+        </view>
+      </view>
+    </view>
+
+    <!-- 地址信息卡片 -->
+    <view class="info-card">
+      <text class="card-title">地址信息</text>
+      <view class="card-content">
+        <!-- 商家地址 -->
+        <view class="form-item">
+          <text class="form-label">商家地址 <text class="required">*</text></text>
+          <input 
+            class="form-input" 
+            name="address" 
+            placeholder="请输入商家地址" 
+            value="{{merchantInfo.address}}" 
+            bindinput="onInputChange" 
+            data-field="address"
+            maxlength="100"
+          />
+          <text class="error-text">{{errors.address}}</text>
+        </view>
+      </view>
+    </view>
+
+    <!-- 资质信息卡片 -->
+    <view class="info-card">
+      <text class="card-title">资质信息</text>
+      <view class="card-content">
+        <!-- 营业执照 -->
+        <view class="form-item">
+          <text class="form-label">营业执照编号 <text class="required">*</text></text>
+          <input 
+            class="form-input" 
+            name="businessLicense" 
+            placeholder="请输入营业执照编号" 
+            value="{{merchantInfo.businessLicense}}" 
+            bindinput="onInputChange" 
+            data-field="businessLicense"
+            maxlength="20"
+          />
+          <text class="error-text">{{errors.businessLicense}}</text>
+        </view>
+      </view>
+    </view>
+
+    <!-- 店铺状态卡片 -->
+    <view class="info-card">
+      <text class="card-title">店铺状态</text>
+      <view class="card-content">
+        <view class="form-item status-item">
+          <text class="form-label">营业状态</text>
+          <view class="status-switch">
+            <text class="status-text">{{merchantInfo.status === 'open' ? '营业中' : '已关闭'}}</text>
+            <switch 
+              checked="{{merchantInfo.status === 'open'}}" 
+              bindchange="toggleStatus"
+              color="#07c160"
+            />
+          </view>
+        </view>
+      </view>
+    </view>
+  </form>
+</view>

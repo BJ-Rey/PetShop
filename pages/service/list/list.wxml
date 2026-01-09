@@ -1,0 +1,182 @@
+<!--pages/service/list/list.wxml-->
+<view class="container">
+  <!-- 顶部操作栏 -->
+  <view class="standard-action-bar">
+    <text class="standard-back-btn" bindtap="navigateBack">←</text>
+    <text class="page-title">服务列表</text>
+  </view>
+
+  <!-- 搜索框 -->
+  <view class="search-box">
+    <input type="text" placeholder="搜索服务，如疫苗接种、宠物美容" bindinput="onSearchInput" bindconfirm="onSearch" value="{{searchKeyword}}" />
+    <button class="search-btn" bindtap="onSearch">搜索</button>
+  </view>
+
+  <!-- 标准化筛选区域 -->
+  <scroll-view scroll-x="true" class="filter-bar" enable-flex>
+    <!-- 服务分类导航 - 仅显示前4个 -->
+    <view class="filter-item {{activeCategory === 'all' ? 'active' : ''}}" bindtap="selectCategory" data-category="all">
+      <text>全部</text>
+    </view>
+    <view class="filter-item {{activeCategory === 'vaccine' ? 'active' : ''}}" bindtap="selectCategory" data-category="vaccine">
+      <text>疫苗接种</text>
+    </view>
+    <view class="filter-item {{activeCategory === 'grooming' ? 'active' : ''}}" bindtap="selectCategory" data-category="grooming">
+      <text>宠物美容</text>
+    </view>
+    <view class="filter-item {{activeCategory === 'boarding' ? 'active' : ''}}" bindtap="selectCategory" data-category="boarding">
+      <text>宠物寄养</text>
+    </view>
+    <!-- 显示更多分类在筛选弹窗中 -->
+    
+    <!-- 视图切换 -->
+    <view class="filter-item {{viewMode === 'grid' ? 'active' : ''}}" bindtap="switchViewMode" data-mode="grid">
+      <text>网格</text>
+    </view>
+    <view class="filter-item {{viewMode === 'list' ? 'active' : ''}}" bindtap="switchViewMode" data-mode="list">
+      <text>列表</text>
+    </view>
+    
+    <!-- 排序选项 -->
+    <view class="filter-item {{sortIndex === 0 ? 'active' : ''}}" bindtap="onSortChange" data-index="0">
+      <text>综合</text>
+    </view>
+    <view class="filter-item {{sortIndex === 1 ? 'active' : ''}}" bindtap="onSortChange" data-index="1">
+      <text>价格低</text>
+    </view>
+    <view class="filter-item {{sortIndex === 2 ? 'active' : ''}}" bindtap="onSortChange" data-index="2">
+      <text>价格高</text>
+    </view>
+    <view class="filter-item {{sortIndex === 3 ? 'active' : ''}}" bindtap="onSortChange" data-index="3">
+      <text>销量</text>
+    </view>
+    <view class="filter-item {{sortIndex === 4 ? 'active' : ''}}" bindtap="onSortChange" data-index="4">
+      <text>评分</text>
+    </view>
+    
+    
+  </scroll-view>
+
+  <!-- 热门服务推荐 -->
+  <view class="hot-services" wx:if="{{hotServices.length > 0}}">
+    <view class="section-header">
+      <text class="section-title">热门服务</text>
+    </view>
+    <scroll-view scroll-x="true" class="hot-services-scroll" enable-flex>
+      <block wx:for="{{hotServices}}" wx:key="id">
+        <view class="hot-service-item" bindtap="navigateToServiceDetail" data-id="{{item.id}}">
+          <image src="{{item.image}}" class="service-image"></image>
+          <text class="service-name">{{item.name}}</text>
+          <text class="service-price">¥{{item.price}}</text>
+        </view>
+      </block>
+    </scroll-view>
+  </view>
+
+  <!-- 服务列表 -->
+  <view class="service-list">
+    <view class="section-header">
+      <text class="section-title">全部服务</text>
+      <view class="sort-options">
+        <picker mode="selector" range="{{sortOptions}}" range-key="name" value="{{sortIndex}}" bindchange="onSortChange" class="sort-picker">
+          <view class="picker-text">{{sortOptions[sortIndex].name}}</view>
+        </picker>
+      </view>
+    </view>
+
+    <!-- 网格视图 -->
+    <view class="grid-view" wx:if="{{viewMode === 'grid'}}">
+      <block wx:for="{{services}}" wx:key="id">
+        <view class="service-card" bindtap="navigateToServiceDetail" data-id="{{item.id}}" aria-role="button" aria-label="服务：{{item.name}}，价格{{item.price}}元">
+          <image src="{{item.image}}" class="service-card-image"></image>
+          <view class="service-card-info">
+            <text class="service-card-name">{{item.name}}</text>
+            <text class="service-card-desc">{{item.description}}</text>
+            <view class="service-card-footer">
+              <text class="service-card-price">¥{{item.price}}</text>
+              <text class="service-card-duration">{{item.duration}}</text>
+            </view>
+          </view>
+        </view>
+      </block>
+    </view>
+
+    <!-- 列表视图 -->
+    <view class="list-view" wx:else>
+      <block wx:for="{{services}}" wx:key="id">
+        <view class="service-list-item" bindtap="navigateToServiceDetail" data-id="{{item.id}}" aria-role="button" aria-label="服务：{{item.name}}，价格{{item.price}}元">
+          <image src="{{item.image}}" class="list-item-image"></image>
+          <view class="list-item-info">
+            <text class="list-item-name">{{item.name}}</text>
+            <text class="list-item-desc">{{item.description}}</text>
+            <view class="list-item-meta">
+              <text class="list-item-price">¥{{item.price}}</text>
+              <text class="list-item-duration">{{item.duration}}</text>
+              <text class="list-item-merchant">{{item.merchantName}}</text>
+            </view>
+          </view>
+          <button class="list-item-btn" bindtap="navigateToServiceAppointment" data-id="{{item.id}}" aria-role="button" aria-label="预约{{item.name}}">预约</button>
+        </view>
+      </block>
+    </view>
+
+    <!-- 空状态 -->
+    <view class="empty" wx:if="{{services.length === 0}}">
+      <text>暂无服务</text>
+    </view>
+  </view>
+
+  
+  <view class="filter-modal" wx:if="{{showFilter}}">
+    <view class="modal-header">
+      <text class="modal-title">筛选</text>
+      <text class="close-btn" bindtap="hideFilterModal">×</text>
+    </view>
+    <view class="modal-content">
+      <!-- 价格范围 -->
+      <view class="filter-section">
+        <text class="section-title">价格范围</text>
+        <view class="price-range">
+          <input type="number" placeholder="最低价" value="{{priceRange.min}}" bindinput="onMinPriceInput" class="price-input" />
+          <text class="range-separator">-</text>
+          <input type="number" placeholder="最高价" value="{{priceRange.max}}" bindinput="onMaxPriceInput" class="price-input" />
+        </view>
+      </view>
+
+      <!-- 评分 -->
+      <view class="filter-section">
+        <text class="section-title">评分</text>
+        <view class="rating-filter">
+          <view class="rating-item {{minRating >= 5 ? 'active' : ''}}" bindtap="onRatingFilterChange" data-rating="5">
+            <text>5分及以上</text>
+          </view>
+          <view class="rating-item {{minRating >= 4 ? 'active' : ''}}" bindtap="onRatingFilterChange" data-rating="4">
+            <text>4分及以上</text>
+          </view>
+          <view class="rating-item {{minRating >= 3 ? 'active' : ''}}" bindtap="onRatingFilterChange" data-rating="3">
+            <text>3分及以上</text>
+          </view>
+          <view class="rating-item {{minRating >= 0 ? 'active' : ''}}" bindtap="onRatingFilterChange" data-rating="0">
+            <text>全部评分</text>
+          </view>
+        </view>
+      </view>
+
+      <!-- 服务分类 -->
+      <view class="filter-section">
+        <text class="section-title">服务分类</text>
+        <view class="rating-filter">
+          <block wx:for="{{categories}}" wx:key="id">
+            <view class="rating-item {{activeCategory === item.id ? 'active' : ''}}" bindtap="selectCategory" data-category="{{item.id}}">
+              <text>{{item.name}}</text>
+            </view>
+          </block>
+        </view>
+      </view>
+    </view>
+    <view class="modal-footer">
+      <button class="btn btn-default" bindtap="resetFilter">重置</button>
+      <button class="btn btn-primary" bindtap="applyFilter">确定</button>
+    </view>
+  </view>
+</view>

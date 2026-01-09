@@ -1,0 +1,37 @@
+<!--pages/mine/address/address.wxml-->
+<view class="container">
+  <!-- 顶部操作栏 -->
+  <view class="standard-action-bar">
+    <text class="standard-back-btn" bindtap="navigateBack">←</text>
+    <text class="page-title">收货地址</text>
+    <text class="add-btn" bindtap="navigateToAddAddress">+ 新增</text>
+  </view>
+
+  <!-- 地址列表 -->
+  <view class="address-list">
+    <block wx:if="{{addresses.length > 0}}">
+      <view wx:for="{{addresses}}" wx:key="id" class="address-item">
+        <view class="address-header">
+          <view class="contact-info">
+            <text class="contact-name">{{item.name}}</text>
+            <text class="contact-phone">{{item.phone}}</text>
+          </view>
+          <view class="address-actions">
+            <text class="default-tag" wx:if="{{item.isDefault}}">默认</text>
+            <view class="action-buttons">
+              <text class="edit-btn" bindtap="editAddress" data-id="{{item.id}}">编辑</text>
+              <text class="delete-btn" bindtap="deleteAddress" data-id="{{item.id}}">删除</text>
+            </view>
+          </view>
+        </view>
+        <view class="address-content">
+          <text class="address-detail">{{item.province}} {{item.city}} {{item.district}} {{item.address}}</text>
+        </view>
+      </view>
+    </block>
+    <view class="empty-state" wx:else>
+      <text class="empty-text">暂无收货地址</text>
+      <button class="btn btn-primary" bindtap="navigateToAddAddress">添加地址</button>
+    </view>
+  </view>
+</view>

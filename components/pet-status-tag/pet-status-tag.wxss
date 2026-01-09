@@ -1,0 +1,25 @@
+/* components/pet-status-tag/pet-status-tag.wxss */
+.pet-status {
+  padding: 6rpx 12rpx;
+  border-radius: 10rpx;
+  font-size: 22rpx;
+  font-weight: bold;
+  z-index: 10;
+  display: inline-block;
+  color: #fff;
+}
+
+/* 可预订 - 绿色 */
+.pet-status.available {
+  background-color: rgba(7, 193, 96, 0.9);
+}
+
+/* 已预订 - 橙色 */
+.pet-status.booked {
+  background-color: rgba(255, 102, 0, 0.9);
+}
+
+/* 已售出 - 灰色 */
+.pet-status.sold {
+  background-color: rgba(153, 153, 153, 0.9);
+}

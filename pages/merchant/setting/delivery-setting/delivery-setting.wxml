@@ -1,0 +1,301 @@
+<!-- pages/merchant/setting/delivery-setting/delivery-setting.wxml -->
+<view class="container">
+  <!-- 顶部操作栏 -->
+  <view class="standard-action-bar">
+    <text class="standard-back-btn" bindtap="goBack">←</text>
+    <text class="page-title">配送设置</text>
+  </view>
+
+  <!-- 悬浮保存按钮 -->
+  <view class="floating-save-btn" bindtap="saveDeliverySetting">
+    <text class="save-icon">💾</text>
+    <text>保存</text>
+  </view>
+
+  <!-- 配送方式设置 -->
+  <view class="setting-section card">
+    <view class="section-title">配送方式</view>
+    
+    <!-- 自提 -->
+    <view class="form-item toggle-item">
+      <view class="form-label">
+        <text class="form-icon">🏠</text>
+        <text>到店自提</text>
+      </view>
+      <switch 
+        checked="{{deliveryMethods.selfPickup}}" 
+        bindchange="toggleDeliveryMethod" 
+        data-type="selfPickup"
+      />
+    </view>
+    
+    <!-- 商家配送 -->
+    <view class="form-item toggle-item">
+      <view class="form-label">
+        <text class="form-icon">🚚</text>
+        <text>商家配送</text>
+      </view>
+      <switch 
+        checked="{{deliveryMethods.merchantDelivery}}" 
+        bindchange="toggleDeliveryMethod" 
+        data-type="merchantDelivery"
+      />
+    </view>
+    
+    <!-- 第三方配送 -->
+    <view class="form-item toggle-item">
+      <view class="form-label">
+        <text class="form-icon">📦</text>
+        <text>第三方配送</text>
+      </view>
+      <switch 
+        checked="{{deliveryMethods.thirdPartyDelivery}}" 
+        bindchange="toggleDeliveryMethod" 
+        data-type="thirdPartyDelivery"
+      />
+    </view>
+  </view>
+
+  <!-- 配送范围设置 -->
+  <view class="setting-section card" wx:if="{{deliveryMethods.merchantDelivery || deliveryMethods.thirdPartyDelivery}}">
+    <view class="section-title">配送范围</view>
+    
+    <!-- 配送范围类型 -->
+    <view class="form-item">
+      <text class="form-label">配送范围类型</text>
+      <radio-group class="radio-group" bindchange="changeDeliveryRangeType">
+        <label class="radio-item" wx:for="{{deliveryRangeTypes}}" wx:key="value">
+          <radio value="{{item.value}}" checked="{{deliveryRangeType === item.value}}" />
+          <text>{{item.name}}</text>
+        </label>
+      </radio-group>
+    </view>
+    
+    <!-- 半径配送 -->
+    <view class="form-item" wx:if="{{deliveryRangeType === 'radius'}}">
+      <text class="form-label">配送半径(公里)</text>
+      <slider 
+        min="1" 
+        max="20" 
+        step="0.5" 
+        value="{{deliveryRadius}}" 
+        show-value 
+        bindchange="changeDeliveryRadius"
+      />
+    </view>
+    
+    <!-- 区域配送 -->
+    <view class="form-item" wx:if="{{deliveryRangeType === 'area'}}">
+      <text class="form-label">配送区域</text>
+      <button class="manage-area-btn" bindtap="manageDeliveryArea">管理配送区域</button>
+      <view class="area-list" wx:if="{{deliveryAreaList.length > 0}}">
+        <view class="area-item" wx:for="{{deliveryAreaList}}" wx:key="id">
+          <text class="area-name">{{item.name}}</text>
+          <button 
+            class="delete-area-btn" 
+            bindtap="deleteDeliveryArea" 
+            data-id="{{item.id}}"
+          >
+            删除
+          </button>
+        </view>
+      </view>
+    </view>
+  </view>
+
+  <!-- 配送费用设置 -->
+  <view class="setting-section card" wx:if="{{deliveryMethods.merchantDelivery || deliveryMethods.thirdPartyDelivery}}">
+    <view class="section-title">配送费用</view>
+    
+    <!-- 费用计算方式 -->
+    <view class="form-item">
+      <text class="form-label">费用计算方式</text>
+      <picker 
+        class="form-picker" 
+        range="{{feeCalculationMethods}}" 
+        value="{{selectedFeeMethodIndex}}" 
+        bindchange="changeFeeCalculationMethod"
+      >
+        <view class="picker-text">{{feeCalculationMethods[selectedFeeMethodIndex]}}</view>
+      </picker>
+    </view>
+    
+    <!-- 固定费用 -->
+    <view class="form-item" wx:if="{{selectedFeeMethodIndex === 0}}">
+      <text class="form-label">固定配送费 (元)</text>
+      <input 
+        class="form-input" 
+        type="number" 
+        placeholder="请输入固定配送费" 
+        value="{{fixedDeliveryFee}}" 
+        bindinput="onInputChange" 
+        data-field="fixedDeliveryFee"
+      />
+    </view>
+    
+    <!-- 按距离计算 -->
+    <view class="form-item" wx:if="{{selectedFeeMethodIndex === 1}}">
+      <text class="form-label">距离费用规则</text>
+      <button class="manage-fee-rule-btn" bindtap="manageDistanceFeeRules">管理距离费用规则</button>
+      <view class="fee-rule-list" wx:if="{{distanceFeeRules.length > 0}}">
+        <view class="fee-rule-item" wx:for="{{distanceFeeRules}}" wx:key="index">
+          <text class="rule-text">{{item.start}}-{{item.end}}公里，{{item.fee}}元</text>
+        </view>
+      </view>
+    </view>
+    
+    <!-- 按重量计算 -->
+    <view class="form-item" wx:if="{{selectedFeeMethodIndex === 2}}">
+      <text class="form-label">首重 (kg)</text>
+      <input 
+        class="form-input" 
+        type="number" 
+        placeholder="请输入首重" 
+        value="{{firstWeight}}" 
+        bindinput="onInputChange" 
+        data-field="firstWeight"
+      />
+    </view>
+    <view class="form-item" wx:if="{{selectedFeeMethodIndex === 2}}">
+      <text class="form-label">首重费用 (元)</text>
+      <input 
+        class="form-input" 
+        type="number" 
+        placeholder="请输入首重费用" 
+        value="{{firstWeightFee}}" 
+        bindinput="onInputChange" 
+        data-field="firstWeightFee"
+      />
+    </view>
+    <view class="form-item" wx:if="{{selectedFeeMethodIndex === 2}}">
+      <text class="form-label">续重 (kg)</text>
+      <input 
+        class="form-input" 
+        type="number" 
+        placeholder="请输入续重" 
+        value="{{addWeight}}" 
+        bindinput="onInputChange" 
+        data-field="addWeight"
+      />
+    </view>
+    <view class="form-item" wx:if="{{selectedFeeMethodIndex === 2}}">
+      <text class="form-label">续重费用 (元)</text>
+      <input 
+        class="form-input" 
+        type="number" 
+        placeholder="请输入续重费用" 
+        value="{{addWeightFee}}" 
+        bindinput="onInputChange" 
+        data-field="addWeightFee"
+      />
+    </view>
+    
+    <!-- 免配送费设置 -->
+    <view class="form-item">
+      <text class="form-label">免配送费条件</text>
+      <input 
+        class="form-input" 
+        type="number" 
+        placeholder="订单满多少元免配送费 (0表示不免)" 
+        value="{{freeDeliveryThreshold}}" 
+        bindinput="onInputChange" 
+        data-field="freeDeliveryThreshold"
+      />
+    </view>
+  </view>
+
+  <!-- 配送时间设置 -->
+  <view class="setting-section card" wx:if="{{deliveryMethods.merchantDelivery || deliveryMethods.thirdPartyDelivery}}">
+    <view class="section-title">配送时间</view>
+    
+    <!-- 预计配送时间 -->
+    <view class="form-item">
+      <text class="form-label">预计配送时间(分钟)</text>
+      <input 
+        class="form-input" 
+        type="number" 
+        placeholder="请输入预计配送时间" 
+        value="{{estimatedDeliveryTime}}" 
+        bindinput="onInputChange" 
+        data-field="estimatedDeliveryTime"
+      />
+    </view>
+    
+    <!-- 配送时段 -->
+    <view class="form-item">
+      <text class="form-label">配送时段</text>
+      <button class="manage-time-btn" bindtap="manageDeliveryTimeSlots">管理配送时段</button>
+      <view class="time-slot-list" wx:if="{{deliveryTimeSlots.length > 0}}">
+        <view class="time-slot-item" wx:for="{{deliveryTimeSlots}}" wx:key="index">
+          <text class="time-slot-text">{{item.start}} - {{item.end}}</text>
+        </view>
+      </view>
+    </view>
+    
+    <!-- 预约配送 -->
+    <view class="form-item toggle-item">
+      <view class="form-label">支持预约配送</view>
+      <switch 
+        checked="{{supportScheduledDelivery}}" 
+        bindchange="toggleScheduledDelivery"
+      />
+    </view>
+    
+    <!-- 预约提前时间 -->
+    <view class="form-item" wx:if="{{supportScheduledDelivery}}">
+      <text class="form-label">预约提前时间 (小时)</text>
+      <input 
+        class="form-input" 
+        type="number" 
+        placeholder="请输入预约提前时间" 
+        value="{{scheduledAdvanceTime}}" 
+        bindinput="onInputChange" 
+        data-field="scheduledAdvanceTime"
+      />
+    </view>
+  </view>
+
+  <!-- 自提设置 -->
+  <view class="setting-section card" wx:if="{{deliveryMethods.selfPickup}}">
+    <view class="section-title">自提设置</view>
+    
+    <!-- 自提地址 -->
+    <view class="form-item">
+      <text class="form-label">自提地址</text>
+      <textarea 
+        class="form-textarea" 
+        placeholder="请输入详细自提地址" 
+        value="{{selfPickupAddress}}" 
+        bindinput="onInputChange" 
+        data-field="selfPickupAddress"
+        maxlength="200"
+        auto-height
+      />
+    </view>
+    
+    <!-- 自提时间 -->
+    <view class="form-item">
+      <text class="form-label">自提时间</text>
+      <button class="manage-time-btn" bindtap="manageSelfPickupTime">管理自提时间</button>
+      <view class="time-slot-list" wx:if="{{selfPickupTimeSlots.length > 0}}">
+        <view class="time-slot-item" wx:for="{{selfPickupTimeSlots}}" wx:key="index">
+          <text class="time-slot-text">{{item.start}} - {{item.end}}</text>
+        </view>
+      </view>
+    </view>
+    
+    <!-- 自提说明 -->
+    <view class="form-item">
+      <text class="form-label">自提说明</text>
+      <textarea 
+        class="form-textarea" 
+        placeholder="请输入自提说明" 
+        value="{{selfPickupNote}}" 
+        bindinput="onInputChange" 
+        data-field="selfPickupNote"
+        maxlength="200"
+        auto-height
+      />
+    </view>
+  </view>
+</view>

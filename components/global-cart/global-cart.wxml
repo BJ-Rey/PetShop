@@ -1,0 +1,5 @@
+<view class="global-cart-btn" bindtap="navigateToCart" hover-class="cart-hover">
+  <!-- 替换SVG为纯CSS图标或文字，避免真机SVG渲染兼容性问题 -->
+  <view class="cart-icon-text">🛒</view>
+  <text class="cart-count" wx:if="{{cartCount > 0}}">{{cartCount}}</text>
+</view>

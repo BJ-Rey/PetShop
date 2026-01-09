@@ -1,0 +1,7 @@
+{
+  "navigationBarTitleText": "宠物商城",
+  "usingComponents": {
+    "pet-status-tag": "/components/pet-status-tag/pet-status-tag",
+    "global-cart": "/components/global-cart/global-cart"
+  }
+}

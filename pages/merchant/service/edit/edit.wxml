@@ -1,0 +1,152 @@
+<!-- pages/merchant/service/edit/edit.wxml -->
+<view class="container">
+  <!-- 顶部操作栏 -->
+  <view class="standard-action-bar">
+    <text class="standard-back-btn" bindtap="navigateBack">←</text>
+    <text class="page-title">编辑服务</text>
+    <button class="logout-btn" bindtap="logout">退出登录</button>
+  </view>
+
+  <!-- 服务信息表单 -->
+  <form class="service-form" bindsubmit="submitForm">
+    <!-- 服务基本信息 -->
+    <view class="form-section">
+      <text class="section-title">基本信息</text>
+      
+      <view class="form-item">
+        <text class="label required">服务名称</text>
+        <input 
+          class="input" 
+          name="name" 
+          placeholder="请输入服务名称" 
+          value="{{service.name}}"
+          bindinput="onInput"
+          data-field="name"
+        />
+      </view>
+      
+      <view class="form-item">
+        <text class="label required">服务分类</text>
+        <picker 
+          class="picker" 
+          bindchange="onPickerChange"
+          data-field="category"
+          range="{{categories}}"
+          range-key="name"
+          value="{{categoryIndex}}"
+        >
+          <text class="picker-text">{{service.category ? getCategoryName(service.category) : '请选择服务分类'}}</text>
+        </picker>
+      </view>
+      
+      <view class="form-item">
+        <text class="label required">服务时长</text>
+        <input 
+          class="input" 
+          name="duration" 
+          placeholder="请输入服务时长，如：30分钟" 
+          value="{{service.duration}}"
+          bindinput="onInput"
+          data-field="duration"
+        />
+      </view>
+      
+      <view class="form-item">
+        <text class="label required">服务价格</text>
+        <input 
+          class="input" 
+          name="price" 
+          placeholder="请输入服务价格" 
+          type="digit"
+          value="{{service.price}}"
+          bindinput="onInput"
+          data-field="price"
+        />
+      </view>
+      
+      <view class="form-item">
+        <text class="label required">服务库存</text>
+        <input 
+          class="input" 
+          name="stock" 
+          placeholder="请输入服务库存" 
+          type="number"
+          value="{{service.stock}}"
+          bindinput="onInput"
+          data-field="stock"
+        />
+      </view>
+    </view>
+    
+    <!-- 服务图片上传 -->
+    <view class="form-section">
+      <text class="section-title">服务图片</text>
+      
+      <view class="form-item">
+        <text class="label required">封面图片</text>
+        <view class="upload-section">
+          <image 
+            class="upload-image" 
+            src="{{service.image}}" 
+            bindtap="chooseImage"
+            wx:if="{{service.image}}"
+          ></image>
+          <view 
+            class="upload-placeholder" 
+            bindtap="chooseImage"
+            wx:else
+          >
+            <text class="upload-icon">+</text>
+            <text class="upload-text">点击上传封面图片</text>
+          </view>
+        </view>
+        <text class="help-text">建议尺寸：800x800px，大小不超过2MB</text>
+      </view>
+    </view>
+    
+    <!-- 服务描述 -->
+    <view class="form-section">
+      <text class="section-title">服务描述</text>
+      
+      <view class="form-item">
+        <text class="label">服务详情</text>
+        <textarea 
+          class="textarea" 
+          name="description" 
+          placeholder="请输入服务详情描述" 
+          value="{{service.description}}"
+          bindinput="onInput"
+          data-field="description"
+          auto-height
+          maxlength="500"
+        ></textarea>
+        <text class="text-count">{{service.description.length || 0}}/500</text>
+      </view>
+    </view>
+    
+    <!-- 服务状态 -->
+    <view class="form-section">
+      <text class="section-title">服务状态</text>
+      
+      <view class="form-item">
+        <text class="label">上架状态</text>
+        <radio-group bindchange="onRadioChange" data-field="status">
+          <label class="radio-item">
+            <radio value="published" checked="{{service.status === 'published'}}" />
+            <text>已上架</text>
+          </label>
+          <label class="radio-item">
+            <radio value="unpublished" checked="{{service.status === 'unpublished'}}" />
+            <text>已下架</text>
+          </label>
+        </radio-group>
+      </view>
+    </view>
+    
+    <!-- 提交按钮 -->
+    <view class="form-actions">
+      <button class="cancel-btn" bindtap="navigateBack">取消</button>
+      <button class="submit-btn" type="primary" form-type="submit">更新服务</button>
+    </view>
+  </form>
+</view>

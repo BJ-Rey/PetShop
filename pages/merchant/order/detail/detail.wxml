@@ -1,0 +1,138 @@
+<!-- pages/merchant/order/detail/detail.wxml -->
+<view class="container">
+  <!-- 顶部操作栏 -->
+  <view class="standard-action-bar">
+    <text class="standard-back-btn" bindtap="navigateBack">←</text>
+    <text class="page-title">订单详情</text>
+  </view>
+
+  <!-- 加载状态 -->
+  <view class="loading-state" wx:if="{{isLoading}}">
+    <text class="loading-text">加载中...</text>
+  </view>
+
+  <!-- 订单详情 -->
+  <view class="order-detail" wx:elif="{{order}}">
+    <!-- 订单状态 -->
+    <view class="order-status-section card">
+      <view class="status-header">
+        <text class="status-title">订单状态</text>
+        <text class="status-value {{order.status}}">
+          {{order.status === 'pending' ? '待付款' : order.status === 'processing' ? '待发货' : order.status === 'shipped' ? '待收货' : order.status === 'completed' ? '已完成' : order.status === 'cancelled' ? '已取消' : '未知状态'}}
+        </text>
+      </view>
+    </view>
+
+    <!-- 订单基本信息 -->
+    <view class="order-info-section card">
+      <view class="info-item">
+        <text class="info-label">订单编号</text>
+        <text class="info-value">{{order.orderNumber}}</text>
+      </view>
+      <view class="info-item">
+        <text class="info-label">创建时间</text>
+        <text class="info-value">{{order.createdAt}}</text>
+      </view>
+      <view class="info-item">
+        <text class="info-label">更新时间</text>
+        <text class="info-value">{{order.updatedAt}}</text>
+      </view>
+      <view class="info-item" wx:if="{{order.trackingNumber}}">
+        <text class="info-label">运单号</text>
+        <text class="info-value">{{order.trackingNumber}}</text>
+      </view>
+    </view>
+
+    <!-- 客户信息 -->
+    <view class="customer-info-section card">
+      <view class="section-title">客户信息</view>
+      <view class="customer-item">
+        <text class="customer-label">客户姓名</text>
+        <text class="customer-value">{{order.customer.name}}</text>
+      </view>
+      <view class="customer-item">
+        <text class="customer-label">联系电话</text>
+        <text class="customer-value">{{order.customer.phone}}</text>
+      </view>
+      <view class="customer-item">
+        <text class="customer-label">收货地址</text>
+        <text class="customer-value">{{order.customer.address}}</text>
+      </view>
+    </view>
+
+    <!-- 商品信息 -->
+    <view class="products-section card">
+      <view class="section-title">商品信息</view>
+      <view class="product-list">
+        <view class="product-item" wx:for="{{order.products}}" wx:key="id">
+          <image class="product-image" src="{{item.image}}"></image>
+          <view class="product-info">
+            <text class="product-name">{{item.name}}</text>
+            <text class="product-spec">规格：{{item.spec}}</text>
+          </view>
+          <view class="product-quantity">x{{item.quantity}}</view>
+          <view class="product-price">¥{{item.price}}</view>
+        </view>
+      </view>
+    </view>
+
+    <!-- 金额信息 -->
+    <view class="amount-section card">
+      <view class="amount-item">
+        <text class="amount-label">商品总额</text>
+        <text class="amount-value">¥{{order.subtotal}}</text>
+      </view>
+      <view class="amount-item">
+        <text class="amount-label">运费</text>
+        <text class="amount-value">¥{{order.shippingFee}}</text>
+      </view>
+      <view class="amount-item total">
+        <text class="amount-label">订单总额</text>
+        <text class="amount-value">¥{{order.total}}</text>
+      </view>
+    </view>
+
+    <!-- 操作按钮 -->
+    <view class="action-section">
+      <!-- 根据订单状态显示不同的操作按钮 -->
+      <button 
+        class="action-btn primary-btn" 
+        bindtap="confirmPayment"
+        wx:if="{{order.status === 'pending'}}"
+      >
+        确认付款
+      </button>
+      
+      <button 
+        class="action-btn primary-btn" 
+        bindtap="shipOrder"
+        wx:if="{{order.status === 'processing'}}"
+      >
+        发货
+      </button>
+      
+      <button 
+        class="action-btn primary-btn" 
+        bindtap="confirmDelivery"
+        wx:if="{{order.status === 'shipped'}}"
+      >
+        确认收货
+      </button>
+      
+      <button 
+        class="action-btn danger-btn" 
+        bindtap="cancelOrder"
+        wx:if="{{order.status === 'pending' || order.status === 'processing'}}"
+      >
+        取消订单
+      </button>
+    </view>
+  </view>
+
+  <!-- 订单不存在 -->
+  <view class="empty-state" wx:else>
+    <text class="empty-icon">📋</text>
+    <text class="empty-text">订单不存在</text>
+    <button class="back-btn" bindtap="navigateBack">返回订单列表</button>
+  </view>
+</view>

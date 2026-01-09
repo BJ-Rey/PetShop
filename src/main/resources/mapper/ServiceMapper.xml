@@ -1,0 +1,48 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.tencent.wxcloudrun.dao.ServiceMapper">
+    <resultMap id="ServiceMap" type="com.tencent.wxcloudrun.model.Service">
+        <id property="id" column="id"/>
+        <result property="name" column="name"/>
+        <result property="category" column="category"/>
+        <result property="price" column="price"/>
+        <result property="duration" column="duration"/>
+        <result property="description" column="description"/>
+        <result property="merchantName" column="merchant_name"/>
+        <result property="merchantId" column="merchant_id"/>
+        <result property="image" column="image"/>
+        <result property="sales" column="sales"/>
+        <result property="rating" column="rating"/>
+        <result property="createdAt" column="created_at"/>
+        <result property="updatedAt" column="updated_at"/>
+    </resultMap>
+
+    <select id="getServiceById" resultMap="ServiceMap">
+        SELECT * FROM services WHERE id = #{id}
+    </select>
+
+    <select id="getServices" resultMap="ServiceMap">
+        SELECT * FROM services LIMIT #{limit} OFFSET #{offset}
+    </select>
+
+    <insert id="createService" parameterType="com.tencent.wxcloudrun.model.Service" useGeneratedKeys="true" keyProperty="id">
+        INSERT INTO services (name, category, price, duration, description, merchant_name, merchant_id, image, sales, rating)
+        VALUES (#{name}, #{category}, #{price}, #{duration}, #{description}, #{merchantName}, #{merchantId}, #{image}, #{sales}, #{rating})
+    </insert>
+
+    <update id="updateService" parameterType="com.tencent.wxcloudrun.model.Service">
+        UPDATE services
+        SET name = #{name}, category = #{category}, price = #{price}, duration = #{duration},
+            description = #{description}, merchant_name = #{merchantName}, merchant_id = #{merchantId},
+            image = #{image}, sales = #{sales}, rating = #{rating}
+        WHERE id = #{id}
+    </update>
+
+    <delete id="deleteService">
+        DELETE FROM services WHERE id = #{id}
+    </delete>
+
+    <select id="countServices" resultType="java.lang.Integer">
+        SELECT COUNT(*) FROM services
+    </select>
+</mapper>

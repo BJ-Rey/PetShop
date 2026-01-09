@@ -1,0 +1,108 @@
+<!-- pages/service/detail/detail.wxml -->
+<view class="container">
+  <!-- 顶部操作栏 -->
+  <view class="standard-action-bar">
+    <text class="standard-back-btn" bindtap="navigateBack">←</text>
+    <text class="page-title">服务详情</text>
+  </view>
+
+  <!-- 服务详情头部 -->
+  <view class="service-header">
+    <image src="{{service.image}}" class="service-image"></image>
+    <view class="service-info">
+      <view class="service-name">{{service.name}}</view>
+      <view class="service-price">¥{{service.price}}</view>
+      <view class="service-meta">
+        <view class="meta-item">
+          <text class="meta-label">销量:</text>
+          <text class="meta-value">{{service.sales}}</text>
+        </view>
+        <view class="meta-item">
+          <text class="meta-label">评分:</text>
+          <text class="meta-value">{{service.rating}} ★</text>
+        </view>
+        <view class="meta-item">
+          <text class="meta-label">时长:</text>
+          <text class="meta-value">{{service.duration}}</text>
+        </view>
+      </view>
+    </view>
+  </view>
+
+  <!-- 服务商家信息 -->
+  <view class="merchant-section">
+    <view class="section-header">
+      <text class="title">商家信息</text>
+    </view>
+    <view class="merchant-info">
+      <view class="merchant-name">{{service.merchantName}}</view>
+      <view class="merchant-desc">专业宠物服务提供商，提供优质的宠物护理服务</view>
+    </view>
+  </view>
+
+  <!-- 服务详情描述 -->
+  <view class="description-section">
+    <view class="section-header">
+      <text class="title">服务详情</text>
+    </view>
+    <view class="description-content">
+      {{service.description}}
+    </view>
+  </view>
+
+  <!-- 服务流程 -->
+  <view class="process-section">
+    <view class="section-header">
+      <text class="title">服务流程</text>
+    </view>
+    <view class="process-list">
+      <view class="process-item" wx:for="{{processList}}" wx:key="index">
+        <view class="process-step">{{index + 1}}</view>
+        <view class="process-content">
+          <view class="process-title">{{item.title}}</view>
+          <view class="process-desc">{{item.desc}}</view>
+        </view>
+      </view>
+    </view>
+  </view>
+
+  <!-- 预约须知 -->
+  <view class="notice-section">
+    <view class="section-header">
+      <text class="title">预约须知</text>
+    </view>
+    <view class="notice-list">
+      <view class="notice-item" wx:for="{{noticeList}}" wx:key="index">
+        <text class="notice-icon">•</text>
+        <text class="notice-content">{{item}}</text>
+      </view>
+    </view>
+  </view>
+
+  <!-- 预约日历组件 -->
+  <view class="calendar-section card">
+    <view class="section-title">预约日期</view>
+    <scroll-view scroll-x="true" class="calendar-scroll">
+      <view class="date-item {{selectedDate === item.date ? 'selected' : ''}}" wx:for="{{calendarDays}}" wx:key="date" bindtap="selectDate" data-date="{{item.date}}">
+        <text class="week">{{item.week}}</text>
+        <text class="day">{{item.day}}</text>
+      </view>
+    </scroll-view>
+    <view class="time-slots" wx:if="{{selectedDate}}">
+        <view class="time-slot {{selectedTime === item ? 'selected' : ''}}" wx:for="{{timeSlots}}" wx:key="*this" bindtap="selectTime" data-time="{{item}}">
+            {{item}}
+        </view>
+    </view>
+  </view>
+
+  <!-- 底部预约按钮 -->
+  <view class="bottom-bar">
+    <view class="price-info">
+      <text class="price-label">服务价格:</text>
+      <text class="price-value">¥{{service.price}}</text>
+    </view>
+    <button class="btn btn-primary appointment-btn" bindtap="navigateToAppointment">立即预约</button>
+  </view>
+
+  <auth-modal id="auth-modal" />
+</view>

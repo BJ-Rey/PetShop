@@ -1,0 +1,140 @@
+<!-- pages/merchant/product/edit/edit.wxml -->
+<view class="container">
+  <!-- 顶部操作栏 -->
+  <view class="standard-action-bar">
+    <text class="standard-back-btn" bindtap="navigateBack">←</text>
+    <text class="page-title">编辑商品</text>
+    <button class="logout-btn" bindtap="logout">退出登录</button>
+  </view>
+
+  <!-- 商品信息表单 -->
+  <form class="product-form" bindsubmit="submitForm">
+    <!-- 商品基本信息 -->
+    <view class="form-section">
+      <text class="section-title">基本信息</text>
+      
+      <view class="form-item">
+        <text class="label required">商品名称</text>
+        <input 
+          class="input" 
+          name="name" 
+          placeholder="请输入商品名称" 
+          value="{{product.name}}"
+          bindinput="onInput"
+          data-field="name"
+        />
+      </view>
+      
+      <view class="form-item">
+        <text class="label required">商品分类</text>
+        <picker 
+          class="picker" 
+          bindchange="onPickerChange"
+          data-field="category"
+          range="{{categories}}"
+          range-key="name"
+          value="{{categoryIndex}}"
+        >
+          <text class="picker-text">{{product.category ? getCategoryName(product.category) : '请选择商品分类'}}</text>
+        </picker>
+      </view>
+      
+      <view class="form-item">
+        <text class="label required">商品价格</text>
+        <input 
+          class="input" 
+          name="price" 
+          placeholder="请输入商品价格" 
+          type="digit"
+          value="{{product.price}}"
+          bindinput="onInput"
+          data-field="price"
+        />
+      </view>
+      
+      <view class="form-item">
+        <text class="label required">商品库存</text>
+        <input 
+          class="input" 
+          name="stock" 
+          placeholder="请输入商品库存" 
+          type="number"
+          value="{{product.stock}}"
+          bindinput="onInput"
+          data-field="stock"
+        />
+      </view>
+    </view>
+    
+    <!-- 商品图片上传 -->
+    <view class="form-section">
+      <text class="section-title">商品图片</text>
+      
+      <view class="form-item">
+        <text class="label required">封面图片</text>
+        <view class="upload-section">
+          <image 
+            class="upload-image" 
+            src="{{product.image}}" 
+            bindtap="chooseImage"
+            wx:if="{{product.image}}"
+          ></image>
+          <view 
+            class="upload-placeholder" 
+            bindtap="chooseImage"
+            wx:else
+          >
+            <text class="upload-icon">+</text>
+            <text class="upload-text">点击上传封面图片</text>
+          </view>
+        </view>
+        <text class="help-text">建议尺寸：800x800px，大小不超过2MB</text>
+      </view>
+    </view>
+    
+    <!-- 商品描述 -->
+    <view class="form-section">
+      <text class="section-title">商品描述</text>
+      
+      <view class="form-item">
+        <text class="label">商品详情</text>
+        <textarea 
+          class="textarea" 
+          name="description" 
+          placeholder="请输入商品详情描述" 
+          value="{{product.description}}"
+          bindinput="onInput"
+          data-field="description"
+          auto-height
+          maxlength="1000"
+        ></textarea>
+        <text class="text-count">{{product.description.length || 0}}/1000</text>
+      </view>
+    </view>
+    
+    <!-- 商品状态 -->
+    <view class="form-section">
+      <text class="section-title">商品状态</text>
+      
+      <view class="form-item">
+        <text class="label">上架状态</text>
+        <radio-group bindchange="onRadioChange" data-field="status">
+          <label class="radio-item">
+            <radio value="published" checked="{{product.status === 'published'}}" />
+            <text>已上架</text>
+          </label>
+          <label class="radio-item">
+            <radio value="unpublished" checked="{{product.status === 'unpublished'}}" />
+            <text>已下架</text>
+          </label>
+        </radio-group>
+      </view>
+    </view>
+    
+    <!-- 提交按钮 -->
+    <view class="form-actions">
+      <button class="cancel-btn" bindtap="navigateBack">取消</button>
+      <button class="submit-btn" type="primary" form-type="submit">保存商品</button>
+    </view>
+  </form>
+</view>

@@ -1,0 +1,241 @@
+<!-- pages/merchant/product/add/add.wxml -->
+<view class="container">
+  <!-- 顶部操作栏 -->
+  <view class="standard-action-bar">
+    <text class="standard-back-btn" bindtap="navigateBack">←</text>
+    <text class="page-title">添加商品</text>
+    <button class="save-btn" type="primary" bindtap="saveProduct">保存</button>
+  </view>
+
+  <!-- 商品基本信息 -->
+  <view class="form-section card">
+    <view class="section-title">基本信息</view>
+    
+    <!-- 商品名称 -->
+    <view class="form-item">
+      <text class="form-label">商品名称</text>
+      <input 
+        class="form-input" 
+        placeholder="请输入商品名称" 
+        value="{{product.name}}"
+        bindinput="onNameInput"
+      />
+    </view>
+    
+    <!-- 商品分类 -->
+    <view class="form-item">
+      <text class="form-label">商品分类</text>
+      <picker 
+        class="form-picker" 
+        range="{{categories}}" 
+        value="{{selectedCategoryIndex}}"
+        bindchange="onCategoryChange"
+      >
+        <view class="picker-text">{{selectedCategory}}</view>
+      </picker>
+    </view>
+    
+    <!-- 商品主图 -->
+    <view class="form-item">
+      <text class="form-label">商品主图</text>
+      <view class="image-upload">
+        <image 
+          class="product-image" 
+          src="{{product.image || 'https://example.com/default-product.jpg'}}"
+        ></image>
+        <button 
+          class="upload-btn" 
+          bindtap="uploadImage"
+        >
+          上传图片
+        </button>
+      </view>
+    </view>
+    
+    <!-- 商品描述 -->
+    <view class="form-item">
+      <text class="form-label">商品描述</text>
+      <textarea 
+        class="form-textarea" 
+        placeholder="请输入商品描述" 
+        value="{{product.description}}"
+        bindinput="onDescriptionInput"
+        auto-height
+        maxlength="500"
+      ></textarea>
+    </view>
+  </view>
+
+  <!-- 商品价格与库存 -->
+  <view class="form-section card">
+    <view class="section-title">价格与库存</view>
+    
+    <!-- 原价 -->
+    <view class="form-item">
+      <text class="form-label">原价</text>
+      <input 
+        class="form-input" 
+        placeholder="请输入原价" 
+        type="digit"
+        value="{{product.originalPrice}}"
+        bindinput="onOriginalPriceInput"
+      />
+    </view>
+    
+    <!-- 现价 -->
+    <view class="form-item">
+      <text class="form-label">现价</text>
+      <input 
+        class="form-input" 
+        placeholder="请输入现价" 
+        type="digit"
+        value="{{product.price}}"
+        bindinput="onPriceInput"
+      />
+    </view>
+    
+    <!-- 库存 -->
+    <view class="form-item">
+      <text class="form-label">库存</text>
+      <input 
+        class="form-input" 
+        placeholder="请输入库存" 
+        type="number"
+        value="{{product.stock}}"
+        bindinput="onStockInput"
+      />
+    </view>
+  </view>
+
+  <!-- SKU管理 -->
+  <view class="form-section card">
+    <view class="section-title">
+      <text>SKU管理</text>
+      <text class="sku-tip">（可选：点击添加多规格）</text>
+    </view>
+    
+    <!-- 规格名称 -->
+    <view class="form-item">
+      <text class="form-label">规格名称</text>
+      <view class="spec-name-inputs">
+        <input 
+          class="form-input spec-name-input" 
+          placeholder="例如：颜色" 
+          value="{{specNames[0]}}"
+          bindinput="onSpecNameInput"
+          data-index="0"
+        />
+        <input 
+          class="form-input spec-name-input" 
+          placeholder="例如：尺寸" 
+          value="{{specNames[1]}}"
+          bindinput="onSpecNameInput"
+          data-index="1"
+        />
+      </view>
+    </view>
+    
+    <!-- 规格选项 -->
+    <view class="form-item">
+      <text class="form-label">规格选项</text>
+      <view class="spec-options">
+        <!-- 规格1选项 -->
+        <view class="spec-option-group">
+          <text class="spec-option-title">{{specNames[0] || '规格1'}}选项：</text>
+          <view class="spec-option-inputs">
+            <input 
+              class="form-input spec-option-input" 
+              placeholder="例如：红色,蓝色,绿色" 
+              value="{{specOptions[0]}}"
+              bindinput="onSpecOptionsInput"
+              data-index="0"
+            />
+          </view>
+        </view>
+        
+        <!-- 规格2选项 -->
+        <view class="spec-option-group">
+          <text class="spec-option-title">{{specNames[1] || '规格2'}}选项：</text>
+          <view class="spec-option-inputs">
+            <input 
+              class="form-input spec-option-input" 
+              placeholder="例如：S,M,L" 
+              value="{{specOptions[1]}}"
+              bindinput="onSpecOptionsInput"
+              data-index="1"
+            />
+          </view>
+        </view>
+      </view>
+    </view>
+    
+    <!-- SKU表格 -->
+    <view class="sku-table-container" wx:if="skuTable.length > 0">
+      <scroll-view scroll-x="true" enable-flex>
+        <table class="sku-table">
+          <thead>
+            <tr>
+              <th wx:for="{{specNames}}" wx:key="index" wx:if="{{item}}">{{item}}</th>
+              <th>库存</th>
+              <th>价格</th>
+              <th>操作</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr wx:for="{{skuTable}}" wx:key="id">
+              <td wx:for="{{item.specs}}" wx:key="index">{{item}}</td>
+              <td>
+                <input 
+                  class="sku-input" 
+                  type="number" 
+                  placeholder="0" 
+                  value="{{item.stock}}"
+                  bindinput="onSkuStockInput"
+                  data-index="{{index}}"
+                />
+              </td>
+              <td>
+                <input 
+                  class="sku-input" 
+                  type="digit" 
+                  placeholder="0.00" 
+                  value="{{item.price}}"
+                  bindinput="onSkuPriceInput"
+                  data-index="{{index}}"
+                />
+              </td>
+              <td>
+                <text class="delete-sku-btn" bindtap="deleteSku" data-index="{{index}}">删除</text>
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </scroll-view>
+    </view>
+    
+    <!-- 生成SKU表格按钮 -->
+    <button 
+      class="generate-sku-btn" 
+      type="default" 
+      bindtap="generateSkuTable"
+      wx:if="specNames[0] && specOptions[0]"
+    >
+      生成SKU表格
+    </button>
+  </view>
+
+  <!-- 商品状态 -->
+  <view class="form-section card">
+    <view class="form-item">
+      <text class="form-label">商品状态</text>
+      <view class="status-toggle">
+        <switch 
+          class="form-switch" 
+          checked="{{product.status === 'published'}}"
+          bindchange="onStatusChange"
+        />
+        <text class="status-text">{{product.status === 'published' ? '已上架' : '已下架'}}</text>
+      </view>
+    </view>
+  </view>
+</view>

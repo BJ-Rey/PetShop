@@ -1,0 +1,612 @@
+/* pages/merchant/finance/finance.wxss */
+
+.container {
+  padding: 20rpx;
+  background-color: #f5f5f5;
+  min-height: 100vh;
+}
+
+/* 顶部操作栏 */
+.standard-action-bar {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 20rpx 0;
+  margin-bottom: 20rpx;
+  background-color: #fff;
+  border-radius: 10rpx;
+  padding: 20rpx 30rpx;
+  box-shadow: 0 2rpx 10rpx rgba(0, 0, 0, 0.1);
+}
+
+.page-title {
+  font-size: 36rpx;
+  font-weight: bold;
+  color: #333;
+}
+
+.logout-btn {
+  font-size: 28rpx;
+  color: #666;
+  background-color: transparent;
+  padding: 0;
+  margin: 0;
+  min-width: auto;
+  height: auto;
+  line-height: normal;
+}
+
+.logout-btn:hover {
+  color: #ff3b30;
+}
+
+/* 财务概览 */
+.finance-overview {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 20rpx;
+  margin-bottom: 20rpx;
+}
+
+.overview-card {
+  background-color: #fff;
+  border-radius: 10rpx;
+  padding: 25rpx;
+  box-shadow: 0 2rpx 10rpx rgba(0, 0, 0, 0.1);
+  display: flex;
+  flex-direction: column;
+  gap: 15rpx;
+  transition: all 0.3s ease;
+}
+
+.overview-card:hover {
+  transform: translateY(-2rpx);
+  box-shadow: 0 4rpx 20rpx rgba(0, 0, 0, 0.15);
+}
+
+.overview-title {
+  font-size: 26rpx;
+  color: #666;
+}
+
+.overview-value {
+  font-size: 40rpx;
+  font-weight: bold;
+  color: #333;
+}
+
+.overview-change {
+  font-size: 24rpx;
+  font-weight: bold;
+}
+
+.overview-change.positive {
+  color: #07c160;
+}
+
+.overview-change.negative {
+  color: #ff3b30;
+}
+
+.overview-desc {
+  font-size: 22rpx;
+  color: #999;
+}
+
+/* 图表区域 */
+.chart-section {
+  padding: 25rpx;
+  margin-bottom: 20rpx;
+}
+
+.section-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 25rpx;
+}
+
+.section-title {
+  font-size: 32rpx;
+  font-weight: bold;
+  color: #333;
+}
+
+.time-filter {
+  display: flex;
+  gap: 20rpx;
+}
+
+.time-filter-item {
+  font-size: 26rpx;
+  padding: 12rpx 25rpx;
+  background-color: #f5f5f5;
+  border-radius: 40rpx;
+  color: #666;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+.time-filter-item:hover {
+  background-color: #e8e8e8;
+}
+
+.time-filter-item.active {
+  background-color: #07c160;
+  color: #fff;
+}
+
+.chart-placeholder {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  height: 300rpx;
+  background-color: #fafafa;
+  border-radius: 10rpx;
+  gap: 20rpx;
+}
+
+.chart-icon {
+  font-size: 80rpx;
+}
+
+.chart-text {
+  font-size: 28rpx;
+  color: #999;
+}
+
+/* 交易明细和结算记录 */
+.transaction-section,
+.settlement-section {
+  padding: 25rpx;
+  margin-bottom: 20rpx;
+}
+
+.view-all-btn {
+  font-size: 26rpx;
+  color: #07c160;
+  background-color: transparent;
+  padding: 0;
+  margin: 0;
+  min-width: auto;
+  height: auto;
+  line-height: normal;
+}
+
+.view-all-btn:hover {
+  text-decoration: underline;
+}
+
+/* 交易列表 */
+.transaction-list,
+.settlement-list {
+  display: flex;
+  flex-direction: column;
+  gap: 20rpx;
+}
+
+/* 空状态 */
+.empty-state {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 80rpx 20rpx;
+  background-color: #fafafa;
+  border-radius: 10rpx;
+}
+
+.empty-icon {
+  font-size: 80rpx;
+  margin-bottom: 20rpx;
+}
+
+.empty-text {
+  font-size: 26rpx;
+  color: #999;
+}
+
+/* 加载状态 */
+.loading-state {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  padding: 80rpx 20rpx;
+  background-color: #fafafa;
+  border-radius: 10rpx;
+}
+
+.loading-text {
+  font-size: 26rpx;
+  color: #999;
+}
+
+/* 交易项 */
+.transaction-item,
+.settlement-item {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 20rpx;
+  background-color: #fafafa;
+  border-radius: 10rpx;
+  transition: all 0.3s ease;
+}
+
+.transaction-item:hover,
+.settlement-item:hover {
+  background-color: #f0f0f0;
+}
+
+.transaction-info,
+.settlement-info {
+  display: flex;
+  flex-direction: column;
+  gap: 10rpx;
+  flex: 1;
+}
+
+.transaction-type {
+  font-size: 28rpx;
+  font-weight: bold;
+  padding: 5rpx 15rpx;
+  border-radius: 20rpx;
+  align-self: flex-start;
+}
+
+.transaction-type.income {
+  color: #07c160;
+  background-color: #f0f9f4;
+}
+
+.transaction-type.expense {
+  color: #ff3b30;
+  background-color: #fff1f0;
+}
+
+.transaction-desc,
+.settlement-period {
+  font-size: 28rpx;
+  color: #333;
+  font-weight: bold;
+}
+
+.transaction-time,
+.settlement-time {
+  font-size: 24rpx;
+  color: #999;
+}
+
+.transaction-amount,
+.settlement-amount {
+  font-size: 32rpx;
+  font-weight: bold;
+}
+
+.transaction-amount.income {
+  color: #07c160;
+}
+
+.transaction-amount.expense {
+  color: #ff3b30;
+}
+
+.settlement-status {
+  font-size: 24rpx;
+  padding: 5rpx 15rpx;
+  border-radius: 20rpx;
+  align-self: flex-start;
+  font-weight: bold;
+}
+
+.settlement-status.completed {
+  color: #07c160;
+  background-color: #f0f9f4;
+}
+
+.settlement-status.processing {
+  color: #ff9500;
+  background-color: #fff7e6;
+}
+
+.settlement-status.pending {
+  color: #007aff;
+  background-color: #e6f2ff;
+}
+
+/* 卡片样式 */
+.card {
+  background-color: #fff;
+  border-radius: 10rpx;
+  box-shadow: 0 2rpx 10rpx rgba(0, 0, 0, 0.1);
+}
+
+/* 图表操作按钮 */
+.chart-actions {
+  display: flex;
+  gap: 15rpx;
+}
+
+.export-btn, .refresh-btn {
+  font-size: 24rpx;
+  padding: 10rpx 25rpx;
+  border-radius: 40rpx;
+  min-width: auto;
+  height: auto;
+  line-height: normal;
+}
+
+.export-btn {
+  color: #fff;
+  background-color: #1890ff;
+}
+
+.refresh-btn {
+  color: #666;
+  background-color: #f5f5f5;
+}
+
+/* 时间维度切换 */
+.time-dimension {
+  display: flex;
+  gap: 20rpx;
+  margin-bottom: 20rpx;
+  overflow-x: auto;
+  padding-bottom: 10rpx;
+}
+
+.dimension-item {
+  font-size: 26rpx;
+  padding: 12rpx 25rpx;
+  background-color: #f5f5f5;
+  border-radius: 40rpx;
+  color: #666;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  white-space: nowrap;
+}
+
+.dimension-item:hover {
+  background-color: #e8e8e8;
+}
+
+.dimension-item.active {
+  background-color: #07c160;
+  color: #fff;
+}
+
+/* 图表样式 */
+.sales-trend-chart {
+  width: 100%;
+  height: 400rpx;
+  background-color: #fafafa;
+  border-radius: 10rpx;
+}
+
+.business-line-chart {
+  width: 100%;
+  height: 300rpx;
+  background-color: #fafafa;
+  border-radius: 10rpx;
+  margin-bottom: 20rpx;
+}
+
+/* 增长率样式 */
+.growth-rate {
+  display: flex;
+  justify-content: space-around;
+  padding: 20rpx 0;
+  margin-top: 20rpx;
+  border-top: 1px solid #f0f0f0;
+}
+
+.rate-item {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 10rpx;
+}
+
+.rate-label {
+  font-size: 24rpx;
+  color: #666;
+}
+
+.rate-value {
+  font-size: 32rpx;
+  font-weight: bold;
+}
+
+.rate-value.positive {
+  color: #07c160;
+}
+
+.rate-value.negative {
+  color: #ff3b30;
+}
+
+/* 图例样式 */
+.legend {
+  display: flex;
+  flex-direction: column;
+  gap: 15rpx;
+  margin-top: 20rpx;
+}
+
+.legend-item {
+  display: flex;
+  align-items: center;
+  gap: 15rpx;
+  padding: 10rpx;
+  background-color: #fafafa;
+  border-radius: 8rpx;
+}
+
+.legend-color {
+  width: 20rpx;
+  height: 20rpx;
+  border-radius: 50%;
+}
+
+.legend-name {
+  flex: 1;
+  font-size: 26rpx;
+  color: #333;
+}
+
+.legend-value {
+  font-size: 26rpx;
+  font-weight: bold;
+  color: #333;
+}
+
+.legend-percentage {
+  font-size: 24rpx;
+  color: #666;
+}
+
+/* 异常预警样式 */
+.alert-section {
+  padding: 25rpx;
+  margin-bottom: 20rpx;
+}
+
+.alert-list {
+  display: flex;
+  flex-direction: column;
+  gap: 20rpx;
+}
+
+.alert-item {
+  display: flex;
+  gap: 20rpx;
+  padding: 20rpx;
+  background-color: #fafafa;
+  border-radius: 10rpx;
+  transition: all 0.3s ease;
+}
+
+.alert-item:hover {
+  background-color: #f0f0f0;
+}
+
+.alert-icon {
+  width: 20rpx;
+  border-radius: 4rpx;
+  flex-shrink: 0;
+}
+
+.alert-content {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 10rpx;
+}
+
+.alert-title {
+  font-size: 28rpx;
+  font-weight: bold;
+  color: #333;
+}
+
+.alert-desc {
+  font-size: 24rpx;
+  color: #666;
+  line-height: 1.5;
+}
+
+.alert-time {
+  font-size: 22rpx;
+  color: #999;
+  align-self: flex-end;
+}
+
+/* 自定义查询样式 */
+.custom-query-section {
+  padding: 25rpx;
+  margin-bottom: 20rpx;
+}
+
+.query-form {
+  display: flex;
+  flex-direction: column;
+  gap: 25rpx;
+}
+
+.form-row {
+  display: flex;
+  align-items: center;
+  gap: 20rpx;
+}
+
+.form-label {
+  font-size: 26rpx;
+  color: #333;
+  width: 150rpx;
+  text-align: right;
+}
+
+.picker {
+  flex: 1;
+  padding: 20rpx;
+  background-color: #fafafa;
+  border-radius: 8rpx;
+  font-size: 26rpx;
+  color: #333;
+  border: 1px solid #e8e8e8;
+}
+
+.query-btn {
+  width: 100%;
+  padding: 20rpx;
+  font-size: 28rpx;
+  color: #fff;
+  background-color: #07c160;
+  border-radius: 8rpx;
+  margin-top: 10rpx;
+}
+
+/* 响应式设计 */
+@media screen and (max-width: 375px) {
+  .finance-overview {
+    grid-template-columns: 1fr;
+  }
+  
+  .overview-card {
+    padding: 20rpx;
+  }
+  
+  .section-header {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 15rpx;
+  }
+  
+  .time-filter, .chart-actions {
+    width: 100%;
+    justify-content: space-between;
+  }
+  
+  .time-filter-item, .export-btn, .refresh-btn {
+    flex: 1;
+    text-align: center;
+    padding: 12rpx 15rpx;
+  }
+  
+  .growth-rate {
+    flex-direction: column;
+    gap: 20rpx;
+  }
+  
+  .form-row {
+    flex-direction: column;
+    align-items: stretch;
+    gap: 10rpx;
+  }
+  
+  .form-label {
+    text-align: left;
+    width: auto;
+  }
+}

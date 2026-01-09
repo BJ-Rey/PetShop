@@ -1,0 +1,32 @@
+<!-- pages/test/permission-simple-test.wxml -->
+<view class="container">
+  <!-- 顶部操作栏 -->
+  <view class="standard-action-bar">
+    <text class="standard-back-btn" bindtap="navigateBack">←</text>
+    <text class="page-title">权限简单测试</text>
+  </view>
+
+  <!-- 测试结果展示 -->
+  <view class="test-content">
+    <view class="section-title">测试结果</view>
+    <view class="test-results">
+      <view class="test-item" wx:for="{{testResults}}" wx:key="test">
+        <view class="test-header">
+          <text class="test-name">{{item.test}}</text>
+          <text class="test-result {{item.result.includes('✅') ? 'pass' : 'fail'}}">{{item.result}}</text>
+        </view>
+        <view class="test-details">{{item.details}}</view>
+      </view>
+    </view>
+
+    <view class="test-actions">
+      <button class="action-btn" bindtap="runTests">
+        重新测试
+      </button>
+      
+      <button class="action-btn" bindtap="goToMerchantDashboard">
+        跳转到商家首页
+      </button>
+    </view>
+  </view>
+</view>

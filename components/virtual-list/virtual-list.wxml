@@ -1,0 +1,22 @@
+<!-- components/virtual-list/virtual-list.wxml -->
+<scroll-view 
+  class="virtual-list" 
+  scroll-y 
+  bindscroll="onScroll" 
+  style="height: {{height}}rpx;"
+  enable-flex
+>
+  <view class="phantom" style="height: {{totalHeight}}px;"></view>
+  <view class="list-content" style="transform: translateY({{offset}}px);">
+    <block wx:for="{{visibleData}}" wx:key="id">
+      <view class="list-item" style="height: {{itemHeight}}px;">
+        <slot name="item" item="{{item}}"></slot>
+        <!-- 
+          注意：由于小程序slot限制，可能需要具体的组件
+          或者使用 generic:item="cat-card" 
+        -->
+        <cat-card wx:if="{{type === 'cat'}}" cat="{{item}}" bind:click="onItemClick" />
+      </view>
+    </block>
+  </view>
+</scroll-view>

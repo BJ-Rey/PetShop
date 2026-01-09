@@ -1,0 +1,491 @@
+/*index.wxss*/
+.container {
+  box-sizing: border-box;
+}
+
+/* 搜索框样式 */
+.search-box {
+  display: flex;
+  align-items: center;
+  background: #f5f5f5;
+  border-radius: 40rpx;
+  padding: 0 20rpx;
+  margin: 20rpx 0;
+  height: 80rpx;
+  box-shadow: 0 2rpx 8rpx rgba(0, 0, 0, 0.05);
+  transition: all 0.3s ease;
+}
+
+.search-box:focus-within {
+  box-shadow: 0 4rpx 12rpx rgba(26, 173, 25, 0.15);
+  background: #fff;
+}
+
+.search-icon {
+  width: 40rpx;
+  height: 40rpx;
+  margin-right: 10rpx;
+  color: #999;
+}
+
+.search-box input {
+  flex: 1;
+  height: 100%;
+  border: none;
+  background: transparent;
+  padding: 0 20rpx;
+  font-size: 32rpx;
+  color: #333;
+}
+
+.search-box input::placeholder {
+  color: #999;
+  font-size: 30rpx;
+}
+
+/* 搜索按钮样式 */
+.search-btn {
+  background: #1aad19;
+  color: #fff;
+  border: none;
+  border-radius: 30rpx;
+  font-size: 28rpx;
+  padding: 0 30rpx;
+  height: 60rpx;
+  line-height: 60rpx;
+  margin-left: 15rpx;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  box-shadow: 0 2rpx 8rpx rgba(26, 173, 25, 0.3);
+}
+
+.search-btn:active {
+  background: #179316;
+  transform: scale(0.95);
+  box-shadow: 0 1rpx 4rpx rgba(26, 173, 25, 0.5);
+}
+
+.search-btn:focus {
+  outline: none;
+}
+
+/* 响应式调整 */
+@media (max-width: 375px) {
+  .search-btn {
+    font-size: 26rpx;
+    padding: 0 25rpx;
+    height: 55rpx;
+    line-height: 55rpx;
+  }
+}
+
+/* 轮播图样式 */
+.swiper {
+  height: 300rpx;
+  margin-top: 20px; /* 增加顶部间距 */
+  margin-bottom: 30rpx;
+  border-radius: 20rpx;
+  overflow: hidden;
+  box-shadow: 0 4rpx 16rpx rgba(0, 0, 0, 0.1);
+}
+
+.slide-image {
+  width: 100%;
+  height: 100%;
+  border-radius: 20rpx;
+  object-fit: cover;
+  transition: transform 0.3s ease;
+  background-color: #e0e0e0; /* 图片加载失败时的占位背景色 */
+}
+
+.swiper:hover .slide-image {
+  transform: scale(1.05);
+}
+
+/* 功能入口样式 */
+.function-list {
+  display: flex;
+  justify-content: space-around;
+  margin-bottom: 40rpx;
+  padding: 30rpx 0;
+  background: #fff;
+  border-radius: 20rpx;
+  box-shadow: 0 4rpx 16rpx rgba(0, 0, 0, 0.1);
+}
+
+.function-item {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 20rpx 30rpx;
+  border-radius: 16rpx;
+  transition: all 0.3s ease;
+  cursor: pointer;
+}
+
+.function-item:active {
+  background: #f5f5f5;
+  transform: translateY(-2rpx);
+  box-shadow: 0 2rpx 12rpx rgba(0, 0, 0, 0.08);
+}
+
+.function-icon {
+  width: 80rpx;
+  height: 80rpx;
+  margin-bottom: 15rpx;
+  background: #f0f0f0;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 40rpx;
+  transition: all 0.3s ease;
+}
+
+.function-item:active .function-icon {
+  background: #e0e0e0;
+  transform: scale(0.95);
+}
+
+.function-item text {
+  font-size: 30rpx;
+  color: #333;
+  font-weight: 500;
+  text-align: center;
+}
+
+/* 分区样式 */
+.section {
+  margin-bottom: 40rpx;
+  background: #fff;
+  padding: 25rpx;
+  border-radius: 16rpx;
+  box-shadow: 0 2rpx 12rpx rgba(0, 0, 0, 0.08);
+}
+
+.section-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 25rpx;
+  padding-bottom: 15rpx;
+  border-bottom: 2rpx solid #f0f0f0;
+}
+
+.section-title {
+  font-size: 38rpx;
+  font-weight: bold;
+  color: #333;
+  letter-spacing: 1rpx;
+  display: flex;
+  align-items: center;
+}
+
+.section-title::before {
+  content: '';
+  display: inline-block;
+  width: 8rpx;
+  height: 38rpx;
+  background: #1aad19;
+  border-radius: 4rpx;
+  margin-right: 15rpx;
+}
+
+.more {
+  font-size: 28rpx;
+  color: #666;
+  display: flex;
+  align-items: center;
+  padding: 8rpx 20rpx;
+  border-radius: 20rpx;
+  transition: all 0.3s ease;
+  cursor: pointer;
+}
+
+.more:active {
+  background: #e8e8e8;
+  color: #1aad19;
+  transform: scale(0.95);
+}
+
+/* 推荐宠物样式 */
+.pet-scroll {
+  white-space: nowrap;
+  padding: 10rpx 0;
+}
+
+.pet-card {
+  display: inline-block;
+  width: 200rpx;
+  margin-right: 20rpx;
+  background: #fafafa;
+  border-radius: 16rpx;
+  box-shadow: 0 2rpx 12rpx rgba(0, 0, 0, 0.08);
+  padding: 15rpx;
+  box-sizing: border-box;
+  vertical-align: top;
+  transition: all 0.3s ease;
+  cursor: pointer;
+}
+
+.pet-card:active {
+  transform: translateY(-4rpx);
+  box-shadow: 0 6rpx 18rpx rgba(0, 0, 0, 0.12);
+}
+
+.pet-avatar {
+  width: 170rpx;
+  height: 170rpx;
+  border-radius: 50%;
+  margin-bottom: 10rpx;
+  object-fit: cover;
+  border: 3rpx solid #fff;
+  box-shadow: 0 2rpx 8rpx rgba(0, 0, 0, 0.1);
+  transition: all 0.3s ease;
+  background-color: #e0e0e0;
+}
+
+.pet-card:active .pet-avatar {
+  transform: scale(1.1);
+}
+
+.pet-name {
+  display: block;
+  font-size: 32rpx;
+  font-weight: bold;
+  color: #333;
+  margin-bottom: 5rpx;
+  text-align: center;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.pet-breed {
+  display: block;
+  font-size: 24rpx;
+  color: #666;
+  margin-bottom: 5rpx;
+  text-align: center;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.pet-age {
+  display: block;
+  font-size: 22rpx;
+  color: #999;
+  margin-bottom: 5rpx;
+  text-align: center;
+}
+
+.pet-merchant {
+  display: block;
+  font-size: 20rpx;
+  color: #1aad19;
+  text-align: center;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  background: #eaffea;
+  padding: 4rpx 12rpx;
+  border-radius: 12rpx;
+  margin-top: 8rpx;
+}
+
+/* 热门服务样式 */
+.service-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 25rpx;
+}
+
+.service-card {
+  background: #fff;
+  border-radius: 16rpx;
+  box-shadow: 0 2rpx 12rpx rgba(0, 0, 0, 0.08);
+  padding: 25rpx;
+  box-sizing: border-box;
+  transition: all 0.2s ease;
+  overflow: hidden;
+  cursor: pointer;
+}
+
+.service-card-hover {
+  transform: scale(0.96);
+  box-shadow: 0 8rpx 24rpx rgba(0, 0, 0, 0.15);
+}
+
+.service-card:active {
+  /* 移除之前的 active 样式，使用 hover-class 代替 */
+}
+
+.service-image {
+  width: 100%;
+  height: 200rpx;
+  border-radius: 12rpx;
+  margin-bottom: 15rpx;
+  object-fit: cover;
+  transition: transform 0.3s ease;
+  background-color: #e0e0e0;
+}
+
+.service-card:active .service-image {
+  transform: scale(1.05);
+}
+
+.service-name {
+  display: block;
+  font-size: 32rpx;
+  font-weight: bold;
+  color: #333;
+  margin-bottom: 10rpx;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  line-height: 1.4;
+}
+
+.service-price {
+  font-size: 36rpx;
+  color: #e64340;
+  font-weight: bold;
+  display: flex;
+  align-items: center;
+}
+
+.service-price::before {
+  content: '¥';
+  font-size: 28rpx;
+  margin-right: 4rpx;
+}
+
+/* 精选商品样式 */
+.product-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 25rpx;
+}
+
+.product-card {
+  background: #fff;
+  border-radius: 16rpx;
+  box-shadow: 0 2rpx 12rpx rgba(0, 0, 0, 0.08);
+  padding: 25rpx;
+  box-sizing: border-box;
+  transition: all 0.3s ease;
+  overflow: hidden;
+  cursor: pointer;
+}
+
+.product-card:active {
+  transform: translateY(-4rpx);
+  box-shadow: 0 8rpx 20rpx rgba(0, 0, 0, 0.15);
+}
+
+.product-image {
+  width: 100%;
+  height: 240rpx;
+  border-radius: 12rpx;
+  margin-bottom: 15rpx;
+  object-fit: cover;
+  transition: transform 0.3s ease;
+  background-color: #e0e0e0;
+}
+
+.product-card:active .product-image {
+  transform: scale(1.05);
+}
+
+.product-name {
+  display: block;
+  font-size: 32rpx;
+  color: #333;
+  margin-bottom: 10rpx;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  line-height: 1.4;
+}
+
+.product-price {
+  font-size: 36rpx;
+  color: #e64340;
+  font-weight: bold;
+  margin-bottom: 5rpx;
+  display: flex;
+  align-items: center;
+}
+
+.product-price::before {
+  content: '¥';
+  font-size: 28rpx;
+  margin-right: 4rpx;
+}
+
+.product-sales {
+  font-size: 24rpx;
+  color: #999;
+  display: flex;
+  align-items: center;
+  background: #f5f5f5;
+  padding: 4rpx 12rpx;
+  border-radius: 12rpx;
+  width: fit-content;
+}
+
+.product-sales::before {
+  content: '🔥';
+  margin-right: 6rpx;
+}
+
+/* 响应式布局 */
+@media (max-width: 375px) {
+  .swiper {
+    height: 250rpx;
+  }
+  
+  .service-grid,
+  .product-grid {
+    grid-template-columns: 1fr;
+  }
+  
+  .service-image {
+    height: 180rpx;
+  }
+  
+  .product-image {
+    height: 220rpx;
+  }
+}
+
+@media (min-width: 750px) {
+  .service-grid,
+  .product-grid {
+    grid-template-columns: repeat(3, 1fr);
+  }
+  
+  .swiper {
+    height: 400rpx;
+  }
+  
+  .pet-card {
+    width: 240rpx;
+  }
+}
+
+@media (min-width: 1024px) {
+  .service-grid,
+  .product-grid {
+    grid-template-columns: repeat(4, 1fr);
+  }
+  
+  .pet-card {
+    width: 280rpx;
+  }
+}

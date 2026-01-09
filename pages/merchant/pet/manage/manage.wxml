@@ -1,0 +1,260 @@
+<!-- pages/merchant/pet/manage/manage.wxml -->
+<view class="container">
+  <!-- 顶部操作栏 -->
+  <view class="standard-action-bar">
+    <text class="standard-back-btn" bindtap="navigateBack">返回</text>
+    <text class="page-title">宠物管理</text>
+  </view>
+
+  <!-- 搜索栏 -->
+  <view class="search-bar">
+    <input 
+      class="search-input" 
+      placeholder="搜索宠物名称、品种或年龄" 
+      bindinput="onSearch"
+      value="{{filter.keyword}}"
+    />
+  </view>
+
+  <!-- 筛选栏 -->
+  <view class="filter-bar">
+    <view class="filter-row">
+      <!-- 状态筛选 -->
+      <view class="filter-item">
+        <view class="filter-header" bindtap="toggleFilter" data-type="status">
+          <text class="filter-label">状态：</text>
+          <text class="filter-value">{{filter.status === 'all' ? '全部' : filter.status === 'published' ? '已上架' : '已下架'}}</text>
+          <text class="filter-arrow {{expandedFilter === 'status' ? 'up' : 'down'}}">▼</text>
+        </view>
+        <view class="filter-options" wx:if="{{expandedFilter === 'status'}}">
+          <view 
+            class="filter-option {{filter.status === 'all' ? 'active' : ''}}" 
+            data-type="status" 
+            data-value="all"
+            bindtap="changeFilter"
+          >
+            全部
+          </view>
+          <view 
+            class="filter-option {{filter.status === 'published' ? 'active' : ''}}" 
+            data-type="status" 
+            data-value="published"
+            bindtap="changeFilter"
+          >
+            已上架
+          </view>
+          <view 
+            class="filter-option {{filter.status === 'unpublished' ? 'active' : ''}}" 
+            data-type="status" 
+            data-value="unpublished"
+            bindtap="changeFilter"
+          >
+            已下架
+          </view>
+        </view>
+      </view>
+      
+      <!-- 品类筛选 -->
+      <view class="filter-item">
+        <view class="filter-header" bindtap="toggleFilter" data-type="category">
+          <text class="filter-label">品类：</text>
+          <text class="filter-value">{{filter.category === 'all' ? '全部' : filter.category === '狗' ? '狗' : filter.category === '猫' ? '猫' : '其他'}}</text>
+          <text class="filter-arrow {{expandedFilter === 'category' ? 'up' : 'down'}}">▼</text>
+        </view>
+        <view class="filter-options" wx:if="{{expandedFilter === 'category'}}">
+          <view 
+            class="filter-option {{filter.category === 'all' ? 'active' : ''}}" 
+            data-type="category" 
+            data-value="all"
+            bindtap="changeFilter"
+          >
+            全部
+          </view>
+          <view 
+            class="filter-option {{filter.category === '狗' ? 'active' : ''}}" 
+            data-type="category" 
+            data-value="狗"
+            bindtap="changeFilter"
+          >
+            狗
+          </view>
+          <view 
+            class="filter-option {{filter.category === '猫' ? 'active' : ''}}" 
+            data-type="category" 
+            data-value="猫"
+            bindtap="changeFilter"
+          >
+            猫
+          </view>
+        </view>
+      </view>
+      
+      <!-- 是否有人下定筛选 -->
+      <view class="filter-item">
+        <view class="filter-header" bindtap="toggleFilter" data-type="isOrdered">
+          <text class="filter-label">下定状态：</text>
+          <text class="filter-value">{{filter.isOrdered === 'all' ? '全部' : filter.isOrdered === 'yes' ? '已下定' : '未下定'}}</text>
+          <text class="filter-arrow {{expandedFilter === 'isOrdered' ? 'up' : 'down'}}">▼</text>
+        </view>
+        <view class="filter-options" wx:if="{{expandedFilter === 'isOrdered'}}">
+          <view 
+            class="filter-option {{filter.isOrdered === 'all' ? 'active' : ''}}" 
+            data-type="isOrdered" 
+            data-value="all"
+            bindtap="changeFilter"
+          >
+            全部
+          </view>
+          <view 
+            class="filter-option {{filter.isOrdered === 'yes' ? 'active' : ''}}" 
+            data-type="isOrdered" 
+            data-value="yes"
+            bindtap="changeFilter"
+          >
+            已下定
+          </view>
+          <view 
+            class="filter-option {{filter.isOrdered === 'no' ? 'active' : ''}}" 
+            data-type="isOrdered" 
+            data-value="no"
+            bindtap="changeFilter"
+          >
+            未下定
+          </view>
+        </view>
+      </view>
+    </view>
+  </view>
+
+  <!-- 排序栏 -->
+  <view class="sort-bar">
+    <view 
+      class="sort-item {{sortField === 'createdAt' ? 'active' : ''}}" 
+      data-field="createdAt"
+      bindtap="changeSort"
+    >
+      <text>创建时间</text>
+      <text class="sort-icon">{{sortField === 'createdAt' ? (sortOrder === 'desc' ? '↓' : '↑') : ''}}</text>
+    </view>
+    <view 
+      class="sort-item {{sortField === 'sales' ? 'active' : ''}}" 
+      data-field="sales"
+      bindtap="changeSort"
+    >
+      <text>销量</text>
+      <text class="sort-icon">{{sortField === 'sales' ? (sortOrder === 'desc' ? '↓' : '↑') : ''}}</text>
+    </view>
+    <view 
+      class="sort-item {{sortField === 'price' ? 'active' : ''}}" 
+      data-field="price"
+      bindtap="changeSort"
+    >
+      <text>价格</text>
+      <text class="sort-icon">{{sortField === 'price' ? (sortOrder === 'desc' ? '↓' : '↑') : ''}}</text>
+    </view>
+  </view>
+
+  <!-- 添加宠物按钮 -->
+  <view class="add-pet-section">
+    <button class="add-btn" type="primary" bindtap="addPet">+ 添 加</button>
+  </view>
+
+  <!-- 批量操作栏 -->
+  <view class="batch-action-bar" wx:if="{{pets.length > 0}}">
+    <view class="batch-select">
+      <checkbox-group bindchange="toggleAllSelect">
+        <label class="checkbox-label">
+          <checkbox value="all" checked="{{isAllSelected}}" />
+          <text>全选</text>
+        </label>
+      </checkbox-group>
+      <text class="selected-count" wx:if="{{selectedPetIds.length > 0}}">({{selectedPetIds.length}} 项)</text>
+    </view>
+    <view class="batch-buttons">
+      <!-- 基础批量操作按钮 -->
+      <button class="batch-btn" bindtap="batchPublish" wx:if="{{selectedPetIds.length > 0}}">批量上架</button>
+      <button class="batch-btn" bindtap="batchUnpublish" wx:if="{{selectedPetIds.length > 0}}">批量下架</button>
+      <button class="batch-btn delete" bindtap="batchDelete" wx:if="{{selectedPetIds.length > 0}}">批量删除</button>
+    </view>
+  </view>
+
+  <!-- 宠物列表 -->
+  <view class="product-list">
+    <view class="empty-state" wx:if="{{!isLoading && pets.length === 0}}">
+      <text class="empty-icon">🐱</text>
+      <text class="empty-text">暂无猫咪数据</text>
+      <button class="empty-btn" type="primary" bindtap="addPet">添加猫咪</button>
+    </view>
+    
+    <view class="loading-state" wx:if="{{isLoading}}">
+      <text class="loading-text">加载中...</text>
+    </view>
+    
+    <block wx:else>
+      <view class="product-item card" wx:for="{{pets}}" wx:key="id">
+        <checkbox-group bindchange="toggleSelect" data-id="{{item.id}}">
+          <label class="checkbox-label">
+            <checkbox value="{{item.id}}" checked="{{selectedPetIds.indexOf(item.id) > -1}}" />
+          </label>
+        </checkbox-group>
+        <image class="product-image" src="{{item.avatar}}"></image>
+        
+        <view class="product-info">
+            <text class="product-name">{{item.name}}</text>
+            <text class="product-category">{{item.category === '猫' ? '猫' : '其他'}}</text>
+            
+            <view class="product-price">
+              <text class="current-price">¥{{item.price}}</text>
+              <text class="deposit-info">（定金：¥{{item.deposit}}）</text>
+            </view>
+            
+            <view class="product-meta">
+              <text class="product-stock">{{item.breed}} • {{item.age}} • {{item.gender === 'male' ? '公' : '母'}}</text>
+              <text class="product-sales">销量：{{item.sales}}</text>
+            </view>
+          </view>
+        
+        <view class="product-status">
+          <text class="status-tag {{item.status === 'published' ? 'published' : 'unpublished'}}">
+            {{item.status === 'published' ? '已上架' : '已下架'}}
+          </text>
+          <text class="status-tag {{item.isOrdered ? 'ordered' : 'not-ordered'}}">
+            {{item.isOrdered ? '已下定' : '未下定'}}
+          </text>
+        </view>
+        
+        <view class="product-actions">
+          <button 
+            class="action-btn view-btn" 
+            bindtap="viewPetDetail" 
+            data-id="{{item.id}}"
+          >
+            详情
+          </button>
+          <button 
+            class="action-btn edit-btn" 
+            bindtap="editPet" 
+            data-id="{{item.id}}"
+          >
+            编辑
+          </button>
+          <button 
+            class="action-btn {{item.status === 'published' ? 'unpublish-btn' : 'publish-btn'}}" 
+            bindtap="togglePetStatus" 
+            data-id="{{item.id}}"
+          >
+            {{item.status === 'published' ? '下架' : '上架'}}
+          </button>
+          <button 
+            class="action-btn delete-btn" 
+            bindtap="deletePet" 
+            data-id="{{item.id}}" 
+            data-name="{{item.name}}"
+          >
+            删除
+          </button>
+        </view>
+      </view>
+    </block>
+  </view>
+</view>

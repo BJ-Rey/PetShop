@@ -1,0 +1,55 @@
+<!-- components/filter/filter.wxml -->
+<view class="filter-container">
+  <!-- 基础筛选入口 -->
+  <view class="filter-header" bindtap="toggleFilter">
+    <text class="filter-title">{{filterTitle}}</text>
+    <text class="filter-arrow" style="transform: rotate({{isExpanded ? '180deg' : '0deg'}}); transition: transform 0.3s ease;">
+      ▼
+    </text>
+  </view>
+  
+  <!-- 可展开的筛选内容 -->
+  <view class="filter-content" style="max-height: {{isExpanded ? '500rpx' : '0'}}; opacity: {{isExpanded ? '1' : '0'}}; transition: max-height 0.3s ease, opacity 0.3s ease;">
+    <!-- 动态生成的筛选条件 -->
+    <view class="filter-conditions">
+      <block wx:for="{{filterConditions}}" wx:key="id">
+        <view class="filter-condition-item">
+          <text class="condition-label">{{item.label}}:</text>
+          <view class="condition-options">
+            <block wx:if="{{item.type === 'select'}}">
+              <picker mode="selector" range="{{item.options}}" range-key="name" value="{{item.selectedIndex}}" bindchange="onConditionChange" data-condition-id="{{item.id}}">
+                <view class="condition-value">{{item.options[item.selectedIndex].name}}</view>
+              </picker>
+            </block>
+            <block wx:elif="{{item.type === 'checkbox'}}">
+              <view class="checkbox-group">
+                <block wx:for="{{item.options}}" wx:key="value">
+                  <label class="checkbox-item">
+                    <checkbox value="{{item2.value}}" checked="{{item.selectedValues.indexOf(item2.value) !== -1}}" bindchange="onCheckboxChange" data-condition-id="{{item.id}}" />
+                    <text>{{item2.name}}</text>
+                  </label>
+                </block>
+              </view>
+            </block>
+            <block wx:elif="{{item.type === 'range'}}">
+              <view class="range-container">
+                <text>{{item.selectedRange[0]}}</text>
+                <slider min="{{item.min}}" max="{{item.max}}" range="true" value="{{item.selectedRange}}" bindchange="onRangeChange" data-condition-id="{{item.id}}" />
+                <text>{{item.selectedRange[1]}}</text>
+              </view>
+            </block>
+            <block wx:elif="{{item.type === 'input'}}">
+              <input type="text" placeholder="{{item.placeholder}}" value="{{item.value}}" bindinput="onInputChange" data-condition-id="{{item.id}}" />
+            </block>
+          </view>
+        </view>
+      </block>
+    </view>
+    
+    <!-- 筛选按钮 -->
+    <view class="filter-actions">
+      <button class="reset-btn" bindtap="resetFilter">重置</button>
+      <button class="confirm-btn" bindtap="confirmFilter">确定</button>
+    </view>
+  </view>
+</view>

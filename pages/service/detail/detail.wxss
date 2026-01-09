@@ -1,0 +1,374 @@
+/* pages/service/detail/detail.wxss */
+.container {
+  background: #f5f5f5;
+  min-height: 100vh;
+  padding: 20rpx;
+  box-sizing: border-box;
+}
+
+/* 服务详情头部 */
+.service-header {
+  background: #fff;
+  border-radius: 16rpx;
+  padding: 25rpx;
+  margin-bottom: 25rpx;
+  box-shadow: 0 2rpx 12rpx rgba(0, 0, 0, 0.08);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+}
+
+.service-image {
+  width: 200rpx;
+  height: 200rpx;
+  border-radius: 50%;
+  object-fit: cover;
+  margin-bottom: 20rpx;
+  border: 4rpx solid #1aad19;
+  box-shadow: 0 4rpx 12rpx rgba(0, 0, 0, 0.15);
+}
+
+.service-info {
+  width: 100%;
+}
+
+.service-name {
+  font-size: 36rpx;
+  font-weight: bold;
+  color: #333;
+  margin-bottom: 15rpx;
+}
+
+.service-price {
+  font-size: 42rpx;
+  font-weight: bold;
+  color: #e64340;
+  margin-bottom: 15rpx;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.service-price::before {
+  content: '¥';
+  font-size: 32rpx;
+  margin-right: 8rpx;
+}
+
+.service-meta {
+  display: flex;
+  justify-content: space-around;
+  align-items: center;
+  padding: 15rpx 0;
+  background: #fafafa;
+  border-radius: 12rpx;
+  margin-top: 15rpx;
+}
+
+.meta-item {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.meta-label {
+  font-size: 24rpx;
+  color: #999;
+  margin-bottom: 5rpx;
+}
+
+.meta-value {
+  font-size: 28rpx;
+  color: #333;
+  font-weight: 500;
+}
+
+/* 通用区块样式 */
+.merchant-section,
+.description-section,
+.process-section,
+.notice-section {
+  background: #fff;
+  border-radius: 16rpx;
+  padding: 25rpx;
+  margin-bottom: 25rpx;
+  box-shadow: 0 2rpx 12rpx rgba(0, 0, 0, 0.08);
+}
+
+.section-header {
+  margin-bottom: 20rpx;
+  padding-bottom: 15rpx;
+  border-bottom: 2rpx solid #f0f0f0;
+}
+
+.section-header .title {
+  font-size: 32rpx;
+  font-weight: bold;
+  color: #333;
+  display: flex;
+  align-items: center;
+}
+
+.section-header .title::before {
+  content: '';
+  display: inline-block;
+  width: 8rpx;
+  height: 32rpx;
+  background: #1aad19;
+  border-radius: 4rpx;
+  margin-right: 15rpx;
+}
+
+/* 商家信息 */
+.merchant-info {
+  padding: 0 10rpx;
+}
+
+.merchant-name {
+  font-size: 32rpx;
+  font-weight: bold;
+  color: #333;
+  margin-bottom: 10rpx;
+}
+
+.merchant-desc {
+  font-size: 28rpx;
+  color: #666;
+  line-height: 1.6;
+}
+
+/* 服务详情描述 */
+.description-content {
+  font-size: 28rpx;
+  color: #333;
+  line-height: 1.8;
+  padding: 0 10rpx;
+  white-space: pre-wrap;
+}
+
+/* 服务流程 */
+.process-list {
+  padding: 0 10rpx;
+}
+
+.process-item {
+  display: flex;
+  margin-bottom: 30rpx;
+  position: relative;
+}
+
+.process-item::after {
+  content: '';
+  position: absolute;
+  left: 30rpx;
+  top: 60rpx;
+  bottom: -30rpx;
+  width: 2rpx;
+  background: #f0f0f0;
+}
+
+.process-item:last-child::after {
+  display: none;
+}
+
+.process-step {
+  width: 60rpx;
+  height: 60rpx;
+  border-radius: 50%;
+  background: #1aad19;
+  color: #fff;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 28rpx;
+  font-weight: bold;
+  margin-right: 25rpx;
+  flex-shrink: 0;
+  box-shadow: 0 4rpx 12rpx rgba(26, 173, 25, 0.3);
+}
+
+.process-content {
+  flex: 1;
+}
+
+.process-title {
+  font-size: 30rpx;
+  font-weight: bold;
+  color: #333;
+  margin-bottom: 10rpx;
+}
+
+.process-desc {
+  font-size: 26rpx;
+  color: #666;
+  line-height: 1.6;
+}
+
+/* 预约须知 */
+.notice-list {
+  padding: 0 10rpx;
+}
+
+.notice-item {
+  display: flex;
+  align-items: flex-start;
+  margin-bottom: 20rpx;
+}
+
+.notice-icon {
+  color: #e64340;
+  font-size: 32rpx;
+  margin-right: 15rpx;
+  flex-shrink: 0;
+  margin-top: 8rpx;
+}
+
+.notice-content {
+  flex: 1;
+  font-size: 28rpx;
+  color: #666;
+  line-height: 1.6;
+}
+
+/* 日历样式 */
+.calendar-section {
+    margin-bottom: 20rpx;
+}
+
+.calendar-scroll {
+    white-space: nowrap;
+    padding: 10rpx 0;
+}
+
+.date-item {
+    display: inline-flex;
+    flex-direction: column;
+    align-items: center;
+    width: 100rpx;
+    padding: 15rpx 0;
+    margin-right: 15rpx;
+    border-radius: 12rpx;
+    background: #f8f8f8;
+    color: #333;
+}
+
+.date-item.selected {
+    background: #1aad19;
+    color: #fff;
+}
+
+.week {
+    font-size: 24rpx;
+    margin-bottom: 5rpx;
+}
+
+.day {
+    font-size: 32rpx;
+    font-weight: bold;
+}
+
+.time-slots {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 20rpx;
+    margin-top: 20rpx;
+    padding-top: 20rpx;
+    border-top: 1rpx solid #f0f0f0;
+}
+
+.time-slot {
+    width: 140rpx;
+    height: 60rpx;
+    line-height: 60rpx;
+    text-align: center;
+    background: #f8f8f8;
+    border-radius: 8rpx;
+    font-size: 26rpx;
+    color: #333;
+}
+
+.time-slot.selected {
+    background: #eaffea;
+    color: #1aad19;
+    border: 1rpx solid #1aad19;
+}
+
+/* 底部栏更新 */
+.bottom-bar {
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  background: #fff;
+  display: flex;
+  align-items: center;
+  padding: 10rpx 30rpx;
+  box-shadow: 0 -2rpx 12rpx rgba(0, 0, 0, 0.1);
+  z-index: 999;
+}
+
+.action-btn {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    margin-right: 30rpx;
+    font-size: 20rpx;
+    color: #666;
+}
+
+.action-icon {
+    font-size: 40rpx;
+    margin-bottom: 5rpx;
+}
+
+.appointment-btn {
+  flex: 1;
+  height: 80rpx;
+  line-height: 80rpx;
+  border-radius: 40rpx;
+  font-size: 32rpx;
+  background: #1aad19;
+  color: #fff;
+  border: none;
+  font-weight: 500;
+  box-shadow: 0 4rpx 12rpx rgba(26, 173, 25, 0.3);
+}
+
+/* 响应式设计 */
+@media (min-width: 750px) {
+  .container {
+    max-width: 750px;
+    margin: 0 auto;
+  }
+}
+
+@media (max-width: 375px) {
+  .service-header {
+    padding: 20rpx;
+  }
+  
+  .service-image {
+    width: 160rpx;
+    height: 160rpx;
+  }
+  
+  .service-name {
+    font-size: 32rpx;
+  }
+  
+  .service-price {
+    font-size: 36rpx;
+  }
+  
+  .bottom-bar {
+    padding: 15rpx;
+  }
+  
+  .appointment-btn {
+    width: 180rpx;
+    height: 70rpx;
+    line-height: 70rpx;
+    font-size: 28rpx;
+  }
+}

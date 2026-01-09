@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.tencent.wxcloudrun.dao.MerchantMapper">
+    <resultMap id="MerchantMap" type="com.tencent.wxcloudrun.model.Merchant">
+        <id property="id" column="id"/>
+        <result property="name" column="name"/>
+        <result property="phone" column="phone"/>
+        <result property="address" column="address"/>
+        <result property="logo" column="logo"/>
+        <result property="rating" column="rating"/>
+        <result property="createdAt" column="created_at"/>
+        <result property="updatedAt" column="updated_at"/>
+    </resultMap>
+
+    <select id="getMerchantById" resultMap="MerchantMap">
+        SELECT * FROM merchants WHERE id = #{id}
+    </select>
+
+    <select id="getMerchants" resultMap="MerchantMap">
+        SELECT * FROM merchants LIMIT #{limit} OFFSET #{offset}
+    </select>
+
+    <insert id="createMerchant" parameterType="com.tencent.wxcloudrun.model.Merchant" useGeneratedKeys="true" keyProperty="id">
+        INSERT INTO merchants (name, phone, address, logo, rating)
+        VALUES (#{name}, #{phone}, #{address}, #{logo}, #{rating})
+    </insert>
+
+    <update id="updateMerchant" parameterType="com.tencent.wxcloudrun.model.Merchant">
+        UPDATE merchants
+        SET name = #{name}, phone = #{phone}, address = #{address}, logo = #{logo}, rating = #{rating}
+        WHERE id = #{id}
+    </update>
+
+    <delete id="deleteMerchant">
+        DELETE FROM merchants WHERE id = #{id}
+    </delete>
+</mapper>

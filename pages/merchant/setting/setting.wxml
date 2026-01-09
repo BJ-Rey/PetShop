@@ -1,0 +1,259 @@
+<!-- pages/merchant/setting/setting.wxml -->
+<view class="container">
+  <!-- 顶部操作栏 -->
+  <view class="standard-action-bar">
+    <text class="standard-back-btn" bindtap="navigateBack">←</text>
+    <text class="page-title">系统设置</text>
+  </view>
+
+  <!-- 商家信息设置 -->
+  <view class="setting-section card">
+    <view class="section-title">商家信息</view>
+    
+    <view class="setting-item" bindtap="editMerchantInfo">
+      <view class="setting-label">
+        <text class="setting-icon">🏪</text>
+        <text class="setting-name">商家基本信息</text>
+      </view>
+      <view class="setting-content">
+        <text class="setting-desc">修改商家名称、联系方式、地址等基本信息</text>
+        <text class="setting-arrow">→</text>
+      </view>
+    </view>
+    
+    <view class="setting-item" bindtap="editMerchantLogo">
+      <view class="setting-label">
+        <text class="setting-icon">🖼️</text>
+        <text class="setting-name">商家LOGO</text>
+      </view>
+      <view class="setting-content">
+        <image class="merchant-logo" src="{{merchantInfo.logo || 'https://example.com/default-logo.png'}}"></image>
+        <text class="setting-arrow">→</text>
+      </view>
+    </view>
+  </view>
+
+  <!-- 店铺设置 -->
+  <view class="setting-section card">
+    <view class="section-title">店铺设置</view>
+    
+    <view class="setting-item" bindtap="editBusinessHours">
+      <view class="setting-label">
+        <text class="setting-icon">⏰</text>
+        <text class="setting-name">营业时间</text>
+      </view>
+      <view class="setting-content">
+        <text class="setting-desc">{{businessHours || '未设置'}}</text>
+        <text class="setting-arrow">→</text>
+      </view>
+    </view>
+    
+    <view class="setting-item" bindtap="editShippingSettings">
+      <view class="setting-label">
+        <text class="setting-icon">🚚</text>
+        <text class="setting-name">配送设置</text>
+      </view>
+      <view class="setting-content">
+        <text class="setting-desc">设置配送范围、运费模板等</text>
+        <text class="setting-arrow">→</text>
+      </view>
+    </view>
+    
+    <view class="setting-item" bindtap="editPaymentSettings">
+      <view class="setting-label">
+        <text class="setting-icon">💳</text>
+        <text class="setting-name">支付设置</text>
+      </view>
+      <view class="setting-content">
+        <text class="setting-desc">配置支付方式、结算账户等</text>
+        <text class="setting-arrow">→</text>
+      </view>
+    </view>
+  </view>
+
+  <!-- 营销与商品 -->
+  <view class="setting-section card">
+    <view class="section-title">营销与商品</view>
+    
+    <view class="setting-item" bindtap="manageCategories">
+      <view class="setting-label">
+        <text class="setting-icon">📂</text>
+        <text class="setting-name">商品分类</text>
+      </view>
+      <view class="setting-content">
+        <text class="setting-desc">管理商品分类目录</text>
+        <text class="setting-arrow">→</text>
+      </view>
+    </view>
+    
+    <view class="setting-item" bindtap="managePromotions">
+      <view class="setting-label">
+        <text class="setting-icon">🎁</text>
+        <text class="setting-name">优惠活动</text>
+      </view>
+      <view class="setting-content">
+        <text class="setting-desc">创建折扣、满减等营销活动</text>
+        <text class="setting-arrow">→</text>
+      </view>
+    </view>
+  </view>
+
+  <!-- 通知设置 -->
+  <view class="setting-section card">
+    <view class="section-title">通知设置</view>
+    
+    <view class="setting-item toggle-item">
+      <view class="setting-label">
+        <text class="setting-icon">🔔</text>
+        <text class="setting-name">订单通知</text>
+      </view>
+      <view class="setting-content">
+        <text class="setting-desc">新订单、订单状态变更等通知</text>
+        <switch checked="{{notificationSettings.order}}" bindchange="toggleNotification" data-type="order"></switch>
+      </view>
+    </view>
+    
+    <view class="setting-item toggle-item">
+      <view class="setting-label">
+        <text class="setting-icon">💬</text>
+        <text class="setting-name">客户消息通知</text>
+      </view>
+      <view class="setting-content">
+        <text class="setting-desc">客户咨询、评价等消息通知</text>
+        <switch checked="{{notificationSettings.message}}" bindchange="toggleNotification" data-type="message"></switch>
+      </view>
+    </view>
+    
+    <view class="setting-item toggle-item">
+      <view class="setting-label">
+        <text class="setting-icon">📊</text>
+        <text class="setting-name">财务通知</text>
+      </view>
+      <view class="setting-content">
+        <text class="setting-desc">结算成功、提现到账等通知</text>
+        <switch checked="{{notificationSettings.finance}}" bindchange="toggleNotification" data-type="finance"></switch>
+      </view>
+    </view>
+  </view>
+
+  <!-- 权限管理 -->
+  <view class="setting-section card">
+    <view class="section-title">权限管理</view>
+    
+    <view class="setting-item" bindtap="managePermissions">
+      <view class="setting-label">
+        <text class="setting-icon">🔑</text>
+        <text class="setting-name">角色与权限</text>
+      </view>
+      <view class="setting-content">
+        <text class="setting-desc">管理员工角色和权限设置</text>
+        <text class="setting-arrow">→</text>
+      </view>
+    </view>
+    
+
+    
+    <view class="setting-item" bindtap="viewOperationLogs">
+      <view class="setting-label">
+        <text class="setting-icon">📋</text>
+        <text class="setting-name">操作日志</text>
+      </view>
+      <view class="setting-content">
+        <text class="setting-desc">查看系统操作日志记录</text>
+        <text class="setting-arrow">→</text>
+      </view>
+    </view>
+  </view>
+
+  <!-- 安全设置 -->
+  <view class="setting-section card">
+    <view class="section-title">安全设置</view>
+    
+    <view class="setting-item" bindtap="changePassword">
+      <view class="setting-label">
+        <text class="setting-icon">🔒</text>
+        <text class="setting-name">修改密码</text>
+      </view>
+      <view class="setting-content">
+        <text class="setting-desc">修改登录密码，建议定期更换</text>
+        <text class="setting-arrow">→</text>
+      </view>
+    </view>
+    
+    <view class="setting-item" bindtap="changePaymentPassword">
+      <view class="setting-label">
+        <text class="setting-icon">💳</text>
+        <text class="setting-name">修改支付密码</text>
+      </view>
+      <view class="setting-content">
+        <text class="setting-desc">修改用于结算、提现的支付密码</text>
+        <text class="setting-arrow">→</text>
+      </view>
+    </view>
+    
+    <view class="setting-item" bindtap="bindPhone">
+      <view class="setting-label">
+        <text class="setting-icon">📱</text>
+        <text class="setting-name">绑定手机号</text>
+      </view>
+      <view class="setting-content">
+        <text class="setting-desc">{{boundPhone || '未绑定'}}</text>
+        <text class="setting-arrow">→</text>
+      </view>
+    </view>
+  </view>
+
+  <!-- 关于我们 -->
+  <view class="setting-section card">
+    <view class="section-title">关于我们</view>
+    
+    <view class="setting-item" bindtap="showVersionInfo">
+      <view class="setting-label">
+        <text class="setting-icon">ℹ️</text>
+        <text class="setting-name">版本信息</text>
+      </view>
+      <view class="setting-content">
+        <text class="setting-desc">当前版本：{{appVersion}}</text>
+        <text class="setting-arrow">→</text>
+      </view>
+    </view>
+    
+    <view class="setting-item" bindtap="showHelpCenter">
+      <view class="setting-label">
+        <text class="setting-icon">❓</text>
+        <text class="setting-name">帮助中心</text>
+      </view>
+      <view class="setting-content">
+        <text class="setting-desc">查看使用指南、常见问题等</text>
+        <text class="setting-arrow">→</text>
+      </view>
+    </view>
+    
+    <view class="setting-item" bindtap="showPrivacyPolicy">
+      <view class="setting-label">
+        <text class="setting-icon">🔏</text>
+        <text class="setting-name">隐私政策</text>
+      </view>
+      <view class="setting-content">
+        <text class="setting-desc">查看平台隐私政策</text>
+        <text class="setting-arrow">→</text>
+      </view>
+    </view>
+    
+    <view class="setting-item" bindtap="showTermsOfService">
+      <view class="setting-label">
+        <text class="setting-icon">📄</text>
+        <text class="setting-name">服务条款</text>
+      </view>
+      <view class="setting-content">
+        <text class="setting-desc">查看平台服务条款</text>
+        <text class="setting-arrow">→</text>
+      </view>
+    </view>
+  </view>
+
+  <!-- 退出登录按钮 -->
+  <view class="logout-section">
+    <button class="logout-button" type="warn" bindtap="logout">退出登录</button>
+  </view>
+</view>

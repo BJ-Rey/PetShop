@@ -1,0 +1,181 @@
+/* pages/mine/address/address.wxss */
+
+/* 地址列表 - 优化为与全局样式一致 */
+.address-list {
+  display: flex;
+  flex-direction: column;
+  gap: 25rpx;
+}
+
+/* 地址项 - 优化为与全局卡片样式一致 */
+.address-item {
+  background: #fff;
+  border-radius: 16rpx;
+  padding: 25rpx;
+  box-shadow: 0 2rpx 12rpx rgba(0, 0, 0, 0.08);
+  transition: all 0.3s ease;
+}
+
+.address-item:active {
+  transform: translateY(-2rpx);
+  box-shadow: 0 6rpx 16rpx rgba(0, 0, 0, 0.12);
+}
+
+/* 地址头部 - 优化为与全局样式一致 */
+.address-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 15rpx;
+}
+
+/* 收货人信息 - 优化为与全局文本样式一致 */
+.consignee {
+  font-size: 32rpx;
+  font-weight: bold;
+  color: #333;
+  display: flex;
+  align-items: center;
+  gap: 15rpx;
+}
+
+/* 默认标签 - 优化为与全局标签样式一致 */
+.default-tag {
+  font-size: 24rpx;
+  color: #1aad19;
+  background: #eaffea;
+  padding: 4rpx 16rpx;
+  border-radius: 12rpx;
+  border: 2rpx solid #d0f0d0;
+  font-weight: 500;
+}
+
+/* 地址内容 - 优化为与全局文本样式一致 */
+.address-content {
+  font-size: 28rpx;
+  color: #666;
+  line-height: 1.4;
+  margin-bottom: 20rpx;
+  padding-bottom: 15rpx;
+  border-bottom: 2rpx solid #f0f0f0;
+}
+
+/* 地址操作区 - 优化为与全局样式一致 */
+.address-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 15rpx;
+  flex-wrap: wrap;
+}
+
+/* 操作按钮 - 优化为与全局按钮样式一致 */
+.action-btn {
+  height: 60rpx;
+  line-height: 60rpx;
+  font-size: 28rpx;
+  padding: 0 24rpx;
+  border-radius: 30rpx;
+  border: 2rpx solid #1aad19;
+  color: #1aad19;
+  background: #fff;
+  transition: all 0.3s ease;
+  font-weight: 500;
+  box-shadow: 0 2rpx 8rpx rgba(26, 173, 25, 0.15);
+}
+
+.action-btn:active {
+  background: #1aad19;
+  color: #fff;
+  transform: scale(0.95);
+  box-shadow: 0 4rpx 12rpx rgba(26, 173, 25, 0.3);
+}
+
+/* 编辑按钮 - 优化为与全局样式一致 */
+.edit-btn {
+  border-color: #1aad19;
+  color: #1aad19;
+}
+
+/* 删除按钮 - 优化为与全局危险按钮样式一致 */
+.delete-btn {
+  border-color: #e64340;
+  color: #e64340;
+  box-shadow: 0 2rpx 8rpx rgba(230, 67, 64, 0.15);
+}
+
+.delete-btn:active {
+  background: #e64340;
+  color: #fff;
+  box-shadow: 0 4rpx 12rpx rgba(230, 67, 64, 0.3);
+}
+
+/* 默认按钮 - 优化为与全局样式一致 */
+.default-btn {
+  border-color: #fa8c16;
+  color: #fa8c16;
+  box-shadow: 0 2rpx 8rpx rgba(250, 140, 22, 0.15);
+}
+
+.default-btn:active {
+  background: #fa8c16;
+  color: #fff;
+  box-shadow: 0 4rpx 12rpx rgba(250, 140, 22, 0.3);
+}
+
+/* 新增地址按钮 - 优化为与全局按钮样式一致 */
+.add-btn {
+  background-color: #1aad19;
+  color: #fff;
+  font-size: 32rpx;
+  font-weight: 500;
+  border: none;
+  border-radius: 24rpx;
+  padding: 12rpx 28rpx;
+  margin: 0 20rpx;
+  transition: all 0.3s ease;
+  cursor: pointer;
+  box-shadow: 0 2rpx 8rpx rgba(26, 173, 25, 0.3);
+}
+
+.add-btn:active {
+  background-color: #179715;
+  transform: scale(0.95);
+  box-shadow: 0 4rpx 12rpx rgba(26, 173, 25, 0.4);
+}
+
+/* 空状态 - 优化为与全局空状态样式一致 */
+.empty {
+  text-align: center;
+  padding: 100rpx 0;
+  color: #999;
+}
+
+.empty-icon {
+  font-size: 100rpx;
+  margin-bottom: 20rpx;
+  display: block;
+}
+
+.empty-text {
+  font-size: 32rpx;
+  margin-bottom: 30rpx;
+  display: block;
+}
+
+.empty-btn {
+  background: #1aad19;
+  color: #fff;
+  border: none;
+  border-radius: 40rpx;
+  padding: 16rpx 40rpx;
+  font-size: 32rpx;
+  font-weight: 500;
+  transition: all 0.3s ease;
+  box-shadow: 0 2rpx 8rpx rgba(26, 173, 25, 0.3);
+}
+
+.empty-btn:active {
+  background: #179715;
+  transform: scale(0.98);
+  box-shadow: 0 4rpx 12rpx rgba(26, 173, 25, 0.4);
+}

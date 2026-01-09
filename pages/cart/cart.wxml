@@ -1,0 +1,74 @@
+<!--pages/cart/cart.wxml-->
+<view class="container">
+  <!-- 页面标题 -->
+  <view class="page-header">
+    <text class="standard-back-btn" bindtap="navigateBack">←</text>
+    <text class="title">我的购物车</text>
+  </view>
+
+  <!-- 购物车为空时 -->
+  <view class="empty-cart" wx:if="{{cartItems.length === 0}}">
+    <text class="empty-text">购物车还是空的</text>
+    <button class="btn btn-primary" bindtap="navigateToMall">去购物</button>
+  </view>
+
+  <!-- 购物车商品列表 -->
+  <view class="cart-list" wx:else>
+    <!-- 清空购物车按钮 -->
+    <view class="cart-header">
+      <text class="empty-cart-btn" bindtap="showEmptyConfirm">清空购物车</text>
+    </view>
+    <!-- 商品项 -->
+    <view class="cart-item" wx:for="{{cartItems}}" wx:key="id" bindtouchstart="touchStart" bindtouchmove="touchMove" bindtouchend="touchEnd" data-index="{{index}}">
+      <view class="cart-item-wrapper" style="transform: translateX({{item.translateX}}px);">
+        <!-- 选择框 -->
+        <view class="checkbox-container">
+          <checkbox checked="{{item.checked}}" bindchange="toggleItem" data-index="{{index}}"></checkbox>
+        </view>
+        <!-- 商品信息 -->
+        <view class="cart-item-content">
+          <image src="{{item.image}}" class="product-image" mode="aspectFill"></image>
+          <view class="product-info">
+            <text class="product-name">{{item.name}}</text>
+            <text class="product-sku">{{item.sku}}</text>
+            <view class="product-price">
+              <text class="current-price">¥{{item.price}}</text>
+              <text class="original-price" wx:if="{{item.originalPrice > item.price}}">¥{{item.originalPrice}}</text>
+            </view>
+          </view>
+        </view>
+        <!-- 数量和操作 -->
+        <view class="cart-item-actions">
+          <view class="quantity-control">
+            <text class="decrease-btn" bindtap="decreaseQuantity" data-index="{{index}}" wx:if="{{item.quantity > 1}}">-</text>
+            <text class="quantity">{{item.quantity}}</text>
+            <text class="increase-btn" bindtap="increaseQuantity" data-index="{{index}}">+</text>
+          </view>
+          <text class="delete-btn" bindtap="deleteItem" data-index="{{index}}">删除</text>
+        </view>
+      </view>
+      <!-- 滑动删除按钮 -->
+      <view class="slide-delete-btn" bindtap="deleteItem" data-index="{{index}}">删除</view>
+    </view>
+  </view>
+
+  <!-- 底部操作栏 -->
+  <view class="cart-footer" wx:if="{{cartItems.length > 0}}">
+    <!-- 全选 -->
+    <view class="select-all">
+      <checkbox checked="{{allChecked}}" bindchange="toggleAll"></checkbox>
+      <text>全选</text>
+    </view>
+    <!-- 总价和结算 -->
+    <view class="total-section">
+      <view class="total-price">
+        <text class="total-label">合计：</text>
+        <text class="total-amount">¥{{totalPrice}}</text>
+        <text class="total-count">（共{{selectedCount}}件）</text>
+      </view>
+      <button class="btn btn-primary checkout-btn" bindtap="checkout" disabled="{{selectedCount === 0}}">
+        批量结账
+      </button>
+    </view>
+  </view>
+</view>

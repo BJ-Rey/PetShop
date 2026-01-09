@@ -1,0 +1,141 @@
+/* components/filter/filter.wxss */
+.filter-container {
+  background: #fff;
+  border-radius: 16rpx;
+  margin-bottom: 20rpx;
+  box-shadow: 0 2rpx 12rpx rgba(0, 0, 0, 0.08);
+  overflow: hidden;
+}
+
+.filter-header {
+  padding: 20rpx 30rpx;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  cursor: pointer;
+  background: #f5f5f5;
+  border-bottom: 2rpx solid #e8e8e8;
+}
+
+.filter-title {
+  font-size: 32rpx;
+  color: #333;
+  font-weight: 500;
+}
+
+.filter-arrow {
+  font-size: 24rpx;
+  color: #666;
+  transition: transform 0.3s ease;
+}
+
+.filter-content {
+  overflow: hidden;
+  padding: 20rpx 30rpx;
+  background: #fff;
+}
+
+.filter-conditions {
+  margin-bottom: 30rpx;
+}
+
+.filter-condition-item {
+  margin-bottom: 25rpx;
+  display: flex;
+  flex-direction: column;
+  gap: 15rpx;
+}
+
+.condition-label {
+  font-size: 30rpx;
+  color: #333;
+  font-weight: 500;
+}
+
+.condition-options {
+  display: flex;
+  flex-direction: column;
+  gap: 15rpx;
+}
+
+.condition-value {
+  padding: 15rpx 20rpx;
+  background: #f5f5f5;
+  border-radius: 10rpx;
+  font-size: 28rpx;
+  color: #666;
+}
+
+.checkbox-group {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 20rpx;
+}
+
+.checkbox-item {
+  display: flex;
+  align-items: center;
+  gap: 10rpx;
+  font-size: 28rpx;
+  color: #666;
+}
+
+.range-container {
+  display: flex;
+  align-items: center;
+  gap: 20rpx;
+}
+
+.range-container text {
+  font-size: 28rpx;
+  color: #666;
+  width: 80rpx;
+  text-align: center;
+}
+
+.range-container slider {
+  flex: 1;
+}
+
+input {
+  padding: 15rpx 20rpx;
+  border: 2rpx solid #e8e8e8;
+  border-radius: 10rpx;
+  font-size: 28rpx;
+  color: #333;
+}
+
+.filter-actions {
+  display: flex;
+  gap: 20rpx;
+  justify-content: flex-end;
+}
+
+.reset-btn, .confirm-btn {
+  padding: 15rpx 30rpx;
+  border-radius: 10rpx;
+  font-size: 30rpx;
+  font-weight: 500;
+  border: none;
+  outline: none;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+.reset-btn {
+  background: #f5f5f5;
+  color: #666;
+}
+
+.reset-btn:active {
+  background: #e8e8e8;
+}
+
+.confirm-btn {
+  background: #1aad19;
+  color: #fff;
+}
+
+.confirm-btn:active {
+  background: #179715;
+}

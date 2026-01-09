@@ -1,0 +1,61 @@
+<!-- pages/merchant/setting/category/category.wxml -->
+<view class="container">
+  <!-- 顶部操作栏 -->
+  <view class="standard-action-bar">
+    <text class="standard-back-btn" bindtap="goBack">←</text>
+    <text class="page-title">商品分类管理</text>
+  </view>
+
+  <!-- 分类列表 -->
+  <view class="category-list" wx:if="{{categories.length > 0}}">
+    <view class="category-item" wx:for="{{categories}}" wx:key="id">
+      <view class="category-info">
+        <text class="drag-handle">≡</text>
+        <text class="category-name">{{item.name}}</text>
+        <text class="category-count">({{item.count}}件商品)</text>
+      </view>
+      <view class="category-actions">
+        <view class="action-btn edit-btn" bindtap="showEditModal" data-id="{{item.id}}">
+          <text>✎</text>
+        </view>
+        <view class="action-btn delete-btn" bindtap="deleteCategory" data-id="{{item.id}}">
+          <text>🗑️</text>
+        </view>
+      </view>
+    </view>
+  </view>
+
+  <!-- 空状态 -->
+  <view class="empty-state" wx:else>
+    <text class="empty-icon">📂</text>
+    <text class="empty-text">暂无商品分类</text>
+  </view>
+
+  <!-- 添加按钮 -->
+  <view class="add-category-btn" bindtap="showAddModal">
+    <text>+ 添加分类</text>
+  </view>
+
+  <!-- 编辑弹窗 -->
+  <view class="modal-mask" wx:if="{{showModal}}">
+    <view class="modal-content">
+      <view class="modal-header">{{modalTitle}}</view>
+      <view class="modal-body">
+        <view class="input-group">
+          <input 
+            class="modal-input" 
+            placeholder="请输入分类名称" 
+            value="{{categoryName}}" 
+            bindinput="onNameInput"
+            maxlength="10"
+            focus="{{showModal}}"
+          />
+        </view>
+      </view>
+      <view class="modal-footer">
+        <button class="modal-btn cancel-btn" bindtap="hideModal">取消</button>
+        <button class="modal-btn confirm-btn" bindtap="confirmSave">确定</button>
+      </view>
+    </view>
+  </view>
+</view>

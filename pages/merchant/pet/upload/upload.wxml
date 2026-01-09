@@ -1,0 +1,213 @@
+<!-- pages/merchant/pet/upload/upload.wxml -->
+<view class="container">
+  <!-- 顶部操作栏 -->
+  <view class="standard-action-bar">
+    <text class="standard-back-btn" bindtap="navigateBack">←</text>
+    <text class="page-title">上传宠物信息</text>
+  </view>
+  
+  <!-- 表单容器 -->
+  <form class="pet-form" bindsubmit="submitPet">
+    <!-- 宠物基本信息 -->
+    <view class="form-section">
+      <text class="section-title">基本信息</text>
+      
+      <!-- 宠物名称 -->
+      <view class="form-item">
+        <text class="form-label required">宠物名称</text>
+        <input 
+          type="text" 
+          placeholder="请输入宠物名称" 
+          name="name" 
+          value="{{petInfo.name}}" 
+          bindinput="onInputChange" 
+          data-field="name"
+          required
+        />
+      </view>
+      
+      <!-- 宠物品种 -->
+      <view class="form-item">
+        <text class="form-label required">宠物品种</text>
+        <picker 
+          range="{{breedOptions}}" 
+          value="{{breedIndex}}" 
+          bindchange="onBreedChange"
+        >
+          <view class="picker">
+            {{breedOptions[breedIndex] || '请选择宠物品种'}}
+          </view>
+        </picker>
+      </view>
+      
+      <!-- 宠物年龄 -->
+      <view class="form-item">
+        <text class="form-label required">宠物年龄</text>
+        <view class="age-inputs">
+          <input 
+            type="number" 
+            placeholder="月龄" 
+            name="ageMonths" 
+            value="{{petInfo.ageMonths}}" 
+            bindinput="onInputChange" 
+            data-field="ageMonths"
+            min="0"
+            max="240"
+            required
+          />
+          <text class="age-separator">月</text>
+        </view>
+      </view>
+      
+      <!-- 宠物性别 -->
+      <view class="form-item">
+        <text class="form-label required">宠物性别</text>
+        <view class="radio-group">
+          <label class="radio-item">
+            <radio 
+              value="male" 
+              checked="{{petInfo.gender === 'male'}}" 
+              bindchange="onGenderChange"
+            />
+            <text>公</text>
+          </label>
+          <label class="radio-item">
+            <radio 
+              value="female" 
+              checked="{{petInfo.gender === 'female'}}" 
+              bindchange="onGenderChange"
+            />
+            <text>母</text>
+          </label>
+        </view>
+      </view>
+      
+      <!-- 宠物颜色 -->
+      <view class="form-item">
+        <text class="form-label">宠物颜色</text>
+        <input 
+          type="text" 
+          placeholder="请输入宠物颜色" 
+          name="color" 
+          value="{{petInfo.color}}" 
+          bindinput="onInputChange" 
+          data-field="color"
+        />
+      </view>
+    </view>
+    
+    <!-- 宠物详细信息 -->
+    <view class="form-section">
+      <text class="section-title">详细信息</text>
+      
+      <!-- 宠物描述 -->
+      <view class="form-item">
+        <text class="form-label">宠物描述</text>
+        <textarea 
+          placeholder="请输入宠物详细描述" 
+          name="description" 
+          value="{{petInfo.description}}" 
+          bindinput="onInputChange" 
+          data-field="description"
+          maxlength="500"
+          rows="4"
+        ></textarea>
+      </view>
+      
+      <!-- 宠物性格 -->
+      <view class="form-item">
+        <text class="form-label">宠物性格</text>
+        <view class="checkbox-group">
+          <label class="checkbox-item" wx:for="{{personalityOptions}}" wx:key="id">
+            <checkbox 
+              value="{{item.value}}" 
+              checked="{{petInfo.personalities.includes(item.value)}}" 
+              bindchange="onPersonalityChange"
+            />
+            <text>{{item.name}}</text>
+          </label>
+        </view>
+      </view>
+      
+      <!-- 宠物健康状况 -->
+      <view class="form-item">
+        <text class="form-label required">健康状况</text>
+        <view class="radio-group">
+          <label class="radio-item">
+            <radio 
+              value="healthy" 
+              checked="{{petInfo.healthStatus === 'healthy'}}" 
+              bindchange="onHealthStatusChange"
+            />
+            <text>健康</text>
+          </label>
+          <label class="radio-item">
+            <radio 
+              value="unhealthy" 
+              checked="{{petInfo.healthStatus === 'unhealthy'}}" 
+              bindchange="onHealthStatusChange"
+            />
+            <text>有健康问题</text>
+          </label>
+        </view>
+      </view>
+      
+      <!-- 健康问题描述 -->
+      <view class="form-item" wx:if="{{petInfo.healthStatus === 'unhealthy'}}">
+        <text class="form-label">健康问题描述</text>
+        <textarea 
+          placeholder="请详细描述宠物健康问题" 
+          name="healthIssues" 
+          value="{{petInfo.healthIssues}}" 
+          bindinput="onInputChange" 
+          data-field="healthIssues"
+          maxlength="300"
+          rows="3"
+        ></textarea>
+      </view>
+    </view>
+    
+    <!-- 宠物图片上传 -->
+    <view class="form-section">
+      <text class="section-title">宠物图片</text>
+      <view class="upload-section">
+        <view class="upload-container">
+          <block wx:for="{{petInfo.images}}" wx:key="index">
+            <view class="image-item">
+              <image src="{{item}}" mode="aspectFill"></image>
+              <text class="delete-btn" bindtap="deleteImage" data-index="{{index}}">×</text>
+            </view>
+          </block>
+          <view class="upload-btn" wx:if="{{petInfo.images.length < 9}}" bindtap="chooseImage">
+            <text class="upload-icon">+</text>
+            <text class="upload-text">上传图片</text>
+          </view>
+        </view>
+        <text class="upload-tip">最多上传9张图片，第一张将作为封面</text>
+      </view>
+    </view>
+    
+    <!-- 上架状态 -->
+    <view class="form-section">
+      <text class="section-title">上架状态</text>
+      <view class="form-item">
+        <switch 
+          checked="{{petInfo.isOnSale}}" 
+          bindchange="onSaleStatusChange"
+        />
+        <text class="switch-text">{{petInfo.isOnSale ? '上架' : '下架'}}</text>
+      </view>
+    </view>
+    
+    <!-- 表单提交按钮 -->
+    <view class="form-actions">
+      <button form-type="reset" class="btn btn-default" bindtap="resetForm">重置</button>
+      <button form-type="submit" class="btn btn-primary">保存宠物信息</button>
+    </view>
+  </form>
+  
+  <!-- 批量操作按钮 -->
+  <button class="batch-upload-btn" bindtap="batchUpload">
+    批量上传宠物信息
+  </button>
+</view>
