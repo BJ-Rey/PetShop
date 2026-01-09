@@ -65,39 +65,6 @@ const request = require('./request');
  * @returns {Promise<Object>} - 包含用户信息的Promise
  */
 const verifyPhoneAndIdentifyUser = (phoneNumber, verificationCode) => {
-  // Mock logic for testing without backend
-  if (phoneNumber === '13800138000') {
-      const userInfo = {
-          phoneNumber: phoneNumber,
-          role: 'merchant',
-          token: 'mock_merchant_token_' + Date.now(),
-          id: 'mock_merchant_id',
-          nickname: '测试商家',
-          avatar: '/images/default-avatar.png',
-          agreementAgreed: true,
-          agreementVersion: '1.0.0',
-          agreementTime: Date.now()
-      };
-      wx.setStorageSync('userInfo', userInfo);
-      wx.setStorageSync('token', userInfo.token);
-      return Promise.resolve(userInfo);
-  } else if (phoneNumber === '13800138001') {
-       const userInfo = {
-          phoneNumber: phoneNumber,
-          role: 'user',
-          token: 'mock_user_token_' + Date.now(),
-          id: 'mock_user_id',
-          nickname: '测试用户',
-          avatar: '/images/default-avatar.png',
-          agreementAgreed: true,
-          agreementVersion: '1.0.0',
-          agreementTime: Date.now()
-      };
-      wx.setStorageSync('userInfo', userInfo);
-      wx.setStorageSync('token', userInfo.token);
-      return Promise.resolve(userInfo);
-  }
-
   return request.post('/api/auth/login', {
     phone: phoneNumber,
     code: verificationCode

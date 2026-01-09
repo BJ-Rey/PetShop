@@ -217,7 +217,9 @@ INSERT INTO `users` (`id`, `openid`, `nickname`, `avatar_url`, `phone`, `role`, 
 (7, 'user_openid_007', 'Bob', 'https://placehold.co/100x100/795548/ffffff?text=B', '13900000007', 'user', NOW()),
 (8, 'user_openid_008', 'Charlie', 'https://placehold.co/100x100/E91E63/ffffff?text=C', '13900000008', 'user', NOW()),
 (9, 'user_openid_009', 'David', 'https://placehold.co/100x100/607D8B/ffffff?text=D', '13900000009', 'user', NOW()),
-(10, 'user_openid_010', 'Eva', 'https://placehold.co/100x100/FF5722/ffffff?text=E', '13900000010', 'user', NOW());
+(10, 'user_openid_010', 'Eva', 'https://placehold.co/100x100/FF5722/ffffff?text=E', '13900000010', 'user', NOW()),
+(11, 'merchant_openid_test', '测试商家', 'https://placehold.co/100x100/9C27B0/ffffff?text=Merchant', '18247122807', 'merchant', NOW()),
+(12, 'user_openid_test', '测试用户', 'https://placehold.co/100x100/4CAF50/ffffff?text=User', '13848836315', 'user', NOW());
 
 -- 2.3 地址数据 (10条)
 -- 关联上述用户，包含默认和非默认
