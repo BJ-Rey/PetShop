@@ -12,50 +12,59 @@
     <button class="search-btn" bindtap="onSearch">搜索</button>
   </view>
 
-  <!-- 标准化筛选区域 -->
-  <scroll-view scroll-x="true" class="filter-bar" enable-flex>
-    <!-- 服务分类导航 - 仅显示前4个 -->
-    <view class="filter-item {{activeCategory === 'all' ? 'active' : ''}}" bindtap="selectCategory" data-category="all">
-      <text>全部</text>
+  <!-- 垂直布局筛选区域 -->
+  <view class="filter-container">
+    <!-- 第一行：服务分类 -->
+    <view class="filter-row">
+      <scroll-view scroll-x="true" class="filter-scroll" enable-flex>
+        <view class="filter-item {{activeCategory === 'all' ? 'active' : ''}}" bindtap="selectCategory" data-category="all">
+          <text>全部</text>
+        </view>
+        <view class="filter-item {{activeCategory === 'vaccine' ? 'active' : ''}}" bindtap="selectCategory" data-category="vaccine">
+          <text>疫苗接种</text>
+        </view>
+        <view class="filter-item {{activeCategory === 'grooming' ? 'active' : ''}}" bindtap="selectCategory" data-category="grooming">
+          <text>宠物美容</text>
+        </view>
+        <view class="filter-item {{activeCategory === 'boarding' ? 'active' : ''}}" bindtap="selectCategory" data-category="boarding">
+          <text>宠物寄养</text>
+        </view>
+      </scroll-view>
     </view>
-    <view class="filter-item {{activeCategory === 'vaccine' ? 'active' : ''}}" bindtap="selectCategory" data-category="vaccine">
-      <text>疫苗接种</text>
+
+    <!-- 第二行：视图切换 -->
+    <view class="filter-row">
+      <view class="view-mode-group">
+        <view class="filter-item {{viewMode === 'grid' ? 'active' : ''}}" bindtap="switchViewMode" data-mode="grid">
+          <text>网格视图</text>
+        </view>
+        <view class="filter-item {{viewMode === 'list' ? 'active' : ''}}" bindtap="switchViewMode" data-mode="list">
+          <text>列表视图</text>
+        </view>
+      </view>
     </view>
-    <view class="filter-item {{activeCategory === 'grooming' ? 'active' : ''}}" bindtap="selectCategory" data-category="grooming">
-      <text>宠物美容</text>
+
+    <!-- 第三行：排序选项 -->
+    <view class="filter-row">
+      <scroll-view scroll-x="true" class="filter-scroll" enable-flex>
+        <view class="filter-item {{sortIndex === 0 ? 'active' : ''}}" bindtap="onSortChange" data-index="0">
+          <text>综合排序</text>
+        </view>
+        <view class="filter-item {{sortIndex === 1 ? 'active' : ''}}" bindtap="onSortChange" data-index="1">
+          <text>价格低</text>
+        </view>
+        <view class="filter-item {{sortIndex === 2 ? 'active' : ''}}" bindtap="onSortChange" data-index="2">
+          <text>价格高</text>
+        </view>
+        <view class="filter-item {{sortIndex === 3 ? 'active' : ''}}" bindtap="onSortChange" data-index="3">
+          <text>销量优先</text>
+        </view>
+        <view class="filter-item {{sortIndex === 4 ? 'active' : ''}}" bindtap="onSortChange" data-index="4">
+          <text>评分优先</text>
+        </view>
+      </scroll-view>
     </view>
-    <view class="filter-item {{activeCategory === 'boarding' ? 'active' : ''}}" bindtap="selectCategory" data-category="boarding">
-      <text>宠物寄养</text>
-    </view>
-    <!-- 显示更多分类在筛选弹窗中 -->
-    
-    <!-- 视图切换 -->
-    <view class="filter-item {{viewMode === 'grid' ? 'active' : ''}}" bindtap="switchViewMode" data-mode="grid">
-      <text>网格</text>
-    </view>
-    <view class="filter-item {{viewMode === 'list' ? 'active' : ''}}" bindtap="switchViewMode" data-mode="list">
-      <text>列表</text>
-    </view>
-    
-    <!-- 排序选项 -->
-    <view class="filter-item {{sortIndex === 0 ? 'active' : ''}}" bindtap="onSortChange" data-index="0">
-      <text>综合</text>
-    </view>
-    <view class="filter-item {{sortIndex === 1 ? 'active' : ''}}" bindtap="onSortChange" data-index="1">
-      <text>价格低</text>
-    </view>
-    <view class="filter-item {{sortIndex === 2 ? 'active' : ''}}" bindtap="onSortChange" data-index="2">
-      <text>价格高</text>
-    </view>
-    <view class="filter-item {{sortIndex === 3 ? 'active' : ''}}" bindtap="onSortChange" data-index="3">
-      <text>销量</text>
-    </view>
-    <view class="filter-item {{sortIndex === 4 ? 'active' : ''}}" bindtap="onSortChange" data-index="4">
-      <text>评分</text>
-    </view>
-    
-    
-  </scroll-view>
+  </view>
 
   <!-- 热门服务推荐 -->
   <view class="hot-services" wx:if="{{hotServices.length > 0}}">

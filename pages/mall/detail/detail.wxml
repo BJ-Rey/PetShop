@@ -31,16 +31,14 @@
 
   <!-- 商品基本信息 -->
   <view class="product-info-section">
-    <view class="price-section">
-      <text class="current-price">¥{{product.price}}</text>
-      <text class="original-price" wx:if="{{product.originalPrice > product.price}}">¥{{product.originalPrice}}</text>
-      <text class="discount" wx:if="{{product.originalPrice > product.price}}">{{utils.getDiscount(product.price, product.originalPrice)}}</text>
+    <view class="info-row">
+      <text class="product-name">{{product.name}}</text>
+      <view class="price-column">
+          <text class="current-price">¥{{product.price}}</text>
+          <text class="original-price" wx:if="{{product.originalPrice > product.price}}">¥{{product.originalPrice}}</text>
+      </view>
     </view>
     
-    <view class="info-header">
-      <text class="product-name">{{product.name}}</text>
-    </view>
-
     <view class="product-meta">
       <text class="product-rating">
         <text class="star">★</text>

@@ -100,6 +100,15 @@ Page({
   },
 
   /**
+   * 配置主页轮播图
+   */
+  navigateToBannerSetting() {
+    wx.navigateTo({
+      url: '/pages/merchant/setting/banner/banner'
+    })
+  },
+
+  /**
    * 编辑营业时间
    */
   editBusinessHours() {

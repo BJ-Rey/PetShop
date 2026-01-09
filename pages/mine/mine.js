@@ -9,6 +9,7 @@ Page({
    */
   data: {
     loading: true, // 添加加载状态
+    isNavigating: false, // Prevent duplicate navigation
     userInfo: null,
     isLoggedIn: false,
     orderStats: [
@@ -136,17 +137,23 @@ Page({
    * 导航到菜单功能
    */
   navigateToMenu(e) {
+    if (this.data.isNavigating) return;
+    
     const url = e.currentTarget.dataset.url;
     
     if (url === 'contact') {
       if (!auth.checkPermission(() => {
+        this.setData({ isNavigating: true });
         wx.navigateTo({
-          url: '/pages/service/contact/contact'
+          url: '/pages/service/contact/contact',
+          complete: () => { setTimeout(() => { this.setData({ isNavigating: false }) }, 1000) }
         });
       })) return;
 
+      this.setData({ isNavigating: true });
       wx.navigateTo({
-        url: '/pages/service/contact/contact'
+        url: '/pages/service/contact/contact',
+        complete: () => { setTimeout(() => { this.setData({ isNavigating: false }) }, 1000) }
       });
       return;
     }
@@ -154,6 +161,7 @@ Page({
     if (!auth.checkPermission(() => {
         // 重新构建事件对象或直接调用逻辑
         if (url) {
+            this.setData({ isNavigating: true });
             wx.navigateTo({
                 url: url,
                 fail: (err) => {
@@ -162,12 +170,14 @@ Page({
                         title: '功能开发中',
                         icon: 'none'
                     });
-                }
+                },
+                complete: () => { setTimeout(() => { this.setData({ isNavigating: false }) }, 1000) }
             });
         }
     })) return;
     
     if (url) {
+      this.setData({ isNavigating: true });
       wx.navigateTo({
         url: url,
         fail: (err) => {
@@ -176,7 +186,8 @@ Page({
             title: '功能开发中',
             icon: 'none'
           });
-        }
+        },
+        complete: () => { setTimeout(() => { this.setData({ isNavigating: false }) }, 1000) }
       });
     }
   },
@@ -223,12 +234,16 @@ Page({
    * 导航到我的宠物页面
    */
   navigateToMyPets() {
+    if (this.data.isNavigating) return;
+    
     if (!auth.checkPermission(() => {
         this.navigateToMyPets();
     })) return;
 
+    this.setData({ isNavigating: true });
     wx.navigateTo({
-      url: '/pages/pet/list/list?tab=my'
+      url: '/pages/pet/list/list?tab=my',
+      complete: () => { setTimeout(() => { this.setData({ isNavigating: false }) }, 1000) }
     });
   },
 
@@ -236,12 +251,16 @@ Page({
    * 导航到收货地址页面
    */
   navigateToAddress() {
+    if (this.data.isNavigating) return;
+
     if (!auth.checkPermission(() => {
         this.navigateToAddress();
     })) return;
 
+    this.setData({ isNavigating: true });
     wx.navigateTo({
-      url: '/pages/mine/address/address'
+      url: '/pages/mine/address/address',
+      complete: () => { setTimeout(() => { this.setData({ isNavigating: false }) }, 1000) }
     });
   },
 

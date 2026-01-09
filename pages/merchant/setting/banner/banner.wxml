@@ -1,0 +1,62 @@
+<view class="container">
+  <view class="header-tip">最多可配置5张轮播图，支持拖拽排序（模拟：点击上下箭头）</view>
+
+  <view class="banner-list">
+    <block wx:for="{{banners}}" wx:key="id">
+      <view class="banner-item">
+        <image class="banner-img" src="{{item.image_url}}" mode="aspectFill"></image>
+        <view class="banner-info">
+          <text class="link-type">{{item.link_type === 'pet' ? '宠物' : '商品'}}</text>
+          <text class="link-name">{{item.link_name}}</text>
+        </view>
+        <view class="banner-actions">
+          <view class="sort-btns">
+            <view class="sort-btn" bindtap="moveUp" data-index="{{index}}" wx:if="{{index > 0}}">↑</view>
+            <view class="sort-btn" bindtap="moveDown" data-index="{{index}}" wx:if="{{index < banners.length - 1}}">↓</view>
+          </view>
+          <view class="delete-btn" bindtap="deleteBanner" data-index="{{index}}">删除</view>
+        </view>
+      </view>
+    </block>
+  </view>
+
+  <view class="add-btn-wrapper" wx:if="{{banners.length < 5}}">
+    <button class="add-btn" bindtap="showAddModal">+ 添加轮播图</button>
+  </view>
+  
+  <view class="save-btn-wrapper">
+    <button class="save-btn" type="primary" bindtap="saveSettings">保存配置</button>
+  </view>
+
+  <!-- Add/Edit Modal -->
+  <view class="modal-mask" wx:if="{{showModal}}" bindtap="hideModal"></view>
+  <view class="modal-content" wx:if="{{showModal}}">
+    <view class="modal-header">添加轮播图</view>
+    <view class="form-item">
+      <text class="label">图片</text>
+      <view class="upload-box" bindtap="chooseImage">
+        <image wx:if="{{tempImage}}" src="{{tempImage}}" mode="aspectFill" class="preview-img"></image>
+        <text wx:else class="upload-text">点击上传</text>
+      </view>
+    </view>
+    <view class="form-item">
+      <text class="label">关联类型</text>
+      <radio-group bindchange="onTypeChange" class="radio-group">
+        <label class="radio"><radio value="pet" checked="{{tempType === 'pet'}}"/>宠物</label>
+        <label class="radio"><radio value="product" checked="{{tempType === 'product'}}"/>商品</label>
+      </radio-group>
+    </view>
+    <view class="form-item">
+      <text class="label">关联项目</text>
+      <picker bindchange="onItemChange" value="{{itemIndex}}" range="{{availableItems}}" range-key="name">
+        <view class="picker">
+          {{itemIndex !== null ? availableItems[itemIndex].name : '请选择关联项目'}}
+        </view>
+      </picker>
+    </view>
+    <view class="modal-footer">
+      <button size="mini" bindtap="hideModal">取消</button>
+      <button size="mini" type="primary" bindtap="confirmAdd">确定</button>
+    </view>
+  </view>
+</view>

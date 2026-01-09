@@ -75,6 +75,7 @@ CREATE TABLE `pets` (
   `avatar` VARCHAR(255) COMMENT '头像URL',
   `health_status` VARCHAR(50) DEFAULT '健康' COMMENT '健康状况',
   `merchant_id` INT COMMENT '所属商家ID',
+  `views` INT DEFAULT 0 COMMENT '浏览量',
   `created_at` TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
   `updated_at` TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
   FOREIGN KEY (`merchant_id`) REFERENCES `merchants`(`id`) ON DELETE SET NULL,
@@ -96,6 +97,8 @@ CREATE TABLE `products` (
   `sales` INT DEFAULT 0 COMMENT '销量',
   `rating` DECIMAL(2,1) DEFAULT 5.0 COMMENT '评分',
   `image` VARCHAR(255) COMMENT '商品图片URL',
+  `views` INT DEFAULT 0 COMMENT '浏览量',
+  `status` ENUM('on_shelf', 'off_shelf') DEFAULT 'on_shelf' COMMENT '上下架状态',
   `created_at` TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
   `updated_at` TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
   INDEX `idx_products_category` (`category`),
@@ -122,6 +125,21 @@ CREATE TABLE `services` (
   INDEX `idx_services_category` (`category`),
   INDEX `idx_services_merchant_id` (`merchant_id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COMMENT='服务项目表';
+
+-- 1.6.1 商家轮播图表 (Merchant Banners)
+-- ------------------------------------------
+DROP TABLE IF EXISTS `merchant_banners`;
+CREATE TABLE `merchant_banners` (
+  `id` INT AUTO_INCREMENT PRIMARY KEY COMMENT '轮播图ID',
+  `merchant_id` INT NOT NULL COMMENT '商家ID',
+  `image_url` VARCHAR(255) NOT NULL COMMENT '图片URL',
+  `link_type` ENUM('pet', 'product') NOT NULL COMMENT '关联类型',
+  `link_id` INT NOT NULL COMMENT '关联项目ID',
+  `sort_order` INT DEFAULT 0 COMMENT '排序权重',
+  `created_at` TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+  FOREIGN KEY (`merchant_id`) REFERENCES `merchants`(`id`) ON DELETE CASCADE,
+  INDEX `idx_banners_merchant` (`merchant_id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COMMENT='商家轮播图配置表';
 
 -- 1.7 订单表 (Orders)
 -- ------------------------------------------
@@ -217,31 +235,36 @@ INSERT INTO `addresses` (`id`, `openid`, `name`, `phone`, `address`, `is_default
 
 -- 2.4 宠物数据 (10条)
 -- 涵盖不同品种、价格、状态
-INSERT INTO `pets` (`id`, `name`, `breed`, `age`, `gender`, `price`, `deposit`, `status`, `description`, `avatar`, `health_status`, `merchant_id`, `created_at`) VALUES
-(1, '小黑', '金毛犬', '2岁', 'male', 3000.00, 900.00, 'available', '非常活泼的金毛，喜欢飞盘', 'https://placehold.co/400x400/FF9800/ffffff?text=Golden', '健康', 1, NOW()),
-(2, '咪咪', '布偶猫', '1岁', 'female', 5000.00, 1500.00, 'available', '性格温顺，粘人，品相极佳', 'https://placehold.co/400x400/2196F3/ffffff?text=Ragdoll', '健康', 3, NOW()),
-(3, '旺财', '中华田园犬', '3个月', 'male', 500.00, 100.00, 'sold', '聪明伶俐，好养活', 'https://placehold.co/400x400/795548/ffffff?text=Dog', '健康', 9, NOW()),
-(4, '小白', '萨摩耶', '1.5岁', 'female', 2500.00, 750.00, 'booked', '微笑天使，由于主人搬家寻找新主人', 'https://placehold.co/400x400/E91E63/ffffff?text=Samoyed', '已绝育', 1, NOW()),
-(5, '皮皮', '柯基', '8个月', 'male', 3500.00, 1050.00, 'available', '短腿小电臀，精力充沛', 'https://placehold.co/400x400/FF5722/ffffff?text=Corgi', '健康', 4, NOW()),
-(6, '露露', '英国短毛猫', '2岁', 'female', 2000.00, 600.00, 'available', '蓝猫，脸圆圆的，很安静', 'https://placehold.co/400x400/607D8B/ffffff?text=BSH', '健康', 2, NOW()),
-(7, '哈利', '哈士奇', '1岁', 'male', 1800.00, 540.00, 'available', '拆家小能手，需要大空间', 'https://placehold.co/400x400/9C27B0/ffffff?text=Husky', '健康', 4, NOW()),
-(8, '娜娜', '贵宾犬', '3岁', 'female', 1500.00, 450.00, 'sold', '泰迪造型，乖巧听话', 'https://placehold.co/400x400/8BC34A/ffffff?text=Poodle', '健康', 2, NOW()),
-(9, '大黄', '橘猫', '5个月', 'male', 200.00, 0.00, 'available', '十只橘猫九只胖，还有一只在路上', 'https://placehold.co/400x400/FFC107/ffffff?text=Orange', '健康', 9, NOW()),
-(10, '辛巴', '缅因猫', '6个月', 'male', 8000.00, 2400.00, 'available', '体型巨大，性格温柔的巨人', 'https://placehold.co/400x400/3F51B5/ffffff?text=Maine', '健康', 3, NOW());
+INSERT INTO `pets` (`id`, `name`, `breed`, `age`, `gender`, `price`, `deposit`, `status`, `description`, `avatar`, `health_status`, `merchant_id`, `views`, `created_at`) VALUES
+(1, '小黑', '金毛犬', '2岁', 'male', 3000.00, 900.00, 'available', '非常活泼的金毛，喜欢飞盘', 'https://placehold.co/400x400/FF9800/ffffff?text=Golden', '健康', 1, 120, NOW()),
+(2, '咪咪', '布偶猫', '1岁', 'female', 5000.00, 1500.00, 'available', '性格温顺，粘人，品相极佳', 'https://placehold.co/400x400/2196F3/ffffff?text=Ragdoll', '健康', 3, 350, NOW()),
+(3, '旺财', '中华田园犬', '3个月', 'male', 500.00, 100.00, 'sold', '聪明伶俐，好养活', 'https://placehold.co/400x400/795548/ffffff?text=Dog', '健康', 9, 800, NOW()),
+(4, '小白', '萨摩耶', '1.5岁', 'female', 2500.00, 750.00, 'booked', '微笑天使，由于主人搬家寻找新主人', 'https://placehold.co/400x400/E91E63/ffffff?text=Samoyed', '已绝育', 1, 45, NOW()),
+(5, '皮皮', '柯基', '8个月', 'male', 3500.00, 1050.00, 'available', '短腿小电臀，精力充沛', 'https://placehold.co/400x400/FF5722/ffffff?text=Corgi', '健康', 4, 600, NOW()),
+(6, '露露', '英国短毛猫', '2岁', 'female', 2000.00, 600.00, 'available', '蓝猫，脸圆圆的，很安静', 'https://placehold.co/400x400/607D8B/ffffff?text=BSH', '健康', 2, 150, NOW()),
+(7, '哈利', '哈士奇', '1岁', 'male', 1800.00, 540.00, 'available', '拆家小能手，需要大空间', 'https://placehold.co/400x400/9C27B0/ffffff?text=Husky', '健康', 4, 300, NOW()),
+(8, '娜娜', '贵宾犬', '3岁', 'female', 1500.00, 450.00, 'sold', '泰迪造型，乖巧听话', 'https://placehold.co/400x400/8BC34A/ffffff?text=Poodle', '健康', 2, 50, NOW()),
+(9, '大黄', '橘猫', '5个月', 'male', 200.00, 0.00, 'available', '十只橘猫九只胖，还有一只在路上', 'https://placehold.co/400x400/FFC107/ffffff?text=Orange', '健康', 9, 999, NOW()),
+(10, '辛巴', '缅因猫', '6个月', 'male', 8000.00, 2400.00, 'available', '体型巨大，性格温柔的巨人', 'https://placehold.co/400x400/3F51B5/ffffff?text=Maine', '健康', 3, 20, NOW());
 
 -- 2.5 商品数据 (10条)
 -- 涵盖不同分类、价格、库存
-INSERT INTO `products` (`id`, `name`, `category`, `price`, `original_price`, `stock`, `sales`, `rating`, `image`, `created_at`) VALUES
-(1, '天然狗粮通用型', 'food', 129.00, 199.00, 500, 1200, 4.8, 'https://placehold.co/400x400/795548/ffffff?text=Food', NOW()),
-(2, '宠物自动喂食器', 'daily', 299.00, 399.00, 100, 800, 4.9, 'https://placehold.co/400x400/607D8B/ffffff?text=Feeder', NOW()),
-(3, '猫咪逗猫棒', 'toy', 19.90, 29.90, 1000, 5000, 4.7, 'https://placehold.co/400x400/E91E63/ffffff?text=Toy', NOW()),
-(4, '狗狗磨牙骨', 'toy', 39.00, 59.00, 200, 300, 4.5, 'https://placehold.co/400x400/FF9800/ffffff?text=Bone', NOW()),
-(5, '宠物专用沐浴露', 'grooming', 68.00, 88.00, 300, 450, 4.6, 'https://placehold.co/400x400/2196F3/ffffff?text=Shampoo', NOW()),
-(6, '豪华猫爬架', 'daily', 350.00, 500.00, 50, 120, 4.9, 'https://placehold.co/400x400/9C27B0/ffffff?text=Tree', NOW()),
-(7, '宠物除臭喷雾', 'daily', 25.00, 35.00, 800, 1500, 4.4, 'https://placehold.co/400x400/00BCD4/ffffff?text=Spray', NOW()),
-(8, '冬季保暖狗窝', 'daily', 89.00, 129.00, 150, 200, 4.7, 'https://placehold.co/400x400/FF5722/ffffff?text=Bed', NOW()),
-(9, '宠物营养膏', 'food', 75.00, 95.00, 400, 600, 4.8, 'https://placehold.co/400x400/4CAF50/ffffff?text=Nutrition', NOW()),
-(10, '自动饮水机滤芯', 'daily', 45.00, 55.00, 0, 900, 4.6, 'https://placehold.co/400x400/3F51B5/ffffff?text=Filter', NOW());
+INSERT INTO `products` (`id`, `name`, `category`, `price`, `original_price`, `stock`, `sales`, `rating`, `image`, `views`, `status`, `created_at`) VALUES
+(1, '天然狗粮通用型', 'food', 129.00, 199.00, 500, 1200, 4.8, 'https://placehold.co/400x400/795548/ffffff?text=Food', 5000, 'on_shelf', NOW()),
+(2, '宠物自动喂食器', 'daily', 299.00, 399.00, 100, 800, 4.9, 'https://placehold.co/400x400/607D8B/ffffff?text=Feeder', 3000, 'on_shelf', NOW()),
+(3, '猫咪逗猫棒', 'toy', 19.90, 29.90, 1000, 5000, 4.7, 'https://placehold.co/400x400/E91E63/ffffff?text=Toy', 10000, 'on_shelf', NOW()),
+(4, '狗狗磨牙骨', 'toy', 39.00, 59.00, 200, 300, 4.5, 'https://placehold.co/400x400/FF9800/ffffff?text=Bone', 1500, 'on_shelf', NOW()),
+(5, '宠物专用沐浴露', 'grooming', 68.00, 88.00, 300, 450, 4.6, 'https://placehold.co/400x400/2196F3/ffffff?text=Shampoo', 2000, 'on_shelf', NOW()),
+(6, '豪华猫爬架', 'daily', 350.00, 500.00, 50, 120, 4.9, 'https://placehold.co/400x400/9C27B0/ffffff?text=Tree', 800, 'on_shelf', NOW()),
+(7, '宠物除臭喷雾', 'daily', 25.00, 35.00, 800, 1500, 4.4, 'https://placehold.co/400x400/00BCD4/ffffff?text=Spray', 4000, 'on_shelf', NOW()),
+(8, '冬季保暖狗窝', 'daily', 89.00, 129.00, 150, 200, 4.7, 'https://placehold.co/400x400/FF5722/ffffff?text=Bed', 600, 'off_shelf', NOW()),
+(9, '宠物营养膏', 'food', 75.00, 95.00, 400, 600, 4.8, 'https://placehold.co/400x400/4CAF50/ffffff?text=Nutrition', 1200, 'on_shelf', NOW()),
+(10, '自动饮水机滤芯', 'daily', 45.00, 55.00, 0, 900, 4.6, 'https://placehold.co/400x400/3F51B5/ffffff?text=Filter', 2500, 'on_shelf', NOW());
+
+-- 2.5.1 商家轮播图数据 (示例)
+INSERT INTO `merchant_banners` (`id`, `merchant_id`, `image_url`, `link_type`, `link_id`, `sort_order`, `created_at`) VALUES
+(1, 1, 'https://placehold.co/800x400/2196F3/ffffff?text=Banner1', 'pet', 1, 1, NOW()),
+(2, 1, 'https://placehold.co/800x400/FF9800/ffffff?text=Banner2', 'product', 1, 2, NOW());
 
 -- 2.6 服务数据 (10条)
 -- 涵盖不同服务类型

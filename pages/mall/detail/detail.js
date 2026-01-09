@@ -246,7 +246,7 @@ Page({
     wx.setStorageSync('cartItems', cartItems)
     
     wx.showToast({
-      title: '加入购物车成功',
+      title: '已加入购物车',
       icon: 'success'
     })
     
@@ -337,17 +337,25 @@ Page({
       // 保存当前订单商品到全局数据，用于跳转到确认订单页面
       app.globalData.currentOrderItems = [orderItem]
       
-      // 跳转到确认订单页面
-      wx.navigateTo({
-        url: '/pages/order/create/create',
-        fail: () => {
-          // 跳转失败时恢复状态
-          this.setData({
-            loading: false,
-            buyNowDisabled: false
+      wx.showToast({
+        title: '即将跳转至订单确认',
+        icon: 'none',
+        duration: 1000
+      });
+
+      setTimeout(() => {
+          // 跳转到确认订单页面
+          wx.navigateTo({
+            url: '/pages/order/create/create',
+            fail: () => {
+              // 跳转失败时恢复状态
+              this.setData({
+                loading: false,
+                buyNowDisabled: false
+              })
+            }
           })
-        }
-      })
+      }, 1000);
     } catch (error) {
       console.error('立即购买失败:', error)
       wx.showToast({

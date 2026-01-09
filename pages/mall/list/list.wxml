@@ -24,17 +24,6 @@
 
   <!-- 非搜索状态显示内容 -->
   <block wx:if="{{!isSearching}}">
-    <!-- 推荐商品轮播 -->
-    <view class="banner-section">
-      <swiper indicator-dots="{{indicatorDots}}" autoplay="{{autoplay}}" interval="{{interval}}" duration="{{duration}}">
-        <block wx:for="{{bannerList}}" wx:key="id">
-          <swiper-item>
-            <image src="{{item.image}}" class="banner-image" mode="aspectFill" bindtap="navigateToBannerLink" data-link="{{item.link}}"></image>
-          </swiper-item>
-        </block>
-      </swiper>
-    </view>
-
     <!-- 热门商品 (仅在查看用品时显示，或者一直显示？用户没说，暂保留但仅在用品Tab显示比较合理，但用户说猫咪页面要整合，所以猫咪Tab下可能不需要热门商品，或者显示热门猫咪。为简化，仅在用品Tab显示) -->
     <view class="hot-products" wx:if="{{currentFilter === 'product' && hotProducts.length > 0}}">
       <view class="section-header">
@@ -61,6 +50,23 @@
       
       <!-- 猫咪列表 -->
       <view class="product-grid" wx:if="{{currentFilter === 'cat'}}">
+        <!-- 精选猫咪 -->
+        <view class="hot-products" wx:if="{{featuredPets.length > 0}}">
+            <view class="section-header">
+                <text class="section-title">精选猫咪</text>
+            </view>
+            <scroll-view scroll-x="true" class="hot-products-scroll" enable-flex>
+                <block wx:for="{{featuredPets}}" wx:key="id">
+                    <view class="hot-product-item" bindtap="navigateToPetDetail" data-id="{{item.id}}">
+                        <image src="{{item.avatar}}" class="product-image"></image>
+                        <text class="product-name">{{item.name}}</text>
+                        <text class="product-price">¥{{item.price}}</text>
+                        <text class="product-sales">人气 {{item.views || 0}}</text>
+                    </view>
+                </block>
+            </scroll-view>
+        </view>
+
         <block wx:if="{{pets.length > 0}}">
           <block wx:for="{{pets}}" wx:key="id">
             <view class="product-card" bindtap="navigateToPetDetail" data-id="{{item.id}}">

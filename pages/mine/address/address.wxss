@@ -1,10 +1,33 @@
 /* pages/mine/address/address.wxss */
 
-/* 地址列表 - 优化为与全局样式一致 */
+/* 底部添加按钮栏 */
+.bottom-action-bar {
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  padding: 20rpx 30rpx;
+  background: #fff;
+  box-shadow: 0 -2rpx 10rpx rgba(0,0,0,0.05);
+  padding-bottom: calc(20rpx + env(safe-area-inset-bottom));
+  z-index: 100;
+}
+
+.add-address-btn {
+  width: 100%;
+  border-radius: 40rpx;
+  height: 80rpx;
+  line-height: 80rpx;
+  font-size: 32rpx;
+}
+
+/* 列表容器增加底部内边距，防止被按钮遮挡 */
 .address-list {
   display: flex;
   flex-direction: column;
   gap: 25rpx;
+  padding-bottom: 140rpx;
+  padding-top: 20rpx; /* 下移内容 */
 }
 
 /* 地址项 - 优化为与全局卡片样式一致 */

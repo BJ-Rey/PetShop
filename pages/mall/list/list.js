@@ -24,14 +24,8 @@ Page({
     isLoading: false,
 
     hotProducts: [], // 热门商品数据
-    bannerList: [], // 轮播图数据
+    featuredPets: [], // 精选猫咪数据
     
-    // 轮播图配置
-    indicatorDots: true,
-    autoplay: true,
-    interval: 3000,
-    duration: 1000,
-
     // 联系商家相关
     showContactModal: false,
     merchantInfo: {
@@ -47,8 +41,6 @@ Page({
     // 加载数据
     this.loadProducts()
     this.loadPets()
-    this.loadHotProducts()
-    this.loadBannerList()
   },
 
   onUnload: function() {
@@ -58,7 +50,9 @@ Page({
   },
 
   onShow: function() {
-    // 页面显示时不需要单独刷新购物车数量，全局购物车组件会自动更新
+    // 页面显示时刷新热门数据，保证实时性
+    this.loadHotProducts()
+    this.loadFeaturedPets()
   },
 
   /**
@@ -185,25 +179,31 @@ Page({
       }
   },
 
-  // 加载热门商品数据 (暂时取前3个商品)
+  // 加载热门商品数据 (按浏览量排序，取前3)
   loadHotProducts: function() {
     productApi.getProductList({
         page: 1,
-        size: 3
+        size: 20 // Fetch more to sort
     }).then(products => {
+        // Sort by views desc
+        const sorted = (products || []).sort((a, b) => (b.views || 0) - (a.views || 0));
         this.setData({
-            hotProducts: products
+            hotProducts: sorted.slice(0, 3)
         });
     });
   },
 
-  // 加载轮播图数据
-  loadBannerList: function() {
-    // 暂时置空或调用API
-    const bannerList = []
-    this.setData({
-      bannerList: bannerList
-    })
+  // 加载精选猫咪 (按浏览量排序，取前3)
+  loadFeaturedPets: function() {
+      catApi.getCatList({
+          page: 1,
+          size: 20
+      }).then(pets => {
+          const sorted = (pets || []).sort((a, b) => (b.views || 0) - (a.views || 0));
+          this.setData({
+              featuredPets: sorted.slice(0, 3)
+          });
+      });
   },
 
   // 搜索输入
@@ -295,7 +295,7 @@ Page({
           this.loadProducts(),
           this.loadPets(),
           this.loadHotProducts(),
-          this.loadBannerList()
+          this.loadFeaturedPets()
       ]).then(() => {
           wx.stopPullDownRefresh();
           wx.showToast({ title: '刷新成功', icon: 'none' });

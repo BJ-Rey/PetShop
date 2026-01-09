@@ -5,102 +5,12 @@ const petStore = require('../../../utils/petStore');
 Page({
   data: {
     petId: null,
-    pet: {
-      id: 1,
-      name: '小黑',
-      breed: '金毛犬',
-      age: '2岁',
-      price: 3000, // 宠物总价
-      deposit: 1000, // 定金价格
-      gender: 'male',
-      color: '黄色',
-      pattern: '纯色',
-      temperament: 'gentle',
-      personality: ['活泼', '粘人'],
-      description: '这是一只非常活泼可爱的金毛犬，喜欢玩耍，对人友善。',
-      images: [
-        'https://example.com/pet1.jpg',
-        'https://example.com/pet1_1.jpg',
-        'https://example.com/pet1_2.jpg'
-      ],
-      hasDisease: false,
-      diseases: [],
-      vaccineRecords: [
-        {
-          id: 1,
-          name: '犬瘟热疫苗',
-          date: '2025-01-15',
-          institution: '爱心宠物医院',
-          certificate: 'https://example.com/certificate1.jpg'
-        },
-        {
-          id: 2,
-          name: '狂犬病疫苗',
-          date: '2025-02-20',
-          institution: '爱心宠物医院',
-          certificate: 'https://example.com/certificate2.jpg'
-        }
-      ],
-      dewormingRecords: [
-        {
-          id: 1,
-          medicine: '拜宠清',
-          date: '2025-03-10',
-          institution: '爱心宠物医院',
-          certificate: ''
-        }
-      ],
-      relatives: [
-        {
-          id: 2,
-          name: '大黄',
-          breed: '金毛犬',
-          relationType: '父亲',
-          avatar: 'https://example.com/pet2.jpg',
-          isMerchantPet: true,
-          merchantName: '宠物乐园',
-          nestedRelations: ['父：大黄 → 祖父：老黄']
-        },
-        {
-          id: 3,
-          name: '小白',
-          breed: '金毛犬',
-          relationType: '母亲',
-          avatar: 'https://example.com/pet3.jpg',
-          isMerchantPet: false,
-          nestedRelations: []
-        }
-      ],
-      serviceRecords: [
-        {
-          id: 1,
-          serviceName: '宠物美容',
-          status: 'completed',
-          date: '2025-05-10',
-          time: '14:30',
-          merchantName: '宠物美容中心',
-          evaluation: {
-            rating: 5,
-            content: '服务非常好，宠物美容后很精神。'
-          }
-        },
-        {
-          id: 2,
-          serviceName: '疫苗接种',
-          status: 'pending',
-          date: '2025-06-20',
-          time: '10:00',
-          merchantName: '爱心宠物医院',
-          evaluation: null
-        }
-      ],
-      status: 'available', // 宠物状态：available, booked, sold
-      statusText: '可预订', // 状态文本描述
-      isOrdered: false, // 是否有人下定
-      rating: 4.8, // 评分
-      sales: 123 // 销量
-    },
-    isMyPet: true,
+    pet: null, // Remove hardcoded "Xiao Hei" data
+    isLoading: true, // Loading state
+    hasError: false, // Error state
+    errorMsg: '', // Error message
+    
+    isMyPet: false,
     indicatorDots: true,
     autoplay: true,
     interval: 3000,
@@ -275,10 +185,11 @@ Page({
     const petId = this.data.petId
     const catApi = require('../../../api/catApi');
     
-    wx.showLoading({ title: '加载中...' });
+    this.setData({ isLoading: true, hasError: false, errorMsg: '' });
+    // wx.showLoading({ title: '加载中...' }); // Use page loading state instead
 
     catApi.getCatDetail(petId).then(pet => {
-        wx.hideLoading();
+        // wx.hideLoading();
         
         // 数据处理
         if (pet) {
@@ -304,18 +215,34 @@ Page({
             }
             
             // 检查宠物是否已收藏
-            const isFav = isFavorite('pets', pet.id);
+            // const isFav = isFavorite('pets', pet.id); // Need import or check logic
             
             this.setData({ 
               pet: pet, 
-              isFavorite: isFav 
+              isLoading: false,
+              // isFavorite: isFav 
+            });
+        } else {
+            this.setData({ 
+                isLoading: false, 
+                hasError: true, 
+                errorMsg: '未找到该宠物信息' 
             });
         }
     }).catch(err => {
-        wx.hideLoading();
+        // wx.hideLoading();
         console.error('Failed to load pet detail', err);
-        wx.showToast({ title: '加载失败', icon: 'none' });
+        // wx.showToast({ title: '加载失败', icon: 'none' });
+        this.setData({ 
+            isLoading: false, 
+            hasError: true, 
+            errorMsg: err.message || '加载失败，请检查网络' 
+        });
     });
+  },
+
+  onRetry: function() {
+      this.loadPetDetail();
   },
 
   // 上一页

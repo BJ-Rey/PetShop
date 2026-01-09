@@ -1,0 +1,178 @@
+.container {
+  padding: 20rpx;
+  background-color: #f8f8f8;
+  min-height: 100vh;
+}
+
+.header-tip {
+  font-size: 24rpx;
+  color: #888;
+  margin-bottom: 20rpx;
+}
+
+.banner-list {
+  margin-bottom: 40rpx;
+}
+
+.banner-item {
+  display: flex;
+  align-items: center;
+  background: #fff;
+  padding: 20rpx;
+  margin-bottom: 20rpx;
+  border-radius: 10rpx;
+  box-shadow: 0 2rpx 5rpx rgba(0,0,0,0.05);
+}
+
+.banner-img {
+  width: 120rpx;
+  height: 60rpx;
+  border-radius: 4rpx;
+  margin-right: 20rpx;
+  background-color: #eee;
+}
+
+.banner-info {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+}
+
+.link-type {
+  font-size: 22rpx;
+  color: #999;
+  margin-bottom: 4rpx;
+}
+
+.link-name {
+  font-size: 28rpx;
+  color: #333;
+  font-weight: 500;
+}
+
+.banner-actions {
+  display: flex;
+  align-items: center;
+}
+
+.sort-btns {
+  display: flex;
+  flex-direction: column;
+  margin-right: 20rpx;
+}
+
+.sort-btn {
+  font-size: 24rpx;
+  color: #666;
+  padding: 4rpx 10rpx;
+  background: #f0f0f0;
+  margin: 2rpx 0;
+  border-radius: 4rpx;
+}
+
+.delete-btn {
+  font-size: 26rpx;
+  color: #ff4d4f;
+  padding: 10rpx;
+}
+
+.add-btn-wrapper {
+  margin-bottom: 30rpx;
+}
+
+.add-btn {
+  background: #fff;
+  border: 1px dashed #ccc;
+  color: #666;
+  font-size: 28rpx;
+}
+
+.save-btn-wrapper {
+  margin-top: 50rpx;
+}
+
+/* Modal */
+.modal-mask {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(0,0,0,0.5);
+  z-index: 100;
+}
+
+.modal-content {
+  position: fixed;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  width: 600rpx;
+  background: #fff;
+  border-radius: 12rpx;
+  padding: 30rpx;
+  z-index: 101;
+}
+
+.modal-header {
+  font-size: 32rpx;
+  font-weight: bold;
+  margin-bottom: 30rpx;
+  text-align: center;
+}
+
+.form-item {
+  margin-bottom: 30rpx;
+}
+
+.label {
+  display: block;
+  font-size: 28rpx;
+  color: #333;
+  margin-bottom: 10rpx;
+}
+
+.upload-box {
+  width: 100%;
+  height: 200rpx;
+  background: #f8f8f8;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border: 1px dashed #ddd;
+  border-radius: 8rpx;
+}
+
+.preview-img {
+  width: 100%;
+  height: 100%;
+  border-radius: 8rpx;
+}
+
+.upload-text {
+  color: #999;
+  font-size: 26rpx;
+}
+
+.radio-group {
+  display: flex;
+}
+
+.radio {
+  margin-right: 30rpx;
+  font-size: 28rpx;
+}
+
+.picker {
+  background: #f8f8f8;
+  padding: 20rpx;
+  border-radius: 8rpx;
+  font-size: 28rpx;
+  color: #333;
+}
+
+.modal-footer {
+  display: flex;
+  justify-content: space-between;
+  margin-top: 40rpx;
+}

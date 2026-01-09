@@ -1,269 +1,285 @@
 <!--pet/detail/detail.wxml-->
 <view class="container">
   <auth-modal id="auth-modal" />
-  <global-cart wx:if="{{!isMerchant}}" />
+  <global-cart wx:if="{{!isMerchant && !isLoading && !hasError}}" />
   <!-- 顶部操作栏 -->
   <view class="custom-nav-placeholder" style="height: {{navBarTotalHeight}}px; background: #fff;"></view>
   <view class="custom-nav" style="height: {{navBarHeight}}px; padding-top: {{statusBarHeight}}px; padding-right: {{capsuleWidth + capsuleRight + 10}}px;">
     <view class="nav-left" bindtap="navigateBack">
       <text class="standard-back-btn">←</text>
     </view>
-    <text class="page-title">{{pet.name}}</text>
+    <text class="page-title">{{pet ? pet.name : '宠物详情'}}</text>
     <!-- 功能按钮移到标题栏内，但需要注意空间 -->
     <view class="action-buttons">
     </view>
   </view>
 
-  <!-- 宠物封面图轮播 -->
-  <swiper indicator-dots="{{indicatorDots}}" autoplay="{{autoplay}}" interval="{{interval}}" duration="{{duration}}">
-    <block wx:for="{{pet.images}}" wx:key="index">
-      <swiper-item>
-        <image src="{{item}}" class="product-image" mode="aspectFill"></image>
-        <!-- 宠物状态标签 -->
-        <pet-status-tag status="{{pet.status}}" statusText="{{pet.statusText}}" style="position: absolute; top: 30rpx; left: 30rpx; z-index: 10;"></pet-status-tag>
-      </swiper-item>
-    </block>
-  </swiper>
-
-  <!-- 宠物基本信息 -->
-  <view class="product-info-section">
-    <view class="price-section">
-      <text class="current-price">¥{{pet.price}}</text>
-      <text class="deposit-info">定金：¥{{pet.deposit}}</text>
-      <text class="balance-status" wx:if="{{pet.isOrdered}}">{{pet.balanceStatusText}}</text>
-    </view>
-    <text class="product-name">{{pet.name}}</text>
-    <view class="product-meta">
-      <text class="product-rating">
-        <text class="star">★</text>
-        {{pet.rating || 0}}
-      </text>
-      <text class="product-sales">销量 {{pet.sales || 0}}</text>
-    </view>
-    <view class="pet-meta">
-      <text class="meta-item">{{pet.breed}}</text>
-      <text class="meta-item">{{pet.age}}</text>
-      <text class="meta-item">{{pet.gender === 'male' ? '公' : '母'}}</text>
-      <text class="meta-item">{{pet.color}}</text>
-    </view>
-    <view class="pet-stats">
-      <view class="stat-item">
-        <text class="label">性格</text>
-        <text class="value">{{pet.temperament || '温顺'}}</text>
-      </view>
-      <view class="stat-item">
-        <text class="label">疫苗</text>
-        <text class="value">{{pet.vaccineStatus || '齐全'}}</text>
-      </view>
-      <view class="stat-item">
-        <text class="label">驱虫</text>
-        <text class="value">{{pet.wormingStatus || '已做'}}</text>
-      </view>
-    </view>
+  <!-- 加载状态 -->
+  <view class="loading-state" wx:if="{{isLoading}}">
+    <image src="/images/加载_loading.svg" class="loading-icon"></image>
+    <text>加载中...</text>
   </view>
 
-  <!-- 宠物详情 -->
-  <view class="product-detail-section card">
-    <view class="section-title">宠物简介</view>
-    <view class="product-description" wx:if="{{pet.description}}">{{pet.description}}</view>
-    <view class="product-description" wx:else>暂无简介</view>
+  <!-- 错误状态 -->
+  <view class="error-state" wx:elif="{{hasError}}">
+    <image src="/images/empty.png" class="error-icon"></image>
+    <text class="error-text">{{errorMsg || '加载失败'}}</text>
+    <button class="btn btn-primary retry-btn" bindtap="onRetry">重试</button>
   </view>
 
-  <!-- 健康信息 -->
-  <view class="product-detail-section card">
-    <view class="section-title">健康信息</view>
-    <view class="health-status">
-      <text class="status-label">健康状况:</text>
-      <text class="status-value {{pet.hasDisease ? 'unhealthy' : 'healthy'}}">
-        {{pet.hasDisease ? '有暗病' : '健康'}}
-      </text>
-    </view>
-    <view class="disease-info" wx:if="{{pet.hasDisease}}">
-      <text class="disease-label">疾病类型:</text>
-      <text class="disease-value">{{pet.diseases.join('、')}}</text>
-    </view>
-    
-    <!-- 疫苗记录 -->
-    <view class="record-section" wx:if="{{pet.vaccineRecords && pet.vaccineRecords.length > 0}}">
-      <view class="record-title">疫苗记录</view>
-      <block wx:for="{{pet.vaccineRecords}}" wx:key="id">
-        <view class="record-item">
-          <view class="record-header">
-            <text class="record-name">{{item.name}}</text>
-            <text class="record-time">{{item.date}}</text>
-          </view>
-          <text class="record-institution">{{item.institution}}</text>
-          <image src="{{item.certificate}}" class="record-certificate" wx:if="{{item.certificate}}"></image>
-        </view>
-      </block>
-    </view>
-    
-    <!-- 驱虫记录 -->
-    <view class="record-section" wx:if="{{pet.dewormingRecords && pet.dewormingRecords.length > 0}}">
-      <view class="record-title">驱虫记录</view>
-      <block wx:for="{{pet.dewormingRecords}}" wx:key="id">
-        <view class="record-item">
-          <view class="record-header">
-            <text class="record-name">{{item.medicine}}</text>
-            <text class="record-time">{{item.date}}</text>
-          </view>
-          <text class="record-institution">{{item.institution}}</text>
-          <image src="{{item.certificate}}" class="record-certificate" wx:if="{{item.certificate}}"></image>
-        </view>
-      </block>
-    </view>
-  </view>
+  <!-- 详情内容 -->
+  <block wx:elif="{{pet}}">
+    <!-- 宠物封面图轮播 -->
+    <swiper indicator-dots="{{indicatorDots}}" autoplay="{{autoplay}}" interval="{{interval}}" duration="{{duration}}">
+        <block wx:for="{{pet.images}}" wx:key="index">
+        <swiper-item>
+            <image src="{{item}}" class="product-image" mode="aspectFill"></image>
+            <!-- 宠物状态标签 -->
+            <pet-status-tag status="{{pet.status}}" statusText="{{pet.statusText}}" style="position: absolute; top: 30rpx; left: 30rpx; z-index: 10;"></pet-status-tag>
+        </swiper-item>
+        </block>
+    </swiper>
 
-  <!-- 亲属关系 -->
-  <view class="product-detail-section card" wx:if="{{pet.relatives && pet.relatives.length > 0}}">
-    <view class="section-title">
-      <text>亲属关系</text>
-      <text class="add-relative" bindtap="addRelative" wx:if="{{isMyPet && isMerchant}}">添加亲属</text>
+    <!-- 宠物基本信息 -->
+    <view class="product-info-section">
+        <view class="price-section">
+        <text class="current-price">¥{{pet.price}}</text>
+        <text class="deposit-info">定金：¥{{pet.deposit}}</text>
+        <text class="balance-status" wx:if="{{pet.isOrdered}}">{{pet.balanceStatusText}}</text>
+        </view>
+        <text class="product-name">{{pet.name}}</text>
+        <view class="product-meta">
+        <text class="product-rating">
+            <text class="star">★</text>
+            {{pet.rating || 0}}
+        </text>
+        <text class="product-sales">销量 {{pet.sales || 0}}</text>
+        </view>
+        <view class="pet-meta">
+        <text class="meta-item">{{pet.breed}}</text>
+        <text class="meta-item">{{pet.age}}</text>
+        <text class="meta-item">{{pet.gender === 'male' ? '公' : '母'}}</text>
+        <text class="meta-item">{{pet.color}}</text>
+        </view>
+        <view class="pet-stats">
+        <view class="stat-item">
+            <text class="label">性格</text>
+            <text class="value">{{pet.temperament || '温顺'}}</text>
+        </view>
+        <view class="stat-item">
+            <text class="label">疫苗</text>
+            <text class="value">{{pet.vaccineStatus || '齐全'}}</text>
+        </view>
+        <view class="stat-item">
+            <text class="label">驱虫</text>
+            <text class="value">{{pet.wormingStatus || '已做'}}</text>
+        </view>
+        </view>
     </view>
-    <block wx:for="{{pet.relatives}}" wx:key="id">
-      <view class="relative-item" bindtap="navigateToRelativeDetail" data-id="{{item.id}}">
-        <image src="{{item.avatar}}" class="relative-avatar"></image>
-        <view class="relative-info">
-          <view class="relative-header">
-            <text class="relative-name">{{item.name}}</text>
-            <text class="relative-type">{{item.relationType}}</text>
-          </view>
-          <text class="relative-breed">{{item.breed}}</text>
-          <text class="relative-merchant" wx:if="{{item.isMerchantPet}}">{{item.merchantName}}</text>
-          <!-- 嵌套亲属关系 -->
-          <view class="nested-relatives" wx:if="{{item.nestedRelations && item.nestedRelations.length > 0}}">
-            <block wx:for="{{item.nestedRelations}}" wx:key="index">
-              <text class="nested-relation">{{item}}</text>
-            </block>
-          </view>
-        </view>
-      </view>
-    </block>
-  </view>
 
-  <!-- 服务记录 -->
-  <view class="product-detail-section card" wx:if="{{pet.serviceRecords && pet.serviceRecords.length > 0}}">
-    <view class="section-title">服务记录</view>
-    <block wx:for="{{pet.serviceRecords}}" wx:key="id">
-      <view class="service-item">
-        <view class="service-header">
-          <text class="service-name">{{item.serviceName}}</text>
-          <text class="service-status {{item.status === 'completed' ? 'completed' : 'pending'}}">
-            {{item.status === 'completed' ? '已完成' : '待服务'}}
-          </text>
+    <!-- 宠物详情 -->
+    <view class="product-detail-section card">
+        <view class="section-title">宠物简介</view>
+        <view class="product-description" wx:if="{{pet.description}}">{{pet.description}}</view>
+        <view class="product-description" wx:else>暂无简介</view>
+    </view>
+
+    <!-- 健康信息 -->
+    <view class="product-detail-section card">
+        <view class="section-title">健康信息</view>
+        <view class="health-status">
+        <text class="status-label">健康状况:</text>
+        <text class="status-value {{pet.hasDisease ? 'unhealthy' : 'healthy'}}">
+            {{pet.hasDisease ? '有暗病' : '健康'}}
+        </text>
         </view>
-        <text class="service-time">{{item.date}} {{item.time}}</text>
-        <text class="service-merchant">{{item.merchantName}}</text>
-        <view class="service-evaluation" wx:if="{{item.evaluation}}">
-          <view class="evaluation-header">
-            <text class="evaluation-label">评价:</text>
-            <view class="star-rating">
-              <block wx:for="{{[1,2,3,4,5]}}" wx:key="index">
-                <text class="{{item <= item.evaluation.rating ? 'star-filled' : 'star-empty'}}">{{item <= item.evaluation.rating ? '★' : '☆'}}</text>
-              </block>
+        <view class="disease-info" wx:if="{{pet.hasDisease}}">
+        <text class="disease-label">疾病类型:</text>
+        <text class="disease-value">{{pet.diseases.join('、')}}</text>
+        </view>
+        
+        <!-- 疫苗记录 -->
+        <view class="record-section" wx:if="{{pet.vaccineRecords && pet.vaccineRecords.length > 0}}">
+        <view class="record-title">疫苗记录</view>
+        <block wx:for="{{pet.vaccineRecords}}" wx:key="id">
+            <view class="record-item">
+            <view class="record-header">
+                <text class="record-name">{{item.name}}</text>
+                <text class="record-time">{{item.date}}</text>
             </view>
-          </view>
-          <text class="evaluation-content">{{item.evaluation.content}}</text>
+            <text class="record-institution">{{item.institution}}</text>
+            <image src="{{item.certificate}}" class="record-certificate" wx:if="{{item.certificate}}"></image>
+            </view>
+        </block>
         </view>
-      </view>
-    </block>
-  </view>
-  
-  <!-- 底部操作栏 -->
-  <view class="bottom-bar">
-    <!-- 普通用户显示按钮 -->
-    <block wx:if="{{!isMerchant}}">
-      <!-- 预约看宠按钮 (总是显示，除非已售出/下架，这里简化为未下定可预约) -->
-      <button class="btn btn-default appointment-btn" bindtap="bookAppointment" wx:if="{{!pet.isOrdered}}">
-        预约看宠
-      </button>
+        
+        <!-- 驱虫记录 -->
+        <view class="record-section" wx:if="{{pet.dewormingRecords && pet.dewormingRecords.length > 0}}">
+        <view class="record-title">驱虫记录</view>
+        <block wx:for="{{pet.dewormingRecords}}" wx:key="id">
+            <view class="record-item">
+            <view class="record-header">
+                <text class="record-name">{{item.medicine}}</text>
+                <text class="record-time">{{item.date}}</text>
+            </view>
+            <text class="record-institution">{{item.institution}}</text>
+            <image src="{{item.certificate}}" class="record-certificate" wx:if="{{item.certificate}}"></image>
+            </view>
+        </block>
+        </view>
+    </view>
 
-      <!-- 宠物未被下定时显示下定按钮 -->
-      <block wx:if="{{!pet.isOrdered}}">
-        <button class="btn btn-primary buy-now-btn" bindtap="directOrder">
-          下定
-        </button>
-      </block>
-      <!-- 已下定状态的宠物显示联系商家按钮 -->
-      <block wx:if="{{pet.isOrdered}}">
-        <button class="btn btn-primary buy-now-btn" bindtap="showContactModal">
-          联系商家
-        </button>
-      </block>
-    </block>
-    <!-- 商家端显示调整价格按钮 -->
-    <block wx:if="{{isMerchant}}">
-      <button class="btn btn-default adjust-price-btn merchant-btn" bindtap="showPriceAdjustModal">
-        调整价格
-      </button>
-      <button class="btn btn-primary merchant-btn" bindtap="editPet">
-        编辑
-      </button>
-    </block>
-  </view>
+    <!-- 亲属关系 -->
+    <view class="product-detail-section card" wx:if="{{pet.relatives && pet.relatives.length > 0}}">
+        <view class="section-title">
+        <text>亲属关系</text>
+        <text class="add-relative" bindtap="addRelative" wx:if="{{isMyPet && isMerchant}}">添加亲属</text>
+        </view>
+        <block wx:for="{{pet.relatives}}" wx:key="id">
+        <view class="relative-item" bindtap="navigateToRelativeDetail" data-id="{{item.id}}">
+            <image src="{{item.avatar}}" class="relative-avatar"></image>
+            <view class="relative-info">
+            <view class="relative-header">
+                <text class="relative-name">{{item.name}}</text>
+                <text class="relative-type">{{item.relationType}}</text>
+            </view>
+            <text class="relative-breed">{{item.breed}}</text>
+            <text class="relative-merchant" wx:if="{{item.isMerchantPet}}">{{item.merchantName}}</text>
+            <!-- 嵌套亲属关系 -->
+            <view class="nested-relatives" wx:if="{{item.nestedRelations && item.nestedRelations.length > 0}}">
+                <block wx:for="{{item.nestedRelations}}" wx:key="index">
+                <text class="nested-relation">{{item}}</text>
+                </block>
+            </view>
+            </view>
+        </view>
+        </block>
+    </view>
 
-  <!-- 浮动加入购物车按钮 -->
-  <view class="floating-cart-btn" bindtap="addToCart" wx:if="{{!isMerchant}}">
-    <text class="cart-icon">🛒</text>
-    <text>加入购物车</text>
-  </view>
-  
-  <!-- 联系商家模态框 -->
-  <view class="modal-mask" wx:if="{{showContactModal}}" bindtap="hideContactModal"></view>
-  <view class="contact-modal" wx:if="{{showContactModal}}">
-    <view class="modal-header">
-      <text class="modal-title">联系商家</text>
-      <text class="close-btn" bindtap="hideContactModal">×</text>
-    </view>
-    <view class="modal-content">
-      <!-- 微信二维码 -->
-      <view class="contact-method">
-        <text class="method-title">微信联系</text>
-        <view class="qrcode-container">
-          <image src="{{merchantInfo.wechatQrcode || 'https://via.placeholder.com/200'}}"></image>
-          <text class="qrcode-tip">扫描二维码添加商家微信</text>
+    <!-- 服务记录 -->
+    <view class="product-detail-section card" wx:if="{{pet.serviceRecords && pet.serviceRecords.length > 0}}">
+        <view class="section-title">服务记录</view>
+        <block wx:for="{{pet.serviceRecords}}" wx:key="id">
+        <view class="service-item">
+            <view class="service-header">
+            <text class="service-name">{{item.serviceName}}</text>
+            <text class="service-status {{item.status === 'completed' ? 'completed' : 'pending'}}">
+                {{item.status === 'completed' ? '已完成' : '待服务'}}
+            </text>
+            </view>
+            <text class="service-time">{{item.date}} {{item.time}}</text>
+            <text class="service-merchant">{{item.merchantName}}</text>
+            <view class="service-evaluation" wx:if="{{item.evaluation}}">
+            <view class="evaluation-header">
+                <text class="evaluation-label">评价:</text>
+                <view class="star-rating">
+                <block wx:for="{{[1,2,3,4,5]}}" wx:key="index">
+                    <text class="{{item <= item.evaluation.rating ? 'star-filled' : 'star-empty'}}">{{item <= item.evaluation.rating ? '★' : '☆'}}</text>
+                </block>
+                </view>
+            </view>
+            <text class="evaluation-content">{{item.evaluation.content}}</text>
+            </view>
         </view>
-      </view>
-      
-      <!-- 电话号码 -->
-      <view class="contact-method">
-        <text class="method-title">电话联系</text>
-        <view class="phone-container">
-          <text class="phone-number">{{merchantInfo.phone}}</text>
-          <button class="call-btn" bindtap="callMerchant">
-            <text class="call-icon">📞</text>
-            <text>拨打</text>
-          </button>
+        </block>
+    </view>
+    
+    <!-- 底部操作栏 -->
+    <view class="bottom-bar">
+        <!-- 普通用户显示按钮 -->
+        <block wx:if="{{!isMerchant}}">
+        <!-- 预约看宠按钮 (总是显示，除非已售出/下架，这里简化为未下定可预约) -->
+        <button class="btn btn-default appointment-btn" bindtap="bookAppointment" wx:if="{{!pet.isOrdered}}">
+            预约看宠
+        </button>
+
+        <!-- 宠物未被下定时显示下定按钮 -->
+        <block wx:if="{{!pet.isOrdered}}">
+            <button class="btn btn-primary buy-now-btn" bindtap="directOrder">
+            下定
+            </button>
+        </block>
+        <!-- 已下定状态的宠物显示联系商家按钮 -->
+        <block wx:if="{{pet.isOrdered}}">
+            <button class="btn btn-primary buy-now-btn" bindtap="showContactModal">
+            联系商家
+            </button>
+        </block>
+        </block>
+        <!-- 商家端显示调整价格按钮 -->
+        <block wx:if="{{isMerchant}}">
+        <button class="btn btn-default adjust-price-btn merchant-btn" bindtap="showPriceAdjustModal">
+            调整价格
+        </button>
+        <button class="btn btn-primary merchant-btn" bindtap="editPet">
+            编辑
+        </button>
+        </block>
+    </view>
+
+    <!-- 浮动加入购物车按钮 -->
+    <view class="floating-cart-btn" bindtap="addToCart" wx:if="{{!isMerchant}}">
+        <text class="cart-icon">🛒</text>
+        <text>加入购物车</text>
+    </view>
+    
+    <!-- 联系商家模态框 -->
+    <view class="modal-mask" wx:if="{{showContactModal}}" bindtap="hideContactModal"></view>
+    <view class="contact-modal" wx:if="{{showContactModal}}">
+        <view class="modal-header">
+        <text class="modal-title">联系商家</text>
+        <text class="close-btn" bindtap="hideContactModal">×</text>
         </view>
-      </view>
-    </view>
-  </view>
-  
-  <!-- 价格调整模态框 -->
-  <view class="modal-mask" wx:if="{{showPriceAdjustModal}}" bindtap="hidePriceAdjustModal"></view>
-  <view class="price-adjust-modal" wx:if="{{showPriceAdjustModal}}">
-    <view class="modal-header">
-      <text class="modal-title">调整宠物价格</text>
-      <text class="close-btn" bindtap="hidePriceAdjustModal">×</text>
-    </view>
-    <view class="modal-content">
-      <view class="price-input-section">
-        <text class="price-label">宠物总价</text>
-        <view class="price-input-wrapper">
-          <text class="price-symbol">¥</text>
-          <input type="number" placeholder="请输入宠物总价" value="{{newPrice}}" bindinput="onPriceInputChange" class="price-input" />
+        <view class="modal-content">
+        <!-- 微信二维码 -->
+        <view class="contact-method">
+            <text class="method-title">微信联系</text>
+            <view class="qrcode-container">
+            <image src="{{merchantInfo.wechatQrcode || 'https://via.placeholder.com/200'}}"></image>
+            <text class="qrcode-tip">扫描二维码添加商家微信</text>
+            </view>
         </view>
-      </view>
-      
-      <view class="deposit-info-section">
-        <text class="deposit-label">定金计算</text>
-        <text class="deposit-formula">定金 = 宠物总价 × 30%</text>
-        <text class="deposit-preview">预计定金：¥{{newDeposit}}</text>
-      </view>
+        
+        <!-- 电话号码 -->
+        <view class="contact-method">
+            <text class="method-title">电话联系</text>
+            <view class="phone-container">
+            <text class="phone-number">{{merchantInfo.phone}}</text>
+            <button class="call-btn" bindtap="callMerchant">
+                <text class="call-icon">📞</text>
+                <text>拨打</text>
+            </button>
+            </view>
+        </view>
+        </view>
     </view>
-    <view class="modal-footer">
-      <button class="btn btn-default" bindtap="hidePriceAdjustModal">取消</button>
-      <button class="btn btn-primary" bindtap="updatePetPrice">确定</button>
+    
+    <!-- 价格调整模态框 -->
+    <view class="modal-mask" wx:if="{{showPriceAdjustModal}}" bindtap="hidePriceAdjustModal"></view>
+    <view class="price-adjust-modal" wx:if="{{showPriceAdjustModal}}">
+        <view class="modal-header">
+        <text class="modal-title">调整宠物价格</text>
+        <text class="close-btn" bindtap="hidePriceAdjustModal">×</text>
+        </view>
+        <view class="modal-content">
+        <view class="price-input-section">
+            <text class="price-label">宠物总价</text>
+            <view class="price-input-wrapper">
+            <text class="price-symbol">¥</text>
+            <input type="number" placeholder="请输入宠物总价" value="{{newPrice}}" bindinput="onPriceInputChange" class="price-input" />
+            </view>
+        </view>
+        
+        <view class="deposit-info-section">
+            <text class="deposit-label">定金计算</text>
+            <text class="deposit-formula">定金 = 宠物总价 × 30%</text>
+            <text class="deposit-preview">预计定金：¥{{newDeposit}}</text>
+        </view>
+        </view>
+        <view class="modal-footer">
+        <button class="btn btn-default" bindtap="hidePriceAdjustModal">取消</button>
+        <button class="btn btn-primary" bindtap="updatePetPrice">确定</button>
+        </view>
     </view>
-  </view>
+  </block>
 </view>

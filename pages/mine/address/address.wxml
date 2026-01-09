@@ -4,7 +4,6 @@
   <view class="standard-action-bar">
     <text class="standard-back-btn" bindtap="navigateBack">←</text>
     <text class="page-title">收货地址</text>
-    <text class="add-btn" bindtap="navigateToAddAddress">+ 新增</text>
   </view>
 
   <!-- 地址列表 -->
@@ -33,6 +32,11 @@
         <view class="address-content">
           <text class="address-detail">{{item.province}} {{item.city}} {{item.district}} {{item.address}}</text>
         </view>
+      </view>
+      
+      <!-- 底部添加按钮 -->
+      <view class="bottom-action-bar">
+        <button class="btn btn-primary add-address-btn" bindtap="navigateToAddAddress">添加新地址</button>
       </view>
     </block>
     <view class="empty-state" wx:else>
