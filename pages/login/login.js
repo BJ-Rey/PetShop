@@ -231,12 +231,13 @@ Page({
             
             // 根据用户角色跳转
             const redirectUrl = userInfo.role === 'merchant' ? '/pages/merchant/dashboard/dashboard' : this.callbackPage;
-            console.log('Redirecting to:', redirectUrl);
+            console.log('Redirecting to:', redirectUrl, 'Role:', userInfo.role);
 
             setTimeout(() => {
                 // 如果是商家且跳转到 merchant 页面，使用 navigateTo (因为 merchant 包可能不在 tabbar)
                 // 如果是 tabbar 页面，使用 switchTab
                 if (userInfo.role === 'merchant') {
+                    console.log('Attempting to navigate to merchant dashboard...');
                     wx.navigateTo({
                         url: redirectUrl,
                         success: () => console.log('Merchant login redirect success'),

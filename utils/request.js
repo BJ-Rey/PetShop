@@ -199,6 +199,11 @@ const request = (options) => {
                 data: config.data,
                 success: (res) => {
                     // 云托管返回的res结构可能不同，通常在res.data中
+                    // Debug Log
+                    if (config.url.includes('/auth/login')) {
+                        console.log('[Cloud Request] Login Raw Response:', res);
+                    }
+
                     if (res.statusCode >= 200 && res.statusCode < 300) {
                          const result = res.data;
                          // 业务状态码判断

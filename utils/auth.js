@@ -69,14 +69,27 @@ const verifyPhoneAndIdentifyUser = (phoneNumber, verificationCode) => {
     phone: phoneNumber,
     code: verificationCode
   }).then(res => {
+      console.log('Login API Response Data:', res); // Debug log
+
+      // 尝试从多个位置获取角色信息，增加容错
+      // 1. res.role
+      // 2. res.data.role (防止嵌套)
+      // 3. res.userInfo.role
+      let role = 'user';
+      if (res.role) role = res.role;
+      else if (res.data && res.data.role) role = res.data.role;
+      else if (res.userInfo && res.userInfo.role) role = res.userInfo.role;
+      
+      console.log('Parsed Role:', role);
+
       // Backend returns { token, role, openid, userInfo }
       // Map to frontend expected structure
       const userInfo = {
           phoneNumber: phoneNumber,
-          role: res.role,
-          token: res.token, // Use openid as token for now or JWT if backend provides
-          id: res.openid,
-          ...res.userInfo,
+          role: role,
+          token: res.token || (res.data && res.data.token), 
+          id: res.openid || (res.data && res.data.openid),
+          ...(res.userInfo || (res.data && res.data.userInfo) || {}),
           agreementAgreed: true,
           agreementVersion: '1.0.0',
           agreementTime: Date.now()
