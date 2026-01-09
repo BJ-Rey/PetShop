@@ -1,0 +1,82 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.tencent.wxcloudrun.dao.OrderMapper">
+    <resultMap id="BaseResultMap" type="com.tencent.wxcloudrun.model.Order">
+        <id column="id" property="id" jdbcType="INTEGER"/>
+        <result column="order_no" property="orderNo" jdbcType="VARCHAR"/>
+        <result column="user_id" property="userId" jdbcType="VARCHAR"/>
+        <result column="total_amount" property="totalAmount" jdbcType="DECIMAL"/>
+        <result column="status" property="status" jdbcType="VARCHAR"/>
+        <result column="items_json" property="itemsJson" jdbcType="VARCHAR"/>
+        <result column="address_snapshot" property="addressSnapshot" jdbcType="VARCHAR"/>
+        <result column="tracking_number" property="trackingNumber" jdbcType="VARCHAR"/>
+        <result column="created_at" property="createdAt" jdbcType="TIMESTAMP"/>
+        <result column="updated_at" property="updatedAt" jdbcType="TIMESTAMP"/>
+    </resultMap>
+
+    <sql id="Base_Column_List">
+        id, order_no, user_id, total_amount, status, items_json, address_snapshot, tracking_number, created_at, updated_at
+    </sql>
+
+    <select id="getOrderById" resultMap="BaseResultMap" parameterType="java.lang.Integer">
+        select
+        <include refid="Base_Column_List"/>
+        from orders
+        where id = #{id,jdbcType=INTEGER}
+    </select>
+
+    <select id="getOrderByOrderNo" resultMap="BaseResultMap" parameterType="java.lang.String">
+        select
+        <include refid="Base_Column_List"/>
+        from orders
+        where order_no = #{orderNo,jdbcType=VARCHAR}
+    </select>
+
+    <select id="getOrdersByUserId" resultMap="BaseResultMap" parameterType="java.lang.String">
+        select
+        <include refid="Base_Column_List"/>
+        from orders
+        where user_id = #{userId,jdbcType=VARCHAR}
+        order by created_at desc
+    </select>
+
+    <select id="getOrdersByStatus" resultMap="BaseResultMap">
+        select
+        <include refid="Base_Column_List"/>
+        from orders
+        where user_id = #{userId,jdbcType=VARCHAR}
+        <if test="status != null and status != ''">
+            and status = #{status,jdbcType=VARCHAR}
+        </if>
+        order by created_at desc
+    </select>
+
+    <select id="getAllOrders" resultMap="BaseResultMap">
+        select
+        <include refid="Base_Column_List"/>
+        from orders
+        order by created_at desc
+    </select>
+
+    <insert id="createOrder" parameterType="com.tencent.wxcloudrun.model.Order" useGeneratedKeys="true" keyProperty="id">
+        insert into orders (order_no, user_id, total_amount, status, items_json, address_snapshot, created_at, updated_at)
+        values (#{orderNo}, #{userId}, #{totalAmount}, #{status}, #{itemsJson}, #{addressSnapshot}, NOW(), NOW())
+    </insert>
+
+    <update id="updateOrderStatus">
+        update orders
+        set status = #{status,jdbcType=VARCHAR}, updated_at = NOW()
+        where order_no = #{orderNo,jdbcType=VARCHAR}
+    </update>
+
+    <update id="updateTrackingNumber">
+        update orders
+        set tracking_number = #{trackingNumber,jdbcType=VARCHAR}, updated_at = NOW()
+        where id = #{id,jdbcType=INTEGER}
+    </update>
+
+    <delete id="deleteOrder" parameterType="java.lang.Integer">
+        delete from orders
+        where id = #{id,jdbcType=INTEGER}
+    </delete>
+</mapper>

@@ -2,6 +2,14 @@ const request = require('../utils/request');
 
 module.exports = {
   /**
+   * 获取用户订单列表
+   */
+  getUserOrderList: (params) => {
+    // Pass params directly, user identity handled by header or app.js logic
+    return request.get('/api/order/user/list', params);
+  },
+
+  /**
    * 获取商家订单列表
    */
   getMerchantOrderList: (params) => {

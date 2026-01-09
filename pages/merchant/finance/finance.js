@@ -1,5 +1,6 @@
 // pages/merchant/finance/finance.js
 const app = getApp()
+const orderApi = require('../../../api/orderApi');
 
 Page({
 
@@ -135,104 +136,76 @@ Page({
     
     // 保存this上下文
     const that = this;
-    // 模拟数据，实际应该调用API获取财务数据
-    setTimeout(() => {
-      // 财务概览数据
-      const overviewData = {
-        todayIncome: 1280,
-        todayIncomeChange: 15.5,
-        monthIncome: 32800,
-        monthIncomeChange: 8.2,
-        totalIncome: 289500,
-        totalIncomeChange: 23.7,
-        pendingSettlement: 5680
-      }
-      
-      // 交易明细数据
-      const transactions = [
-        {
-          id: 1,
-          type: 'income',
-          description: '订单ORD202512190001',
-          amount: 334,
-          createdAt: '2025-12-19T10:30:00Z',
-          status: 'completed'
-        },
-        {
-          id: 2,
-          type: 'income',
-          description: '订单ORD202512190002',
-          amount: 213,
-          createdAt: '2025-12-19T09:15:00Z',
-          status: 'completed'
-        },
-        {
-          id: 3,
-          type: 'expense',
-          description: '提现到银行卡',
-          amount: 5000,
-          createdAt: '2025-12-18T16:45:00Z',
-          status: 'completed'
-        },
-        {
-          id: 4,
-          type: 'income',
-          description: '订单ORD202512180005',
-          amount: 122,
-          createdAt: '2025-12-18T14:20:00Z',
-          status: 'completed'
-        },
-        {
-          id: 5,
-          type: 'income',
-          description: '订单ORD202512180004',
-          amount: 214,
-          createdAt: '2025-12-18T11:10:00Z',
-          status: 'completed'
-        }
-      ]
-      
-      // 结算记录数据
-      const settlements = [
-        {
-          id: 1,
-          periodStart: '2025-12-01',
-          periodEnd: '2025-12-15',
-          amount: 15680,
-          status: 'completed',
-          settlementTime: '2025-12-17T14:30:00Z',
-          bankName: '招商银行',
-          bankAccount: '**** **** **** 1234'
-        },
-        {
-          id: 2,
-          periodStart: '2025-11-16',
-          periodEnd: '2025-11-30',
-          amount: 12890,
-          status: 'completed',
-          settlementTime: '2025-12-02T16:45:00Z',
-          bankName: '招商银行',
-          bankAccount: '**** **** **** 1234'
-        },
-        {
-          id: 3,
-          periodStart: '2025-12-16',
-          periodEnd: '2025-12-31',
-          amount: 5680,
-          status: 'processing',
-          settlementTime: null,
-          bankName: '招商银行',
-          bankAccount: '**** **** **** 1234'
-        }
-      ]
-      
-      that.setData({
-        ...overviewData,
-        transactions: transactions,
-        settlements: settlements,
-        isLoading: false
-      })
-    }, 1000)
+    
+    // 调用真实API获取订单数据来计算财务数据
+    orderApi.getMerchantOrderList().then(res => {
+        const orders = res || [];
+        
+        // 计算收入
+        let todayIncome = 0;
+        let monthIncome = 0;
+        let totalIncome = 0;
+        let pendingSettlement = 0;
+        
+        const now = new Date();
+        const todayStr = now.toISOString().split('T')[0];
+        const thisMonthStr = todayStr.substring(0, 7); // YYYY-MM
+
+        const transactions = [];
+
+        orders.forEach(order => {
+            const amount = parseFloat(order.totalAmount || 0);
+            const createTime = order.createdAt ? new Date(order.createdAt) : new Date();
+            const dateStr = createTime.toISOString().split('T')[0];
+            const monthStr = dateStr.substring(0, 7);
+
+            // 只统计已支付/已完成/已发货的订单作为收入 (pending/cancelled exclude)
+            if (['paid', 'shipped', 'completed'].includes(order.status)) {
+                totalIncome += amount;
+                if (dateStr === todayStr) {
+                    todayIncome += amount;
+                }
+                if (monthStr === thisMonthStr) {
+                    monthIncome += amount;
+                }
+                
+                // Add to transactions list (limit to recent 5)
+                if (transactions.length < 5) {
+                    transactions.push({
+                        id: order.id,
+                        type: 'income',
+                        description: `订单${order.orderNo}`,
+                        amount: amount,
+                        createdAt: order.createdAt,
+                        status: 'completed'
+                    });
+                }
+            }
+            
+            // 待结算: 假设 shipped 但未 completed
+            if (order.status === 'shipped') {
+                pendingSettlement += amount;
+            }
+        });
+
+        that.setData({
+            todayIncome: todayIncome.toFixed(2),
+            todayIncomeChange: 0, // 暂无历史对比
+            monthIncome: monthIncome.toFixed(2),
+            monthIncomeChange: 0,
+            totalIncome: totalIncome.toFixed(2),
+            totalIncomeChange: 0,
+            pendingSettlement: pendingSettlement.toFixed(2),
+            transactions: transactions,
+            settlements: [], // 暂无结算API
+            isLoading: false
+        });
+
+    }).catch(err => {
+        console.error('Load finance data failed', err);
+        that.setData({ isLoading: false });
+        // Fallback to mock if API fails? No, keep it real or empty.
+    });
   },
   
   /**

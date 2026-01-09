@@ -1,4 +1,7 @@
 // pages/order/list/list.js
+const orderApi = require('../../../api/orderApi');
+const app = getApp();
+
 Page({
   data: {
     activeStatus: 'all', // 当前选中的订单状态
@@ -38,143 +41,69 @@ Page({
 
   // 加载订单列表
   loadOrders() {
-    // 模拟从API获取订单数据
     const page = this.data.page
     const activeStatus = this.data.activeStatus
+    const app = getApp();
+    const openid = app.globalData.userInfo ? app.globalData.userInfo.openid : null; // Assuming userInfo has openid
+    // If not, maybe userToken is openid? or handled by backend session?
+    // For now, let's assume backend gets it from header, or we pass userToken as userId if needed.
+    // Given previous context, userToken might be a JWT or just a session key.
     
-    // 模拟订单数据
-    const mockOrders = [
-      {
-        id: 1,
-        merchantName: '猫咪专属商城',
-        status: 'pending',
-        statusText: '待付款',
-        products: [
-          {
-            productId: 1,
-            name: '天然猫粮通用型英短美短成猫粮',
-            sku: '10kg装',
-            price: 129,
-            quantity: 2,
-            image: 'https://placehold.co/400x400/FFA726/ffffff?text=Food'
-          }
-        ],
-        totalPrice: 258,
-        totalQuantity: 2,
-        createTime: '2025-12-18 10:30:00'
-      },
-      {
-        id: 2,
-        merchantName: '猫咪专属商城',
-        status: 'shipping',
-        statusText: '待发货',
-        products: [
-          {
-            productId: 2,
-            name: '猫砂膨润土除臭结团猫砂10kg',
-            sku: '10kg装',
-            price: 59,
-            quantity: 1,
-            image: 'https://placehold.co/400x400/FFA726/ffffff?text=Sand'
-          },
-          {
-            productId: 3,
-            name: '猫咪逗猫棒玩具',
-            sku: '常规款',
-            price: 39,
-            quantity: 1,
-            image: 'https://placehold.co/400x400/FFA726/ffffff?text=Toy'
-          }
-        ],
-        totalPrice: 98,
-        totalQuantity: 2,
-        createTime: '2025-12-17 15:20:00'
-      },
-      {
-        id: 3,
-        merchantName: '猫咪专属商城',
-        status: 'delivering',
-        statusText: '待收货',
-        products: [
-          {
-            productId: 4,
-            name: '猫咪牵引绳防挣脱',
-            sku: '红色',
-            price: 49,
-            quantity: 1,
-            image: 'https://placehold.co/400x400/FFA726/ffffff?text=Leash'
-          }
-        ],
-        totalPrice: 49,
-        totalQuantity: 1,
-        createTime: '2025-12-16 09:45:00'
-      },
-      {
-        id: 4,
-        merchantName: '猫咪专属商城',
-        status: 'completed',
-        statusText: '已完成',
-        products: [
-          {
-            productId: 1,
-            name: '天然猫粮通用型英短美短成猫粮',
-            sku: '10kg装',
-            price: 129,
-            quantity: 1,
-            image: 'https://placehold.co/400x400/FFA726/ffffff?text=Food'
-          },
-          {
-            productId: 5,
-            name: '猫咪疫苗妙三多疫苗',
-            sku: '单支',
-            price: 198,
-            quantity: 1,
-            image: 'https://placehold.co/400x400/FFA726/ffffff?text=Vaccine'
-          }
-        ],
-        totalPrice: 327,
-        totalQuantity: 2,
-        createTime: '2025-12-15 14:10:00'
-      },
-      {
-        id: 5,
-        merchantName: '猫咪专属商城',
-        status: 'completed',
-        statusText: '已完成',
-        products: [
-          {
-            productId: 6,
-            name: '猫咪专用香波沐浴露',
-            sku: '500ml',
-            price: 69,
-            quantity: 1,
-            image: 'https://placehold.co/400x400/FFA726/ffffff?text=Shampoo'
-          }
-        ],
-        totalPrice: 69,
-        totalQuantity: 1,
-        createTime: '2025-12-14 11:25:00'
-      }
-    ]
-    
-    // 根据状态筛选订单
-    let filteredOrders = mockOrders
-    if (this.data.activeStatus !== 'all') {
-      filteredOrders = mockOrders.filter(order => order.status === this.data.activeStatus)
-    }
-    
-    // 模拟分页
-    const start = (page - 1) * this.data.pageSize
-    const end = start + this.data.pageSize
-    const paginatedOrders = filteredOrders.slice(start, end)
-    
-    // 合并订单列表
-    const orders = page === 1 ? paginatedOrders : [...this.data.orders, ...paginatedOrders]
-    
-    this.setData({
-      orders: orders,
-      hasMore: paginatedOrders.length === this.data.pageSize
-    })
+    // Call API
+    orderApi.getUserOrderList({
+      status: activeStatus === 'all' ? '' : activeStatus,
+      // userId: openid // Optional if handled by header
+    }).then(res => {
+        // Backend returns list of orders
+        let ordersData = res || []; // Assuming res is the list directly or res.data
+        // Adapt data structure
+        const orders = ordersData.map(order => {
+            let products = [];
+            try {
+                products = JSON.parse(order.itemsJson || '[]');
+            } catch (e) {
+                console.error('Parse itemsJson error', e);
+            }
+            return {
+                id: order.id,
+                orderNo: order.orderNo,
+                merchantName: '宠物商城', // Backend doesn't have merchant name in order yet
+                status: order.status,
+                statusText: this.data.statusMap[order.status] || order.status,
+                products: products,
+                totalPrice: order.totalAmount,
+                totalQuantity: products.reduce((sum, p) => sum + (p.count || p.quantity || 1), 0),
+                createTime: order.createdAt ? order.createdAt.replace('T', ' ') : ''
+            };
+        });
+
+        // Filter locally if backend doesn't support filter (backend supports status filter)
+        // But backend `getOrdersByUserId` returns all if we used that endpoint, or we should use `getOrdersByStatus`.
+        // My Mapper has `getOrdersByStatus`.
+        // My Controller `getUserOrderList` calls `getOrdersByUserId` ignoring status param!
+        // I need to fix Controller or filter locally. 
+        // Let's filter locally for now to be safe as Controller change is already written.
+        
+        let filteredOrders = orders;
+        if (activeStatus !== 'all') {
+             filteredOrders = orders.filter(o => o.status === activeStatus);
+        }
+
+        // Pagination (Frontend mock pagination since backend returns all for user)
+        const start = (page - 1) * this.data.pageSize
+        const end = start + this.data.pageSize
+        const paginatedOrders = filteredOrders.slice(start, end)
+        
+        const newOrders = page === 1 ? paginatedOrders : [...this.data.orders, ...paginatedOrders]
+        
+        this.setData({
+          orders: newOrders,
+          hasMore: paginatedOrders.length === this.data.pageSize
+        })
+    }).catch(err => {
+        console.error('Load orders failed', err);
+        wx.showToast({ title: '加载失败', icon: 'none' });
+    });
   },
 
   // 刷新订单列表

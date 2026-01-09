@@ -29,15 +29,18 @@ public class MerchantController {
     @Autowired
     private ServiceService serviceService;
 
+    @Autowired
+    private OrderService orderService;
+
     @GetMapping("/dashboard")
     public ApiResponse getDashboardStats() {
         Map<String, Object> stats = new HashMap<>();
         stats.put("pets", petService.countPets());
         stats.put("products", productService.countProducts());
         stats.put("services", serviceService.countServices()); // Also count services
-        // For orders and customers, returning 0 as placeholder since tables are not implemented yet
-        stats.put("orders", 0);
-        stats.put("customers", 0);
+        // Use real order count
+        stats.put("orders", orderService.getAllOrders().size());
+        stats.put("customers", 0); // Still 0 as we don't have distinct customer count logic handy yet
         // Recent orders list - placeholder
         stats.put("recentOrders", new ArrayList<>());
         
