@@ -73,35 +73,30 @@
     </view>
     <view class="notice-list">
       <view class="notice-item" wx:for="{{noticeList}}" wx:key="index">
-        <text class="notice-icon">•</text>
-        <text class="notice-content">{{item}}</text>
-      </view>
-    </view>
-  </view>
-
-  <!-- 预约日历组件 -->
-  <view class="calendar-section card">
-    <view class="section-title">预约日期</view>
-    <scroll-view scroll-x="true" class="calendar-scroll">
-      <view class="date-item {{selectedDate === item.date ? 'selected' : ''}}" wx:for="{{calendarDays}}" wx:key="date" bindtap="selectDate" data-date="{{item.date}}">
-        <text class="week">{{item.week}}</text>
-        <text class="day">{{item.day}}</text>
-      </view>
-    </scroll-view>
-    <view class="time-slots" wx:if="{{selectedDate}}">
-        <view class="time-slot {{selectedTime === item ? 'selected' : ''}}" wx:for="{{timeSlots}}" wx:key="*this" bindtap="selectTime" data-time="{{item}}">
-            {{item}}
+        <view class="notice-title-row">
+            <text class="notice-icon">•</text>
+            <text class="notice-title">{{item.title}}</text>
         </view>
+        <view class="notice-desc">{{item.desc}}</view>
+      </view>
     </view>
   </view>
 
   <!-- 底部预约按钮 -->
   <view class="bottom-bar">
-    <view class="price-info">
-      <text class="price-label">服务价格:</text>
-      <text class="price-value">¥{{service.price}}</text>
+    <view class="action-icons">
+        <view class="action-icon" bindtap="contactMerchant">
+            <image src="/images/商店_shop.svg" class="icon"></image>
+            <text>客服</text>
+        </view>
+        <view class="action-icon" bindtap="toggleFavorite">
+            <text class="icon">{{isFavorited ? '★' : '☆'}}</text>
+            <text>{{isFavorited ? '已收藏' : '收藏'}}</text>
+        </view>
     </view>
-    <button class="btn btn-primary appointment-btn" bindtap="navigateToAppointment">立即预约</button>
+    <view class="btn-group">
+        <button class="btn btn-primary appointment-btn" bindtap="navigateToAppointment">立即预约</button>
+    </view>
   </view>
 
   <auth-modal id="auth-modal" />

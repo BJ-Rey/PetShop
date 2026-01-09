@@ -1,59 +1,67 @@
 <!--pages/mine/mine.wxml-->
 <view class="container">
-  <!-- 登录状态下的用户信息区 -->
-  <view class="user-info" wx:if="{{isLoggedIn}}">
-    <view class="avatar">
-      <image src="{{userInfo.avatar}}" mode="aspectFill"></image>
-    </view>
-    <view class="user-details">
-      <view class="nickname">{{userInfo.nickname}}</view>
-    </view>
+  <!-- 加载中提示 -->
+  <view class="loading-container" wx:if="{{loading}}">
+    <image src="/images/加载_loading.svg" class="loading-icon"></image>
+    <text>加载中...</text>
   </view>
 
-  <!-- 未登录状态下的头部 -->
-  <view class="user-info guest" bindtap="navigateToLogin" wx:else>
-    <view class="avatar">
-      <image src="/images/default-avatar.png" mode="aspectFill"></image>
+  <block wx:else>
+    <!-- 登录状态下的用户信息区 -->
+    <view class="user-info" wx:if="{{isLoggedIn}}">
+      <view class="avatar">
+        <image src="{{userInfo.avatar}}" mode="aspectFill"></image>
+      </view>
+      <view class="user-details">
+        <view class="nickname">{{userInfo.nickname}}</view>
+      </view>
     </view>
-    <view class="user-details">
-      <view class="nickname">点击登录/注册</view>
-      <view class="desc">登录后享受更多服务</view>
-    </view>
-    <view class="arrow">→</view>
-  </view>
 
-  <!-- 订单管理区 -->
-  <view class="order-section">
-    <view class="section-header" bindtap="navigateToAllOrders">
-      <text class="title">我的订单</text>
-      <view class="more">
-        <text>查看全部</text>
-        <text class="arrow">→</text>
+    <!-- 未登录状态下的头部 -->
+    <view class="user-info guest" bindtap="navigateToLogin" wx:else>
+      <view class="avatar">
+        <image src="/images/default-avatar.png" mode="aspectFill"></image>
       </view>
-    </view>
-    <view class="order-stats">
-      <view wx:for="{{orderStats}}" wx:key="status" class="order-stat-item" bindtap="navigateToOrderList" data-status="{{item.status}}">
-        <view class="stat-icon">{{item.count > 0 ? '🔴' : ''}}</view>
-        <view class="stat-count">{{item.count}}</view>
-        <view class="stat-name">{{item.name}}</view>
+      <view class="user-details">
+        <view class="nickname">点击登录/注册</view>
+        <view class="desc">登录后享受更多服务</view>
       </view>
+      <view class="arrow">→</view>
     </view>
-  </view>
 
-  <!-- 功能菜单区 -->
-  <view class="menu-section">
-    <view class="menu-grid">
-      <view wx:for="{{menuItems}}" wx:key="id" class="menu-item" bindtap="navigateToMenu" data-url="{{item.url}}">
-        <view class="menu-icon">{{item.icon}}</view>
-        <view class="menu-name">{{item.name}}</view>
+    <!-- 订单管理区 -->
+    <view class="order-section">
+      <view class="section-header" bindtap="navigateToAllOrders">
+        <text class="title">我的订单</text>
+        <view class="more">
+          <text>查看全部</text>
+          <text class="arrow">→</text>
+        </view>
+      </view>
+      <view class="order-stats">
+        <view wx:for="{{orderStats}}" wx:key="status" class="order-stat-item" bindtap="navigateToOrderList" data-status="{{item.status}}">
+          <view class="stat-icon">{{item.count > 0 ? '🔴' : ''}}</view>
+          <view class="stat-count">{{item.count}}</view>
+          <view class="stat-name">{{item.name}}</view>
+        </view>
       </view>
     </view>
-  </view>
-  
-  <!-- 退出登录按钮 -->
-  <view class="logout-section" wx:if="{{isLoggedIn}}">
-    <button class="logout-btn" type="warn" bindtap="logout">退出登录</button>
-  </view>
+
+    <!-- 功能菜单区 -->
+    <view class="menu-section">
+      <view class="menu-grid">
+        <view wx:for="{{menuItems}}" wx:key="id" class="menu-item" bindtap="navigateToMenu" data-url="{{item.url}}">
+          <view class="menu-icon">{{item.icon}}</view>
+          <view class="menu-name">{{item.name}}</view>
+        </view>
+      </view>
+    </view>
+    
+    <!-- 退出登录按钮 -->
+    <view class="logout-section" wx:if="{{isLoggedIn}}">
+      <button class="logout-btn" type="warn" bindtap="logout">退出登录</button>
+    </view>
+  </block>
 
   <!-- 权限弹窗组件 -->
   <auth-modal id="auth-modal" />

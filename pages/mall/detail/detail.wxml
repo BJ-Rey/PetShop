@@ -96,7 +96,7 @@
   <view class="bottom-bar">
     <view class="cart-icon" bindtap="navigateToCart">
       <view class="icon-wrapper">
-        <image src="/images/tabbar/mall.png" mode="aspectFit" class="bar-icon"></image>
+        <image src="/images/商品_commodity.svg" mode="aspectFit" class="bar-icon"></image>
         <text class="badge" wx:if="{{cartCount > 0}}">{{cartCount}}</text>
       </view>
       <text class="bar-text">购物车</text>

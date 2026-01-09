@@ -1,141 +1,130 @@
 // pages/service/detail/detail.js
+const serviceApi = require('../../../api/serviceApi');
 const auth = require('../../../utils/auth');
 
 Page({
   data: {
-    service: null,
-    merchantInfo: null,
-    calendarDays: [],
-    selectedDate: '',
-    timeSlots: ['09:00', '10:00', '11:00', '14:00', '15:00', '16:00'],
-    selectedTime: ''
+    service: {},
+    processList: [], // 服务流程
+    noticeList: [], // 购买须知
+    isFavorited: false
   },
 
   onLoad: function(options) {
-    if (options.id) {
-      this.loadServiceDetail(options.id)
+    const id = options.id;
+    if (id) {
+      this.loadServiceDetail(id);
+      this.loadProcessList();
+      this.loadNoticeList();
+      this.checkFavoriteStatus(id);
     }
-    this.initCalendar();
   },
 
-  initCalendar() {
-      const days = [];
-      const weeks = ['日', '一', '二', '三', '四', '五', '六'];
-      for(let i=0; i<7; i++) {
-          const d = new Date();
-          d.setDate(d.getDate() + i);
-          const month = d.getMonth() + 1;
-          const day = d.getDate();
-          const dateStr = `${d.getFullYear()}-${month.toString().padStart(2, '0')}-${day.toString().padStart(2, '0')}`;
-          days.push({
-              week: i === 0 ? '今天' : '周' + weeks[d.getDay()],
-              day: `${month}/${day}`,
-              date: dateStr
-          });
-      }
-      this.setData({ calendarDays: days, selectedDate: days[0].date });
-  },
-
-  selectDate(e) {
-      this.setData({ selectedDate: e.currentTarget.dataset.date, selectedTime: '' });
-  },
-
-  selectTime(e) {
-      this.setData({ selectedTime: e.currentTarget.dataset.time });
-  },
-
-  /**
-   * 立即预约
-   */
-  bookAppointment() {
-    auth.checkPermission(() => {
-        if (!this.data.selectedTime) {
-            wx.showToast({ title: '请选择预约时间', icon: 'none' });
-            return;
-        }
-    
-        const service = this.data.service
-        wx.navigateTo({
-          url: `/pages/appointment/create/create?serviceId=${service.id}&merchantName=${this.data.merchantInfo.name}&date=${this.data.selectedDate}&time=${this.data.selectedTime}`
-        })
-    });
-  },
-
-  // 加载服务详情数据
-  loadServiceDetail: function(serviceId) {
+  // 加载服务详情
+  loadServiceDetail: function(id) {
     wx.showLoading({ title: '加载中...' });
-    const serviceApi = require('../../../api/serviceApi');
-    
-    serviceApi.getServiceDetail(serviceId).then(service => {
-        wx.hideLoading();
-        this.setData({
-            service: service
-        });
+
+    // 尝试调用API（兼容真实后端）
+    serviceApi.getServiceDetail(id).then(res => {
+      this.setData({
+        service: res
+      });
+      wx.hideLoading();
     }).catch(err => {
-        wx.hideLoading();
-        console.error('Failed to load service detail', err);
-        wx.showToast({ title: '加载失败', icon: 'none' });
+      console.error('加载服务详情失败', err);
+      wx.hideLoading();
+      wx.showToast({
+        title: '加载失败',
+        icon: 'none'
+      });
+      // 兜底数据，防止页面空白
+      this.setData({
+          service: {
+              id: id,
+              name: '未知服务',
+              price: 0,
+              description: '暂无详细信息'
+          }
+      });
     });
   },
 
-  // 加载服务流程数据
+  // 加载服务流程 (模拟)
   loadProcessList: function() {
-    const processData = [
-      {
-        title: '预约到店',
-        desc: '提前预约，按时到店，避免等待'
-      },
-      {
-        title: '健康检查',
-        desc: '专业兽医进行接种前健康检查，确保宠物适合接种'
-      },
-      {
-        title: '疫苗接种',
-        desc: '使用进口疫苗，由专业兽医进行接种操作'
-      },
-      {
-        title: '观察留观',
-        desc: '接种后留观30分钟，确保无不良反应'
-      },
-      {
-        title: '发放证明',
-        desc: '发放疫苗接种证明，记录接种信息'
-      }
-    ]
-    
     this.setData({
-      processList: processData
-    })
+        processList: [
+            { title: '在线预约', desc: '选择服务项目和时间' },
+            { title: '到店核销', desc: '出示预约码核销' },
+            { title: '享受服务', desc: '专业人员为您服务' },
+            { title: '评价反馈', desc: '服务完成后评价' }
+        ]
+    });
   },
 
-  // 加载预约须知数据
+  // 加载购买须知 (模拟)
   loadNoticeList: function() {
-    const noticeData = [
-      '接种前24小时内，宠物需保持健康状态，无发热、呕吐、腹泻等症状',
-      '接种前7天内，未使用过抗生素、免疫抑制剂等药物',
-      '接种后24小时内，避免洗澡、剧烈运动',
-      '接种后可能出现轻微发热、食欲不振等症状，属于正常反应，一般2-3天恢复',
-      '如出现严重不良反应，请及时联系医院',
-      '建议提前1-3天预约，避免高峰时段等待'
-    ]
-    
     this.setData({
-      noticeList: noticeData
-    })
+        noticeList: [
+            { title: '有效期', desc: '购买后90天内有效' },
+            { title: '预约信息', desc: '请提前1天预约' },
+            { title: '退款规则', desc: '未消费随时退' }
+        ]
+    });
   },
 
-  // 跳转到服务预约页面
-  navigateToAppointment: function(e) {
-    const serviceId = this.data.service.id
+  // 检查收藏状态
+  checkFavoriteStatus(id) {
+     // 模拟检查
+     const favorites = wx.getStorageSync('favorites_services') || [];
+     const isFavorited = favorites.some(item => item.id == id);
+     this.setData({ isFavorited });
+  },
+
+  // 切换收藏状态
+  toggleFavorite() {
+    if (!auth.checkPermission()) return;
+
+    const { service, isFavorited } = this.data;
+    let favorites = wx.getStorageSync('favorites_services') || [];
+
+    if (isFavorited) {
+        favorites = favorites.filter(item => item.id != service.id);
+        wx.showToast({ title: '已取消收藏', icon: 'none' });
+    } else {
+        favorites.push(service);
+        wx.showToast({ title: '收藏成功', icon: 'success' });
+    }
+
+    wx.setStorageSync('favorites_services', favorites);
+    this.setData({ isFavorited: !isFavorited });
+  },
+
+  // 跳转到预约页面
+  navigateToAppointment: function() {
+    if (!auth.checkPermission()) return;
+    
     wx.navigateTo({
-      url: `/pages/service/appointment/appointment?id=${serviceId}`
-    })
+      url: `/pages/service/appointment/appointment?id=${this.data.service.id}`
+    });
+  },
+  
+  // 联系商家
+  contactMerchant() {
+      wx.makePhoneCall({
+          phoneNumber: '13800138000' // Mock phone
+      });
   },
 
-  // 上一页
-  navigateBack: function() {
-    wx.navigateBack({
-      delta: 1
-    })
+  // 分享
+  onShareAppMessage() {
+      return {
+          title: this.data.service.name,
+          path: `/pages/service/detail/detail?id=${this.data.service.id}`
+      };
+  },
+
+  // 返回上一页
+  navigateBack() {
+    wx.navigateBack();
   }
-})
+});

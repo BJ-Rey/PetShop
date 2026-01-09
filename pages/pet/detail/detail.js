@@ -276,7 +276,7 @@ Page({
     const catApi = require('../../../api/catApi');
     
     wx.showLoading({ title: '加载中...' });
-    
+
     catApi.getCatDetail(petId).then(pet => {
         wx.hideLoading();
         

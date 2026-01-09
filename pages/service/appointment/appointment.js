@@ -1,6 +1,9 @@
 // pages/service/appointment/appointment.js
+const auth = require('../../../utils/auth');
+
 Page({
   data: {
+    isLoggedIn: false, // 登录状态
     serviceId: null,
     service: {
       id: 1,
@@ -65,6 +68,24 @@ Page({
     this.initAvailableDates()
   },
 
+  onShow() {
+    // 检查登录状态
+    const isLoggedIn = auth.isLoggedIn();
+    this.setData({ isLoggedIn });
+    
+    if (isLoggedIn) {
+        this.loadPets();
+    } else {
+        // 未登录时清空宠物列表
+        this.setData({ 
+            pets: [], 
+            displayPets: [],
+            selectedPets: [],
+            selectedPetIds: []
+        });
+    }
+  },
+
   // 初始化可用日期 (模拟)
   initAvailableDates() {
       // 假设未来7天除周末外可用
@@ -115,6 +136,8 @@ Page({
 
   // 加载宠物列表
   loadPets() {
+    if (!this.data.isLoggedIn) return;
+
     this.setData({ isLoadingPets: true, loadPetsError: false });
     
     // 模拟网络请求延迟，验证性能要求（<2秒）
@@ -225,9 +248,21 @@ Page({
 
   // 跳转到添加宠物页面
   navigateToAddPet() {
+    if (!auth.checkPermission(() => {
+        // 登录成功后回调：重新加载宠物
+        this.onShow();
+    })) return;
+
     wx.navigateTo({
       url: '/pages/pet/add/add'
     })
+  },
+
+  // 跳转到登录页
+  navigateToLogin() {
+    wx.navigateTo({
+        url: '/pages/login/login'
+    });
   },
 
   // 提交预约

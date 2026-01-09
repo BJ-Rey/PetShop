@@ -211,9 +211,14 @@
 }
 
 .notice-item {
-  display: flex;
-  align-items: flex-start;
-  margin-bottom: 20rpx;
+  display: block;
+  margin-bottom: 25rpx;
+}
+
+.notice-title-row {
+    display: flex;
+    align-items: center;
+    margin-bottom: 8rpx;
 }
 
 .notice-icon {
@@ -221,77 +226,19 @@
   font-size: 32rpx;
   margin-right: 15rpx;
   flex-shrink: 0;
-  margin-top: 8rpx;
 }
 
-.notice-content {
-  flex: 1;
-  font-size: 28rpx;
-  color: #666;
-  line-height: 1.6;
-}
-
-/* 日历样式 */
-.calendar-section {
-    margin-bottom: 20rpx;
-}
-
-.calendar-scroll {
-    white-space: nowrap;
-    padding: 10rpx 0;
-}
-
-.date-item {
-    display: inline-flex;
-    flex-direction: column;
-    align-items: center;
-    width: 100rpx;
-    padding: 15rpx 0;
-    margin-right: 15rpx;
-    border-radius: 12rpx;
-    background: #f8f8f8;
-    color: #333;
-}
-
-.date-item.selected {
-    background: #1aad19;
-    color: #fff;
-}
-
-.week {
-    font-size: 24rpx;
-    margin-bottom: 5rpx;
-}
-
-.day {
-    font-size: 32rpx;
+.notice-title {
+    font-size: 28rpx;
     font-weight: bold;
-}
-
-.time-slots {
-    display: flex;
-    flex-wrap: wrap;
-    gap: 20rpx;
-    margin-top: 20rpx;
-    padding-top: 20rpx;
-    border-top: 1rpx solid #f0f0f0;
-}
-
-.time-slot {
-    width: 140rpx;
-    height: 60rpx;
-    line-height: 60rpx;
-    text-align: center;
-    background: #f8f8f8;
-    border-radius: 8rpx;
-    font-size: 26rpx;
     color: #333;
 }
 
-.time-slot.selected {
-    background: #eaffea;
-    color: #1aad19;
-    border: 1rpx solid #1aad19;
+.notice-desc {
+    font-size: 26rpx;
+    color: #666;
+    line-height: 1.5;
+    padding-left: 30rpx;
 }
 
 /* 底部栏更新 */
@@ -303,27 +250,46 @@
   background: #fff;
   display: flex;
   align-items: center;
+  justify-content: space-between;
   padding: 10rpx 30rpx;
+  padding-bottom: calc(10rpx + env(safe-area-inset-bottom));
   box-shadow: 0 -2rpx 12rpx rgba(0, 0, 0, 0.1);
   z-index: 999;
 }
 
-.action-btn {
+.action-icons {
     display: flex;
-    flex-direction: column;
     align-items: center;
-    margin-right: 30rpx;
-    font-size: 20rpx;
-    color: #666;
 }
 
 .action-icon {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    margin-right: 40rpx;
+    font-size: 22rpx;
+    color: #666;
+    min-width: 80rpx;
+}
+
+.action-icon .icon {
+    width: 44rpx;
+    height: 44rpx;
+    margin-bottom: 4rpx;
     font-size: 40rpx;
-    margin-bottom: 5rpx;
+    line-height: 44rpx;
+    text-align: center;
+}
+
+.btn-group {
+    flex: 1;
+    display: flex;
+    justify-content: flex-end;
 }
 
 .appointment-btn {
-  flex: 1;
+  width: 100%;
   height: 80rpx;
   line-height: 80rpx;
   border-radius: 40rpx;
@@ -333,6 +299,7 @@
   border: none;
   font-weight: 500;
   box-shadow: 0 4rpx 12rpx rgba(26, 173, 25, 0.3);
+  margin: 0;
 }
 
 /* 响应式设计 */

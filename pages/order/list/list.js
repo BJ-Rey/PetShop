@@ -1,5 +1,6 @@
 // pages/order/list/list.js
 const orderApi = require('../../../api/orderApi');
+const auth = require('../../../utils/auth');
 const app = getApp();
 
 Page({
@@ -24,10 +25,15 @@ Page({
     if (options.status) {
       this.setData({ activeStatus: options.status })
     }
-    this.loadOrders()
+    // onLoad不自动加载，交由onShow
   },
 
   onShow() {
+    // 检查登录
+    if (!auth.checkPermission(() => {
+        this.refreshOrders();
+    })) return;
+
     // 页面显示时刷新订单数据
     this.refreshOrders()
   },
@@ -41,6 +47,8 @@ Page({
 
   // 加载订单列表
   loadOrders() {
+    if (!auth.isLoggedIn()) return;
+
     const page = this.data.page
     const activeStatus = this.data.activeStatus
     const app = getApp();

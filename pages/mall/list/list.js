@@ -199,23 +199,8 @@ Page({
 
   // 加载轮播图数据
   loadBannerList: function() {
-    const bannerList = [
-      {
-        id: 1,
-        image: 'https://placehold.co/800x400/FFA726/ffffff?text=Banner1',
-        link: '/pages/mall/detail/detail?id=1'
-      },
-      {
-        id: 2,
-        image: 'https://placehold.co/800x400/FFA726/ffffff?text=Banner2',
-        link: '/pages/mall/list/list'
-      },
-      {
-        id: 3,
-        image: 'https://placehold.co/800x400/FFA726/ffffff?text=Banner3',
-        link: '/pages/mall/list/list'
-      }
-    ]
+    // 暂时置空或调用API
+    const bannerList = []
     this.setData({
       bannerList: bannerList
     })

@@ -8,14 +8,15 @@ Page({
    * 页面的初始数据
    */
   data: {
+    loading: true, // 添加加载状态
     userInfo: null,
     isLoggedIn: false,
-    orderStats: {
-      pendingPayment: 0,
-      pendingShipment: 0,
-      pendingReceipt: 0,
-      completed: 0
-    },
+    orderStats: [
+      { status: 'pendingPayment', name: '待付款', count: 0, icon: '💳' },
+      { status: 'pendingShipment', name: '待发货', count: 0, icon: '📦' },
+      { status: 'pendingReceipt', name: '待收货', count: 0, icon: '🚚' },
+      { status: 'completed', name: '已完成', count: 0, icon: '✅' }
+    ],
     menuItems: [
       { id: 1, name: '我的宠物', icon: '🐱', url: '/pages/pet/list/list?tab=my' },
       { id: 3, name: '收货地址', icon: '📍', url: '/pages/mine/address/address' },
@@ -62,6 +63,7 @@ Page({
    * 检查登录状态
    */
   checkLoginStatus() {
+    this.setData({ loading: true });
     return new Promise((resolve) => {
       const isLoggedIn = auth.isLoggedIn();
       this.setData({ isLoggedIn });
@@ -72,19 +74,21 @@ Page({
         // 使用 Promise.all 确保所有数据加载完成
         Promise.all([
           this.loadOrderStats(),
-          this.loadUserBalance()
+          // this.loadUserBalance()
         ]).then(() => {
+          this.setData({ loading: false });
           resolve();
         });
       } else {
         this.setData({
           userInfo: null,
-          orderStats: {
-            pendingPayment: 0,
-            pendingShipment: 0,
-            pendingReceipt: 0,
-            completed: 0
-          }
+          loading: false,
+          orderStats: [
+            { status: 'pendingPayment', name: '待付款', count: 0, icon: '💳' },
+            { status: 'pendingShipment', name: '待发货', count: 0, icon: '📦' },
+            { status: 'pendingReceipt', name: '待收货', count: 0, icon: '🚚' },
+            { status: 'completed', name: '已完成', count: 0, icon: '✅' }
+          ]
         });
         resolve();
       }
@@ -99,12 +103,12 @@ Page({
       // 模拟从服务器获取订单统计数据
       setTimeout(() => {
         this.setData({
-          orderStats: {
-            pendingPayment: 2, // 待付款
-            pendingShipment: 1, // 待发货
-            pendingReceipt: 1, // 待收货
-            completed: 5      // 已完成
-          }
+          orderStats: [
+            { status: 'pendingPayment', name: '待付款', count: 2, icon: '💳' },
+            { status: 'pendingShipment', name: '待发货', count: 1, icon: '📦' },
+            { status: 'pendingReceipt', name: '待收货', count: 1, icon: '🚚' },
+            { status: 'completed', name: '已完成', count: 5, icon: '✅' }
+          ]
         });
         resolve();
       }, 300);

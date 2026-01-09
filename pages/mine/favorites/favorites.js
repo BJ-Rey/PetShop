@@ -1,5 +1,6 @@
 // pages/mine/favorites/favorites.js
 const { getAllFavorites, removeFromFavorites } = require('../../../utils/favorites');
+const auth = require('../../../utils/auth');
 
 Page({
   data: {
@@ -10,20 +11,34 @@ Page({
     services: [],
     products: [],
     pets: [],
-    hasMore: true
+    hasMore: true,
+    isLoggedIn: false
   },
 
   onLoad() {
-    this.loadFavorites(true);
+    // 页面加载无需立即加载，交由onShow统一检查
   },
 
   onShow() {
-    // Refresh on show, reset pagination
-    this.loadFavorites(true);
+    // 检查登录状态
+    const isLoggedIn = auth.isLoggedIn();
+    this.setData({ isLoggedIn });
+
+    if (isLoggedIn) {
+        // Refresh on show, reset pagination
+        this.loadFavorites(true);
+    } else {
+        // Clear data
+        this.setData({
+            services: [],
+            products: [],
+            pets: []
+        });
+    }
   },
 
   onReachBottom() {
-    if (this.data.hasMore) {
+    if (this.data.isLoggedIn && this.data.hasMore) {
       this.setData({ page: this.data.page + 1 });
       this.loadFavorites(false);
     }
@@ -31,6 +46,8 @@ Page({
 
   // Load favorites with pagination and sorting
   loadFavorites(reset = false) {
+    if (!this.data.isLoggedIn) return;
+
     if (reset) {
       this.setData({ page: 1, hasMore: true, services: [], products: [], pets: [] });
     }
@@ -124,6 +141,13 @@ Page({
 
   navigateToPetList() {
     wx.navigateTo({ url: '/pages/pet/list/list' });
+  },
+  
+  // 跳转到登录页
+  navigateToLogin() {
+      wx.navigateTo({
+          url: '/pages/login/login'
+      });
   },
 
   navigateBack() {

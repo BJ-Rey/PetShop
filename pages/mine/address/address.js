@@ -1,17 +1,28 @@
 // pages/mine/address/address.js
+const auth = require('../../../utils/auth');
+
 Page({
   data: {
-    addresses: [] // 收货地址列表
+    addresses: [], // 收货地址列表
+    isLoggedIn: false
   },
 
   onLoad() {
-    // 页面加载时加载地址数据
-    this.loadAddresses()
+    // 页面加载时无需加载，交由onShow统一处理
   },
 
   onShow() {
-    // 页面显示时重新加载地址数据，确保数据最新
-    this.loadAddresses()
+    // 检查登录状态
+    const isLoggedIn = auth.isLoggedIn();
+    this.setData({ isLoggedIn });
+
+    if (isLoggedIn) {
+        // 页面显示时加载地址数据，确保数据最新（包括从添加/编辑页返回时）
+        this.loadAddresses();
+    } else {
+        // 未登录时清空数据
+        this.setData({ addresses: [] });
+    }
   },
 
   // 加载地址数据
@@ -25,6 +36,11 @@ Page({
 
   // 跳转到新增地址页面
   navigateToAddAddress() {
+    if (!auth.checkPermission(() => {
+        // 登录成功回调
+        this.onShow();
+    })) return;
+
     if (this.data.addresses.length >= 3) {
       wx.showToast({
         title: '最多只能添加3个收货地址',
@@ -35,6 +51,13 @@ Page({
     wx.navigateTo({
       url: '/pages/mine/address/add/add'
     })
+  },
+
+  // 跳转到登录页
+  navigateToLogin() {
+      wx.navigateTo({
+          url: '/pages/login/login'
+      });
   },
 
   // 跳转到编辑地址页面

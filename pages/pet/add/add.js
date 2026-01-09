@@ -15,6 +15,17 @@ Page({
   },
 
   onLoad(options) {
+    // 检查登录状态
+    if (!auth.checkPermission(() => {
+      // 如果未登录，checkPermission会自动处理（弹窗或跳转）
+      // 这里如果checkPermission返回false，我们可能需要延迟一下跳转或者什么都不做等待回调
+      // 但checkPermission内部已经有跳转逻辑
+    })) {
+        // 如果checkPermission返回false，说明未登录，回调会在登录成功后执行
+        // 但这里是页面加载，如果是跳转登录页，当前页可能会被卸载或隐藏
+        return;
+    }
+
     if (options.id) {
         // Edit mode (Mock)
         wx.setNavigationBarTitle({ title: '编辑宠物' });

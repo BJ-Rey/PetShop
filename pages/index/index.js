@@ -7,19 +7,32 @@ const auth = require('../../utils/auth');
 
 Page({
   data: {
+    loading: true, // 添加加载状态
     indicatorDots: true,
     autoplay: true,
     interval: 5000, 
     duration: 1000,
     keyword: '',
     imgUrls: [
-      'https://images.unsplash.com/photo-1514888286974-6c03e2ca1dba?ixlib=rb-1.2.1&auto=format&fit=crop&w=1350&q=80',
-      'https://images.unsplash.com/photo-1573865526739-10659fec78a5?ixlib=rb-1.2.1&auto=format&fit=crop&w=1350&q=80',
-      'https://images.unsplash.com/photo-1450778869180-41d0601e046e?ixlib=rb-1.2.1&auto=format&fit=crop&w=1350&q=80'
+      { id: 1, url: 'https://images.unsplash.com/photo-1514888286974-6c03e2ca1dba?ixlib=rb-1.2.1&auto=format&fit=crop&w=1350&q=80', type: 'cat' },
+      { id: 2, url: 'https://images.unsplash.com/photo-1573865526739-10659fec78a5?ixlib=rb-1.2.1&auto=format&fit=crop&w=1350&q=80', type: 'service' },
+      { id: 3, url: 'https://images.unsplash.com/photo-1450778869180-41d0601e046e?ixlib=rb-1.2.1&auto=format&fit=crop&w=1350&q=80', type: 'product' }
     ],
     recommendedPets: [],
     hotServices: [],
     selectedProducts: []
+  },
+
+  // 轮播图点击事件
+  onSwiperTap(e) {
+    const item = e.currentTarget.dataset.item;
+    if (item.type === 'cat') {
+      this.navigateToPetList();
+    } else if (item.type === 'service') {
+      this.navigateToServiceList();
+    } else if (item.type === 'product') {
+      this.navigateToMallList();
+    }
   },
 
   // 轮播图触摸开始，暂停自动播放
@@ -38,7 +51,40 @@ Page({
 
   onLoad: function() {
     // 页面加载时的初始化逻辑
-    console.log('index页面加载')
+    console.log('index页面加载');
+    this.loadData();
+  },
+
+  loadData: function() {
+    this.setData({ loading: true });
+    
+    Promise.all([
+      catApi.getCatList({ page: 1, pageSize: 5, recommend: true }).catch(err => {
+        console.error('获取推荐猫咪失败', err);
+        return { list: [] };
+      }),
+      serviceApi.getServiceList({ page: 1, pageSize: 4, hot: true }).catch(err => {
+        console.error('获取热门服务失败', err);
+        return { list: [] };
+      }),
+      productApi.getProductList({ page: 1, pageSize: 4, recommend: true }).catch(err => {
+        console.error('获取精选商品失败', err);
+        return { list: [] };
+      })
+    ]).then(([catRes, serviceRes, productRes]) => {
+      // 兼容直接返回数组或返回包含list对象的结构
+      const recommendedPets = Array.isArray(catRes) ? catRes : (catRes.list || []);
+      const hotServices = Array.isArray(serviceRes) ? serviceRes : (serviceRes.list || []);
+      const selectedProducts = Array.isArray(productRes) ? productRes : (productRes.list || []);
+
+      this.setData({
+        recommendedPets,
+        hotServices,
+        selectedProducts,
+        loading: false
+      });
+      wx.stopPullDownRefresh();
+    });
   },
 
   onSearchInput: function(e) {

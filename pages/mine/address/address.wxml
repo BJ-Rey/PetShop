@@ -9,7 +9,13 @@
 
   <!-- 地址列表 -->
   <view class="address-list">
-    <block wx:if="{{addresses.length > 0}}">
+    <!-- 未登录状态 -->
+    <view class="empty-state" wx:if="{{!isLoggedIn}}">
+        <text class="empty-text">登录后可管理收货地址</text>
+        <button class="btn btn-primary" bindtap="navigateToLogin">立即登录</button>
+    </view>
+
+    <block wx:elif="{{addresses.length > 0}}">
       <view wx:for="{{addresses}}" wx:key="id" class="address-item">
         <view class="address-header">
           <view class="contact-info">

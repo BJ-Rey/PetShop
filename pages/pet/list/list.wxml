@@ -40,8 +40,11 @@
     <!-- 空状态 -->
     <view class="empty-state" wx:else>
       <image src="/images/empty.png" mode="aspectFit" class="empty-icon"></image>
-      <text>暂无宠物信息</text>
-      <button class="add-pet-btn" bindtap="navigateToAdd" wx:if="{{isMyPetsMode}}">添加宠物</button>
+      <text wx:if="{{isMyPetsMode && !pets.length && !isLoggedIn}}">登录后查看我的宠物</text>
+      <text wx:else>暂无宠物信息</text>
+      
+      <button class="add-pet-btn" bindtap="navigateToLogin" wx:if="{{isMyPetsMode && !isLoggedIn}}">立即登录</button>
+      <button class="add-pet-btn" bindtap="navigateToAdd" wx:elif="{{isMyPetsMode}}">添加宠物</button>
     </view>
   </view>
 </view>

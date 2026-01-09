@@ -77,8 +77,14 @@
   <view class="pet-select-section card" wx:if="{{!petId}}">
     <view class="section-title">选择宠物 (可多选)</view>
     
+    <!-- 未登录状态 -->
+    <view class="no-pets" wx:if="{{!isLoggedIn}}">
+        <text>请先登录以查看和选择您的宠物</text>
+        <button class="btn btn-primary" bindtap="navigateToLogin">立即登录</button>
+    </view>
+
     <!-- 加载中 -->
-    <view class="loading-state" wx:if="{{isLoadingPets}}">
+    <view class="loading-state" wx:elif="{{isLoadingPets}}">
         <view class="loading-spinner"></view>
         <text>加载宠物档案...</text>
     </view>
@@ -149,7 +155,10 @@
 
   <!-- 预约提交 -->
   <view class="submit-section">
-    <button class="btn btn-primary submit-btn" bindtap="submitAppointment" wx:if="{{petId || pets.length > 0}}">
+    <button class="btn btn-primary submit-btn" bindtap="navigateToLogin" wx:if="{{!isLoggedIn}}">
+      登录并预约
+    </button>
+    <button class="btn btn-primary submit-btn" bindtap="submitAppointment" wx:elif="{{petId || pets.length > 0}}">
       提交预约
     </button>
     <button class="btn btn-primary submit-btn" bindtap="navigateToAddPet" wx:else>

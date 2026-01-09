@@ -6,13 +6,14 @@ Page({
     pets: [],
     isMyPetsMode: false,
     startX: 0,
-    startY: 0
+    startY: 0,
+    isLoggedIn: false
   },
 
   onLoad(options) {
     if (options.tab === 'my') {
       this.setData({ isMyPetsMode: true });
-      this.loadMyPets();
+      // this.loadMyPets(); // 移至onShow加载，避免重复
     } else {
         this.loadPublicPets();
     }
@@ -32,13 +33,24 @@ Page({
   },
 
   onShow() {
+    // 检查登录状态
+    const isLoggedIn = auth.isLoggedIn();
+    this.setData({ isLoggedIn });
+
     if (this.data.isMyPetsMode) {
+      // 检查登录状态
+      if (!isLoggedIn) {
+          this.setData({ pets: [] });
+          // 可选：引导登录或显示空状态（WXML已处理）
+          return;
+      }
       this.loadMyPets();
     }
   },
 
   // 加载我的宠物
   loadMyPets() {
+    if (!auth.isLoggedIn()) return;
     const myPets = wx.getStorageSync('myPets') || [];
     // 添加translateX用于滑动
     const petsWithSlide = myPets.map(p => ({ ...p, translateX: 0 }));
@@ -47,11 +59,22 @@ Page({
 
   // 跳转添加
   navigateToAdd() {
+    if (!auth.checkPermission(() => {
+        this.onShow();
+    })) return;
+
     wx.navigateTo({ url: '/pages/pet/add/add' });
   },
 
   navigateBack() {
     wx.navigateBack();
+  },
+
+  // 跳转到登录页
+  navigateToLogin() {
+      wx.navigateTo({
+          url: '/pages/login/login'
+      });
   },
 
   // 编辑宠物

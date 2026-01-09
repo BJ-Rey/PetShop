@@ -63,29 +63,10 @@ Page({
 
   // 加载热门服务数据
   loadHotServices: function() {
-    // 模拟数据，实际应该调用API
-    const hotServices = [
-      {
-        id: 2,
-        name: '宠物美容套餐',
-        price: 128,
-        image: 'https://example.com/service2.jpg'
-      },
-      {
-        id: 6,
-        name: '狂犬病疫苗接种',
-        price: 80,
-        image: 'https://example.com/service6.jpg'
-      },
-      {
-        id: 1,
-        name: '犬瘟热疫苗接种',
-        price: 198,
-        image: 'https://example.com/service1.jpg'
-      }
-    ]
+    // 暂时置空或调用API（如果有）
+    // const hotServices = [...]
     this.setData({
-      hotServices: hotServices
+      hotServices: [] // 等待后端接口或暂时不显示
     })
   },
 
