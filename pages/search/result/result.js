@@ -90,7 +90,7 @@ Page({
       // 宠物数据
       if (i % 2 === 0) {
         pets.push({
-          id: `pet-${i}`,
+          id: i + 1, // 使用纯数字ID以匹配详情页逻辑，原为 `pet-${i}`
           name: `${this.data.keyword} 宠物 ${i + 1}`,
           breed: ['金毛', '布偶', '哈士奇', '英短'][Math.floor(Math.random() * 4)],
           age: `${Math.floor(Math.random() * 5) + 1}岁`,
@@ -103,7 +103,7 @@ Page({
       // 商品数据
       if (i % 3 === 0) {
         products.push({
-          id: `product-${i}`,
+          id: i + 1, // 使用纯数字ID以匹配详情页逻辑，原为 `product-${i}`
           name: `${this.data.keyword} 商品 ${i + 1}`,
           price: Math.floor(Math.random() * 1000) + 100,
           sales: Math.floor(Math.random() * 5000),
@@ -114,7 +114,7 @@ Page({
       // 服务数据
       if (i % 4 === 0) {
         services.push({
-          id: `service-${i}`,
+          id: i + 1, // 使用纯数字ID
           name: `${this.data.keyword} 服务 ${i + 1}`,
           description: `这是与"${this.data.keyword}"相关的服务描述，提供专业的宠物服务。`,
           price: Math.floor(Math.random() * 500) + 50,
@@ -126,7 +126,7 @@ Page({
       // 商家数据
       if (i % 5 === 0) {
         merchants.push({
-          id: `merchant-${i}`,
+          id: i + 1, // 使用纯数字ID
           name: `${this.data.keyword} 商家 ${i + 1}`,
           logo: `/images/default.png`,
           rating: (Math.random() * 5).toFixed(1),
@@ -240,16 +240,38 @@ Page({
   // 跳转到宠物详情页
   navigateToPetDetail(e) {
     const petId = e.currentTarget.dataset.id;
+    if (!petId || petId === 'undefined' || petId === 'null') {
+      logger.warn('跳转宠物详情页失败，无效的ID:', petId);
+      return;
+    }
+    
+    // 确保ID是数字或有效字符串，如果包含 'pet-' 前缀需要处理（模拟数据带前缀，实际数据可能不带）
+    // 这里假设模拟数据的ID格式是 'pet-123'，而真实详情页可能需要纯数字ID，或者详情页能处理前缀
+    // 为兼容模拟数据，这里不做处理，但在真实环境中应确保ID格式一致
+    
     wx.navigateTo({
-      url: `/pages/pet/detail/detail?id=${petId}`
+      url: `/pages/pet/detail/detail?id=${petId}`,
+      fail: (err) => {
+        logger.error('跳转宠物详情页失败', err);
+        wx.showToast({ title: '无法打开详情页', icon: 'none' });
+      }
     });
   },
 
   // 跳转到商品详情页
   navigateToProductDetail(e) {
     const productId = e.currentTarget.dataset.id;
+    if (!productId || productId === 'undefined' || productId === 'null') {
+        logger.warn('跳转商品详情页失败，无效的ID:', productId);
+        return;
+    }
+
     wx.navigateTo({
-      url: `/pages/mall/detail/detail?id=${productId}`
+      url: `/pages/mall/detail/detail?id=${productId}`,
+      fail: (err) => {
+          logger.error('跳转商品详情页失败', err);
+          wx.showToast({ title: '无法打开详情页', icon: 'none' });
+      }
     });
   },
 

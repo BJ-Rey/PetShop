@@ -199,7 +199,9 @@ Page({
           page: 1,
           size: 20
       }).then(pets => {
-          const sorted = (pets || []).sort((a, b) => (b.views || 0) - (a.views || 0));
+          // 数据去重：确保没有重复ID
+          const uniquePets = Array.from(new Map(pets.map(item => [item.id, item])).values());
+          const sorted = (uniquePets || []).sort((a, b) => (b.views || 0) - (a.views || 0));
           this.setData({
               featuredPets: sorted.slice(0, 3)
           });

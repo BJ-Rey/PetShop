@@ -39,9 +39,39 @@
   line-height: normal;
 }
 
+/* 底部保存按钮栏 */
+.bottom-action-bar {
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  padding: 20rpx 30rpx;
+  background: #fff;
+  box-shadow: 0 -2rpx 10rpx rgba(0,0,0,0.05);
+  padding-bottom: calc(20rpx + env(safe-area-inset-bottom));
+  z-index: 100;
+}
+
+.save-address-btn {
+  width: 100%;
+  border-radius: 40rpx;
+  height: 80rpx;
+  line-height: 80rpx;
+  font-size: 32rpx;
+  background-color: #1aad19;
+  color: #fff;
+}
+
+/* 占位符颜色 */
+.placeholder-text {
+    color: #888;
+}
+
+/* 增加底部间距 */
 .address-form {
   background-color: #fff;
   margin-top: 20rpx;
+  padding-bottom: 140rpx;
 }
 
 .form-item {

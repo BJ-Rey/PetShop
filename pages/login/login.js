@@ -234,22 +234,36 @@ Page({
             console.log('Redirecting to:', redirectUrl);
 
             setTimeout(() => {
-                globalUtils.safeNavigate(redirectUrl, { 
-                success: () => {
-                    console.log('Login redirect success');
-                },
-                fail: (error) => {
-                    console.error('Login redirect error:', error);
-                    logError('LoginRedirect', error);
-                    // 跳转失败时的降级处理
-                    wx.switchTab({
-                        url: '/pages/index/index',
-                        fail: () => {
-                             wx.reLaunch({ url: '/pages/index/index' });
+                // 如果是商家且跳转到 merchant 页面，使用 navigateTo (因为 merchant 包可能不在 tabbar)
+                // 如果是 tabbar 页面，使用 switchTab
+                if (userInfo.role === 'merchant') {
+                    wx.navigateTo({
+                        url: redirectUrl,
+                        success: () => console.log('Merchant login redirect success'),
+                        fail: (err) => {
+                            console.error('Merchant redirect failed:', err);
+                            // Fallback to home if merchant page fails
+                            wx.switchTab({ url: '/pages/index/index' });
+                        }
+                    });
+                } else {
+                    globalUtils.safeNavigate(redirectUrl, { 
+                        success: () => {
+                            console.log('Login redirect success');
+                        },
+                        fail: (error) => {
+                            console.error('Login redirect error:', error);
+                            logError('LoginRedirect', error);
+                            // 跳转失败时的降级处理
+                            wx.switchTab({
+                                url: '/pages/index/index',
+                                fail: () => {
+                                    wx.reLaunch({ url: '/pages/index/index' });
+                                }
+                            });
                         }
                     });
                 }
-                });
             }, 1500);
         }).catch(error => {
             console.error('Login error:', error);

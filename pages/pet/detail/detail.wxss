@@ -91,6 +91,11 @@
   margin-bottom: 20rpx;
   border-radius: 12rpx;
   box-shadow: 0 2rpx 8rpx rgba(0, 0, 0, 0.08);
+  /* Ensure content doesn't overflow horizontally on small screens */
+  overflow-x: hidden; 
+  width: auto;
+  margin-left: 20rpx;
+  margin-right: 20rpx;
 }
 
 /* 价格区域样式 */

@@ -50,7 +50,7 @@
       
       <!-- 猫咪列表 -->
       <view class="product-grid" wx:if="{{currentFilter === 'cat'}}">
-        <!-- 精选猫咪 -->
+        <!-- 精选猫咪 (仅显示一次) -->
         <view class="hot-products" wx:if="{{featuredPets.length > 0}}">
             <view class="section-header">
                 <text class="section-title">精选猫咪</text>
@@ -69,6 +69,7 @@
 
         <block wx:if="{{pets.length > 0}}">
           <block wx:for="{{pets}}" wx:key="id">
+            <!-- 过滤掉已在精选列表中的猫咪，避免重复展示 (可选逻辑，根据需求，如果需要去重可以添加 wx:if="{{!utils.includes(featuredPetsIds, item.id)}}") -->
             <view class="product-card" bindtap="navigateToPetDetail" data-id="{{item.id}}">
               <image src="{{item.avatar}}" class="product-card-image" mode="aspectFill"></image>
               <pet-status-tag status="{{item.status}}" statusText="{{item.statusText}}" style="position: absolute; top: 15rpx; left: 15rpx; z-index: 10;"></pet-status-tag>
