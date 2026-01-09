@@ -305,13 +305,18 @@ Page({
 
   // 下拉刷新事件处理
   onPullDownRefresh: function() {
-    setTimeout(() => {
-      this.loadProducts()
-      this.loadPets()
-      this.loadHotProducts()
-      this.loadBannerList()
-      wx.stopPullDownRefresh()
-    }, 1000)
+      // 重新加载所有数据
+      Promise.all([
+          this.loadProducts(),
+          this.loadPets(),
+          this.loadHotProducts(),
+          this.loadBannerList()
+      ]).then(() => {
+          wx.stopPullDownRefresh();
+          wx.showToast({ title: '刷新成功', icon: 'none' });
+      }).catch(() => {
+          wx.stopPullDownRefresh();
+      });
   },
 
   // 联系商家

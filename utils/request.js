@@ -241,9 +241,35 @@ const request = (options) => {
                   cache.setCache(cacheKey, result.data, config.cacheTime);
                 }
                 resolve(result.data);
+              } else if (result.code === 401 || result.code === 403) {
+                  // 权限异常处理
+                  console.warn('Unauthorized/Forbidden:', result.errorMsg);
+                  wx.showToast({
+                      title: '无权限访问',
+                      icon: 'none'
+                  });
+                  // 记录安全日志 (Mock)
+                  console.log('[Security Log] Access Denied for:', config.url);
+                  
+                  // 强制跳转首页
+                  setTimeout(() => {
+                      wx.switchTab({ url: '/pages/index/index' });
+                  }, 1500);
+                  reject(result);
               } else {
                 reject(result);
               }
+            } else if (res.statusCode === 401 || res.statusCode === 403) {
+                 // HTTP status code check
+                  console.warn('Unauthorized/Forbidden HTTP:', res.statusCode);
+                  wx.showToast({
+                      title: '无权限访问',
+                      icon: 'none'
+                  });
+                  setTimeout(() => {
+                      wx.switchTab({ url: '/pages/index/index' });
+                  }, 1500);
+                  reject({ code: res.statusCode, message: '无权限访问' });
             } else {
               // HTTP错误
               reject({ code: res.statusCode, message: `请求失败: ${res.statusCode}` });

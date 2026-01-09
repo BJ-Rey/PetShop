@@ -233,19 +233,20 @@ App({
       // 每次调用时动态计算权限
       switch(operation) {
         // 普通用户可执行的操作
-        case 'add_pet':
-        case 'edit_pet':
-        case 'delete_pet':
         case 'view_personal_center':
         case 'checkout':
           return true;
         
-        // 商家可执行的操作
+        // 商家可执行的操作 (Strict RBAC)
+        case 'add_pet':
+        case 'edit_pet':
+        case 'delete_pet':
         case 'manage_merchant':
         case 'manage_pets':
         case 'manage_products':
         case 'manage_orders':
         case 'manage_services':
+        case 'view_dashboard':
           // 直接检查用户角色是否为商家
           return isMerchant;
         

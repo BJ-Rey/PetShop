@@ -78,34 +78,40 @@ Page({
     this.setData({ isSubmitting: true });
 
     try {
-      // 1. 创建订单 (模拟)
+      // 1. 创建订单 (真实API)
       const orderInfo = {
-        items: this.data.orderItems,
-        address: this.data.address,
-        totalPrice: this.data.actualPrice,
-        createTime: new Date().toISOString()
+        itemsJson: JSON.stringify(this.data.orderItems),
+        addressSnapshot: JSON.stringify(this.data.address),
+        totalAmount: this.data.actualPrice,
+        userId: app.globalData.userInfo ? app.globalData.userInfo.id : null // Optional if header handled
       };
       
       console.log('[Order] Creating order:', orderInfo);
+      
+      const createdOrder = await orderApi.createOrder(orderInfo);
+      console.log('[Order] Created:', createdOrder);
 
-      // 2. 获取支付参数 (模拟)
-      const payParams = await payment.unifiedOrder(orderInfo);
+      // 2. 获取支付参数 (模拟，因为无真实商户号)
+      // const payParams = await payment.unifiedOrder(createdOrder);
 
       // 3. 发起支付 (模拟)
-      // 在开发工具中 wx.requestPayment 会失败，这里我们模拟成功
       // await payment.requestPayment(payParams);
       
-      // 模拟支付成功
+      // 模拟支付成功，调用后端更新状态
       wx.showLoading({ title: '支付中...' });
+      
+      // Update status to 'paid'
+      await orderApi.updateOrderStatus(createdOrder.id, 'paid');
+
       setTimeout(() => {
           wx.hideLoading();
           this.onPaySuccess();
-      }, 1500);
+      }, 1000);
 
     } catch (err) {
       console.error(err);
       wx.showToast({
-        title: err.message || '支付失败',
+        title: '下单失败',
         icon: 'none'
       });
       this.setData({ isSubmitting: false });

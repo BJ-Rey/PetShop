@@ -1,0 +1,43 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.tencent.wxcloudrun.dao.UserMapper">
+    <resultMap id="BaseResultMap" type="com.tencent.wxcloudrun.model.User">
+        <id column="id" property="id" jdbcType="INTEGER"/>
+        <result column="openid" property="openid" jdbcType="VARCHAR"/>
+        <result column="nickname" property="nickname" jdbcType="VARCHAR"/>
+        <result column="avatar_url" property="avatarUrl" jdbcType="VARCHAR"/>
+        <result column="phone" property="phone" jdbcType="VARCHAR"/>
+        <result column="role" property="role" jdbcType="VARCHAR"/>
+        <result column="created_at" property="createdAt" jdbcType="TIMESTAMP"/>
+        <result column="updated_at" property="updatedAt" jdbcType="TIMESTAMP"/>
+    </resultMap>
+
+    <sql id="Base_Column_List">
+        id, openid, nickname, avatar_url, phone, role, created_at, updated_at
+    </sql>
+
+    <select id="getUserByOpenId" resultMap="BaseResultMap" parameterType="java.lang.String">
+        select
+        <include refid="Base_Column_List"/>
+        from users
+        where openid = #{openid,jdbcType=VARCHAR}
+    </select>
+
+    <select id="getUserById" resultMap="BaseResultMap" parameterType="java.lang.Integer">
+        select
+        <include refid="Base_Column_List"/>
+        from users
+        where id = #{id,jdbcType=INTEGER}
+    </select>
+
+    <insert id="createUser" parameterType="com.tencent.wxcloudrun.model.User" useGeneratedKeys="true" keyProperty="id">
+        insert into users (openid, nickname, avatar_url, phone, role)
+        values (#{openid}, #{nickname}, #{avatarUrl}, #{phone}, #{role})
+    </insert>
+
+    <update id="updateUserRole">
+        update users
+        set role = #{role}, updated_at = NOW()
+        where openid = #{openid}
+    </update>
+</mapper>

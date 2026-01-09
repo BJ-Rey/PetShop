@@ -29,6 +29,7 @@ CREATE TABLE IF NOT EXISTS `users` (
   `nickname` VARCHAR(64) COMMENT '用户昵称',
   `avatar_url` VARCHAR(255) COMMENT '头像URL',
   `phone` VARCHAR(20) COMMENT '手机号',
+  `role` VARCHAR(20) DEFAULT 'user' COMMENT '角色: user, merchant, admin',
   `created_at` TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
   `updated_at` TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COMMENT='用户信息表';

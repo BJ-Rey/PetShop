@@ -24,6 +24,13 @@ module.exports = {
   },
 
   /**
+   * 创建订单
+   */
+  createOrder: (orderData) => {
+    return request.post('/api/order/create', orderData);
+  },
+
+  /**
    * 更新订单状态 (发货、确认付款、取消等)
    */
   updateOrderStatus: (id, status) => {

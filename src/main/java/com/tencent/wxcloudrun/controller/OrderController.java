@@ -1,17 +1,22 @@
 package com.tencent.wxcloudrun.controller;
 
 import com.tencent.wxcloudrun.config.ApiResponse;
+import com.tencent.wxcloudrun.dto.CreateOrderRequest;
+import com.tencent.wxcloudrun.dto.UpdateOrderRequest;
 import com.tencent.wxcloudrun.model.Order;
 import com.tencent.wxcloudrun.service.OrderService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
+import javax.validation.Valid;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 
 @RestController
 @RequestMapping("/api/order")
+@Validated
 public class OrderController {
 
     final OrderService orderService;
@@ -59,18 +64,53 @@ public class OrderController {
     }
 
     /**
+     * 创建订单
+     */
+    @PostMapping("/create")
+    public ApiResponse createOrder(@Valid @RequestBody CreateOrderRequest request, @RequestHeader(value = "x-wx-openid", required = false) String openId) {
+        // Use userId from header if available (Security)
+        String userId = openId != null ? openId : request.getUserId();
+        
+        if (userId == null) {
+            return ApiResponse.error("Missing user identity");
+        }
+        
+        Order order = new Order();
+        order.setUserId(userId);
+        order.setItemsJson(request.getItemsJson());
+        order.setAddressSnapshot(request.getAddressSnapshot());
+        order.setTotalAmount(request.getTotalAmount());
+        
+        // Generate Order No
+        order.setOrderNo("ORD" + System.currentTimeMillis() + (int)(Math.random() * 1000));
+        order.setStatus("pending"); // Initial status
+        
+        try {
+            orderService.createOrder(order);
+            return ApiResponse.ok(order);
+        } catch (Exception e) {
+            return ApiResponse.error("Create order failed: " + e.getMessage());
+        }
+    }
+
+    /**
      * 更新订单状态
      */
     @PostMapping("/status")
-    public ApiResponse updateOrderStatus(@RequestBody Map<String, Object> body) {
-        Integer id = (Integer) body.get("id");
-        String status = (String) body.get("status");
-        // Usually update by orderNo, but frontend might pass ID. 
-        // Mapper uses orderNo. Let's support ID first by fetching orderNo.
+    public ApiResponse updateOrderStatus(@Valid @RequestBody UpdateOrderRequest request) {
+        Integer id = request.getId();
+        String status = request.getStatus();
+        
         Optional<Order> order = orderService.getOrderById(id);
         if (order.isPresent()) {
-            orderService.updateOrderStatus(order.get().getOrderNo(), status);
-            return ApiResponse.ok();
+            try {
+                orderService.updateOrderStatus(order.get().getOrderNo(), status);
+                return ApiResponse.ok();
+            } catch (IllegalArgumentException e) {
+                return ApiResponse.error(e.getMessage());
+            } catch (Exception e) {
+                return ApiResponse.error("Update failed");
+            }
         }
         return ApiResponse.error("Order not found");
     }

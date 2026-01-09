@@ -56,67 +56,37 @@ const hasPermission = (requiredRole) => {
   return roleHierarchy[userRole] >= roleHierarchy[requiredRole];
 };
 
+const request = require('./request');
+
 /**
  * 验证手机号并识别用户类型
  * @param {string} phoneNumber - 手机号
  * @param {string} verificationCode - 验证码
  * @returns {Promise<Object>} - 包含用户信息的Promise
- * @resolve {Object} - 用户信息对象，包含role、phoneNumber等字段
- * @reject {Error} - 验证失败时抛出错误
  */
 const verifyPhoneAndIdentifyUser = (phoneNumber, verificationCode) => {
-  // 模拟手机号验证和用户类型识别
-  // 实际项目中应调用后端API
-  return new Promise((resolve, reject) => {
-    // 模拟网络请求延迟
-    setTimeout(() => {
-      // 测试账号配置
-      const testAccounts = {
-        '18247122807': { role: 'merchant', id: 'merchant-test-001' },
-        '13848836315': { role: 'user', id: 'user-test-001' }
-      };
-      
-      // 验证测试账号和验证码
-      if (testAccounts[phoneNumber]) {
-        // 测试账号，使用固定验证码123456
-        if (verificationCode === '123456') {
-          const userInfo = {
-            phoneNumber,
-            role: testAccounts[phoneNumber].role,
-            token: `mock-token-${Date.now()}`,
-            id: testAccounts[phoneNumber].id
-          };
-          
-          // 保存用户信息到本地存储
-          const finalUserInfo = {
-            ...userInfo,
-            agreementAgreed: true,
-            agreementVersion: '1.0.0',
-            agreementTime: Date.now()
-          };
-          wx.setStorageSync('userInfo', finalUserInfo);
-          resolve(finalUserInfo);
-        } else {
-          reject(new Error('验证码错误'));
-        }
-      } else {
-        // 普通账号：手机号以188开头的是商家，其他是普通用户
-        const isMerchant = phoneNumber.startsWith('188');
-        const userInfo = {
-          phoneNumber,
-          role: isMerchant ? 'merchant' : 'user',
-          token: `mock-token-${Date.now()}`,
-          id: isMerchant ? 'merchant-001' : 'user-001',
+  return request.post('/api/auth/login', {
+    phone: phoneNumber,
+    code: verificationCode
+  }).then(res => {
+      // Backend returns { token, role, openid, userInfo }
+      // Map to frontend expected structure
+      const userInfo = {
+          phoneNumber: phoneNumber,
+          role: res.role,
+          token: res.token, // Use openid as token for now or JWT if backend provides
+          id: res.openid,
+          ...res.userInfo,
           agreementAgreed: true,
           agreementVersion: '1.0.0',
           agreementTime: Date.now()
-        };
-        
-        // 保存用户信息到本地存储
-        wx.setStorageSync('userInfo', userInfo);
-        resolve(userInfo);
-      }
-    }, 500);
+      };
+      
+      wx.setStorageSync('userInfo', userInfo);
+      // Also set token for request.js
+      wx.setStorageSync('token', res.token);
+      
+      return userInfo;
   });
 };
 

@@ -258,8 +258,9 @@ Page({
     auth.loginInterceptor(
       () => {
         // 登录成功，跳转到结算页面
+        const itemsStr = JSON.stringify(selectedItems);
         wx.navigateTo({
-          url: '/pages/order/create/create'
+          url: `/pages/order/create/create?items=${encodeURIComponent(itemsStr)}`
         })
       },
       () => {

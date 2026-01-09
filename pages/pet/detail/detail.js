@@ -201,13 +201,17 @@ Page({
 
   // 加载类似推荐
   loadSimilarPets(currentId) {
-    // 模拟推荐数据
-    this.setData({
-      similarPets: [
-        { id: 101, name: '英短蓝猫', price: 2500, coverImage: 'https://placehold.co/200x200/e0e0e0/ffffff?text=Cat1' },
-        { id: 102, name: '布偶猫', price: 3800, coverImage: 'https://placehold.co/200x200/e0e0e0/ffffff?text=Cat2' },
-        { id: 103, name: '美短起司', price: 1800, coverImage: 'https://placehold.co/200x200/e0e0e0/ffffff?text=Cat3' }
-      ]
+    const catApi = require('../../../api/catApi');
+    // Fetch random pets or by same breed
+    // API might not support 'similar', so we just fetch a list
+    catApi.getCatList({ page: 1, pageSize: 3 }).then(res => {
+        if (res && res.data) {
+            // Filter out current pet if possible, or just take 3
+            const similar = res.data.filter(p => p.id != currentId).slice(0, 3);
+            this.setData({ similarPets: similar });
+        }
+    }).catch(err => {
+        console.error('Load similar pets failed', err);
     });
   },
 

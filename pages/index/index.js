@@ -1,106 +1,25 @@
 //index.js
 const globalUtils = require('../../utils/globalUtils');
+const catApi = require('../../api/catApi');
+const serviceApi = require('../../api/serviceApi');
+const productApi = require('../../api/productApi');
+const auth = require('../../utils/auth');
 
 Page({
   data: {
     indicatorDots: true,
     autoplay: true,
-    interval: 5000, // 自动轮播间隔为5秒
+    interval: 5000, 
     duration: 1000,
     keyword: '',
     imgUrls: [
-      'https://placehold.co/600x400/FFA726/ffffff?text=Cat+Mall',
-      'https://placehold.co/600x400/e64340/ffffff?text=Cute+Cats',
-      'https://placehold.co/600x400/4FC3F7/ffffff?text=Pet+Services'
+      'https://images.unsplash.com/photo-1514888286974-6c03e2ca1dba?ixlib=rb-1.2.1&auto=format&fit=crop&w=1350&q=80',
+      'https://images.unsplash.com/photo-1573865526739-10659fec78a5?ixlib=rb-1.2.1&auto=format&fit=crop&w=1350&q=80',
+      'https://images.unsplash.com/photo-1450778869180-41d0601e046e?ixlib=rb-1.2.1&auto=format&fit=crop&w=1350&q=80'
     ],
-    recommendedPets: [
-      {
-        id: 1,
-        name: '小黑',
-        breed: '英国短毛猫',
-        age: '2岁',
-        avatar: 'https://placehold.co/200x200/333333/ffffff?text=Cat1'
-      },
-      {
-        id: 2,
-        name: '咪咪',
-        breed: '布偶猫',
-        age: '1岁',
-        avatar: 'https://placehold.co/200x200/ff99cc/ffffff?text=Cat2',
-        merchantName: '爱心宠物医院'
-      },
-      {
-        id: 3,
-        name: '花花',
-        breed: '三花猫',
-        age: '3岁',
-        avatar: 'https://placehold.co/200x200/ffcc00/ffffff?text=Cat3'
-      },
-      {
-        id: 4,
-        name: '雪球',
-        breed: '英短',
-        age: '1.5岁',
-        avatar: 'https://placehold.co/200x200/eeeeee/333333?text=Cat4',
-        merchantName: '宠物乐园'
-      }
-    ],
-    hotServices: [
-      {
-        id: 1,
-        name: '猫咪疫苗接种',
-        price: 198,
-        image: 'https://placehold.co/400x300/FFA726/ffffff?text=Vaccine'
-      },
-      {
-        id: 2,
-        name: '猫咪美容',
-        price: 128,
-        image: 'https://placehold.co/400x300/F57C00/ffffff?text=Grooming'
-      },
-      {
-        id: 3,
-        name: '猫咪寄养',
-        price: 80,
-        image: 'https://placehold.co/400x300/4FC3F7/ffffff?text=Hotel'
-      },
-      {
-        id: 4,
-        name: '猫咪洗澡',
-        price: 68,
-        image: 'https://placehold.co/400x300/99cc33/ffffff?text=Bath'
-      }
-    ],
-    selectedProducts: [
-      {
-        id: 1,
-        name: '天然猫粮通用型英短美短成猫粮',
-        price: 129,
-        sales: 1256,
-        image: 'https://placehold.co/400x400/ff9900/ffffff?text=Cat+Food'
-      },
-      {
-        id: 2,
-        name: '猫砂膨润土除臭结团猫砂10kg',
-        price: 59,
-        sales: 2341,
-        image: 'https://placehold.co/400x400/cccccc/333333?text=Litter'
-      },
-      {
-        id: 3,
-        name: '猫咪逗猫棒玩具',
-        price: 39,
-        sales: 892,
-        image: 'https://placehold.co/400x400/ff3333/ffffff?text=Toy'
-      },
-      {
-        id: 4,
-        name: '猫咪牵引绳',
-        price: 49,
-        sales: 1567,
-        image: 'https://placehold.co/400x400/3399ff/ffffff?text=Leash'
-      }
-    ]
+    recommendedPets: [],
+    hotServices: [],
+    selectedProducts: []
   },
 
   // 轮播图触摸开始，暂停自动播放
@@ -204,32 +123,11 @@ Page({
 
   // 下拉刷新事件处理
   onPullDownRefresh: function() {
-    // 模拟数据刷新
-    setTimeout(() => {
-      // 重置数据（这里可以替换为实际的API调用）
-      this.setData({
-        // 可以在这里重新加载数据
-        recommendedPets: [...this.data.recommendedPets],
-        hotServices: [...this.data.hotServices],
-        selectedProducts: [...this.data.selectedProducts]
-      })
-      // 停止下拉刷新动画
-      wx.stopPullDownRefresh()
-      wx.showToast({
-        title: '刷新成功',
-        icon: 'none'
-      })
-    }, 1000)
+    this.loadData();
   },
 
   // 页面显示时触发
   onShow: function() {
-    try {
-      const cache = require('../../utils/cache')
-      // 触发页面刷新，确保展示最新数据
-      this.onPullDownRefresh()
-    } catch (e) {
-      console.error('index onShow failed', e)
-    }
+    // 可以在这里做一些轻量级的状态检查，避免每次都全量刷新
   }
 })
