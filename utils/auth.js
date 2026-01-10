@@ -69,35 +69,40 @@ const verifyPhoneAndIdentifyUser = (phoneNumber, verificationCode) => {
     phone: phoneNumber,
     code: verificationCode
   }).then(res => {
-      console.log('Login API Response Data:', res); // Debug log
+      console.log('[Auth] Login Response:', res);
 
-      // 尝试从多个位置获取角色信息，增加容错
-      // 1. res.role
-      // 2. res.data.role (防止嵌套)
-      // 3. res.userInfo.role
-      let role = 'user';
-      if (res.role) role = res.role;
-      else if (res.data && res.data.role) role = res.data.role;
-      else if (res.userInfo && res.userInfo.role) role = res.userInfo.role;
+      // request.js 已经返回 result.data，所以 res 就是 {token, role, openid, userInfo}
+      // 直接获取 role，不需要多层判断
+      const role = res.role || 'user';
       
-      console.log('Parsed Role:', role);
+      console.log('[Auth] Parsed Role:', role);
 
       // Backend returns { token, role, openid, userInfo }
       // Map to frontend expected structure
       const userInfo = {
           phoneNumber: phoneNumber,
-          role: role,
-          token: res.token || (res.data && res.data.token), 
-          id: res.openid || (res.data && res.data.openid),
-          ...(res.userInfo || (res.data && res.data.userInfo) || {}),
+          role: role,  // 确保 role 正确设置
+          token: res.token,
+          id: res.openid,
+          nickname: res.userInfo?.nickname || '',
+          avatarUrl: res.userInfo?.avatarUrl || '',
           agreementAgreed: true,
           agreementVersion: '1.0.0',
           agreementTime: Date.now()
       };
       
-      // Store userInfo and token locally
+      // 存储到本地
       wx.setStorageSync('userInfo', userInfo);
       wx.setStorageSync('token', res.token);
+      
+      // 同步更新全局状态
+      const app = getApp();
+      if (app) {
+          app.globalData.userInfo = userInfo;
+          app.globalData.isMerchant = (role === 'merchant');
+          app.globalData.userToken = res.token;
+          console.log('[Auth] Updated globalData.isMerchant:', app.globalData.isMerchant);
+      }
       
       return userInfo;
   });
@@ -161,11 +166,30 @@ const permissionInterceptor = (requiredRole, successCallback, failCallback) => {
 
 /**
  * 退出登录
+ * 清除 Storage 中的 userInfo 和 token
+ * 重置 globalData.isMerchant 为 false
+ * Requirements: 5.4
  */
 const logout = () => {
   try {
-    // 清除本地存储中的用户信息
+    // 清除 Storage 中的 userInfo 和 token
     wx.removeStorageSync('userInfo');
+    wx.removeStorageSync('token');
+    wx.removeStorageSync('merchantInfo');
+    wx.removeStorageSync('isMerchant');
+    
+    // 重置 globalData
+    const app = getApp();
+    if (app) {
+      app.globalData.userInfo = null;
+      app.globalData.isMerchant = false;
+      app.globalData.merchantInfo = null;
+      app.globalData.userToken = null;
+      console.log('[Auth] Logout: globalData reset, isMerchant:', app.globalData.isMerchant);
+    }
+    
+    console.log('[Auth] Logout: Storage cleared');
+    
     // 显示退出成功提示
     wx.showToast({
       title: '已退出登录',
@@ -173,7 +197,7 @@ const logout = () => {
       duration: 2000
     });
   } catch (error) {
-    console.error('退出登录失败:', error);
+    console.error('[Auth] Logout failed:', error);
   }
 };
 

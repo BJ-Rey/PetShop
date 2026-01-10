@@ -12,12 +12,24 @@ Page({
     isNavigating: false, // Prevent duplicate navigation
     userInfo: null,
     isLoggedIn: false,
+    isMerchant: false, // 新增：商家标志
     orderStats: [
       { status: 'pendingPayment', name: '待付款', count: 0, icon: '💳' },
       { status: 'pendingShipment', name: '待发货', count: 0, icon: '📦' },
       { status: 'pendingReceipt', name: '待收货', count: 0, icon: '🚚' },
       { status: 'completed', name: '已完成', count: 0, icon: '✅' }
     ],
+    // 基础菜单（所有用户可见）
+    baseMenuItems: [
+      { id: 1, name: '我的宠物', icon: '🐱', url: '/pages/pet/list/list?tab=my' },
+      { id: 3, name: '收货地址', icon: '📍', url: '/pages/mine/address/address' },
+      { id: 5, name: '联系客服', icon: '🎧', url: 'contact' }
+    ],
+    // 商家菜单（仅商家可见）
+    merchantMenuItems: [
+      { id: 10, name: '商家管理', icon: '🏪', url: '/pages/merchant/dashboard/dashboard' }
+    ],
+    // 当前显示的菜单列表
     menuItems: [
       { id: 1, name: '我的宠物', icon: '🐱', url: '/pages/pet/list/list?tab=my' },
       { id: 3, name: '收货地址', icon: '📍', url: '/pages/mine/address/address' },
@@ -67,11 +79,25 @@ Page({
     this.setData({ loading: true });
     return new Promise((resolve) => {
       const isLoggedIn = auth.isLoggedIn();
-      this.setData({ isLoggedIn });
+      const userInfo = isLoggedIn ? auth.getUserInfo() : null;
+      const isMerchant = userInfo?.role === 'merchant';
+      
+      console.log('[Mine] checkLoginStatus:', { isLoggedIn, role: userInfo?.role, isMerchant });
+      
+      // 构建菜单列表：商家显示商家管理入口
+      let menuItems = [...this.data.baseMenuItems];
+      if (isMerchant) {
+        menuItems = [...this.data.merchantMenuItems, ...menuItems];
+      }
+      
+      this.setData({ 
+        isLoggedIn,
+        userInfo,
+        isMerchant,
+        menuItems
+      });
       
       if (isLoggedIn) {
-        const userInfo = auth.getUserInfo();
-        this.setData({ userInfo });
         // 使用 Promise.all 确保所有数据加载完成
         Promise.all([
           this.loadOrderStats(),
@@ -83,7 +109,9 @@ Page({
       } else {
         this.setData({
           userInfo: null,
+          isMerchant: false,
           loading: false,
+          menuItems: [...this.data.baseMenuItems],
           orderStats: [
             { status: 'pendingPayment', name: '待付款', count: 0, icon: '💳' },
             { status: 'pendingShipment', name: '待发货', count: 0, icon: '📦' },
@@ -286,12 +314,14 @@ Page({
           this.setData({
             isLoggedIn: false,
             userInfo: null,
-            orderStats: {
-              pendingPayment: 0,
-              pendingShipment: 0,
-              pendingReceipt: 0,
-              completed: 0
-            }
+            isMerchant: false,
+            menuItems: [...this.data.baseMenuItems],
+            orderStats: [
+              { status: 'pendingPayment', name: '待付款', count: 0, icon: '💳' },
+              { status: 'pendingShipment', name: '待发货', count: 0, icon: '📦' },
+              { status: 'pendingReceipt', name: '待收货', count: 0, icon: '🚚' },
+              { status: 'completed', name: '已完成', count: 0, icon: '✅' }
+            ]
           });
           wx.showToast({
             title: '已退出登录',

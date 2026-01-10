@@ -59,6 +59,16 @@
   align-items: center;
 }
 
+.merchant-badge {
+  background: #fff;
+  color: #FFA726;
+  font-size: 22rpx;
+  padding: 4rpx 12rpx;
+  border-radius: 20rpx;
+  margin-left: 12rpx;
+  font-weight: 500;
+}
+
 .balance {
   display: flex;
   align-items: center;

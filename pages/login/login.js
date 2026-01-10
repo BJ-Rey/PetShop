@@ -186,38 +186,37 @@ Page({
         
         // 验证
         if (!phoneNumber || phoneNumber.length !== 11) {
-        wx.showToast({
-            title: '请输入正确的手机号',
-            icon: 'none'
-        });
-        return;
+            wx.showToast({
+                title: '请输入正确的手机号',
+                icon: 'none'
+            });
+            return;
         }
         
         if (!verificationCode || verificationCode.length !== 6) {
-        wx.showToast({
-            title: '请输入6位验证码',
-            icon: 'none'
-        });
-        return;
+            wx.showToast({
+                title: '请输入6位验证码',
+                icon: 'none'
+            });
+            return;
         }
         
         if (!isAgreed) {
-        wx.showToast({
-            title: '请阅读并同意用户协议',
-            icon: 'none'
-        });
-        return;
+            wx.showToast({
+                title: '请阅读并同意用户协议',
+                icon: 'none'
+            });
+            return;
         }
         
         this.setData({ loading: true });
         
         // 调用登录接口
-        // const userInfo = await auth.verifyPhoneAndIdentifyUser(phoneNumber, verificationCode);
-        // 使用 Promise 形式以兼容不支持 await 的环境
         auth.verifyPhoneAndIdentifyUser(phoneNumber, verificationCode).then(async userInfo => {
-            console.log('Login success:', userInfo);
+            console.log('[Login] Success, userInfo:', userInfo);
+            console.log('[Login] Role:', userInfo.role);
             
-            // 保存token到全局
+            // 保存token到全局（auth.js 已做，这里确保同步）
             const app = getApp();
             app.globalData.userToken = userInfo.token;
             
@@ -229,45 +228,85 @@ Page({
                 icon: 'success'
             });
             
-            // 根据用户角色跳转
-            const redirectUrl = userInfo.role === 'merchant' ? '/pages/merchant/dashboard/dashboard' : this.callbackPage;
-            console.log('Redirecting to:', redirectUrl, 'Role:', userInfo.role);
-
+            // 延迟跳转，确保 Toast 显示和数据存储完成
             setTimeout(() => {
-                // 如果是商家且跳转到 merchant 页面，使用 navigateTo (因为 merchant 包可能不在 tabbar)
-                // 如果是 tabbar 页面，使用 switchTab
-                if (userInfo.role === 'merchant') {
-                    console.log('Attempting to navigate to merchant dashboard...');
+                const isMerchant = userInfo.role === 'merchant';
+                console.log('[Login] isMerchant:', isMerchant);
+                
+                if (isMerchant) {
+                    // 商家跳转到管理后台
+                    console.log('[Login] Attempting to navigate to merchant dashboard...');
                     wx.navigateTo({
-                        url: redirectUrl,
-                        success: () => console.log('Merchant login redirect success'),
+                        url: '/pages/merchant/dashboard/dashboard',
+                        success: () => {
+                            console.log('[Login] Merchant redirect success');
+                        },
                         fail: (err) => {
-                            console.error('Merchant redirect failed:', err);
-                            // Fallback to home if merchant page fails
-                            wx.switchTab({ url: '/pages/index/index' });
+                            console.error('[Login] Merchant redirect failed:', err);
+                            // 降级：显示错误提示并跳转首页
+                            wx.showToast({
+                                title: '商家页面跳转失败',
+                                icon: 'none',
+                                duration: 2000
+                            });
+                            setTimeout(() => {
+                                wx.switchTab({ 
+                                    url: '/pages/index/index',
+                                    fail: () => {
+                                        wx.reLaunch({ url: '/pages/index/index' });
+                                    }
+                                });
+                            }, 500);
                         }
                     });
                 } else {
-                    globalUtils.safeNavigate(redirectUrl, { 
-                        success: () => {
-                            console.log('Login redirect success');
-                        },
-                        fail: (error) => {
-                            console.error('Login redirect error:', error);
-                            logError('LoginRedirect', error);
-                            // 跳转失败时的降级处理
-                            wx.switchTab({
-                                url: '/pages/index/index',
-                                fail: () => {
-                                    wx.reLaunch({ url: '/pages/index/index' });
-                                }
-                            });
-                        }
-                    });
+                    // 普通用户跳转回调页面或首页
+                    const redirectUrl = this.callbackPage || '/pages/index/index';
+                    console.log('[Login] User redirect to:', redirectUrl);
+                    
+                    // 判断是否是 tabBar 页面
+                    const tabBarPages = [
+                        '/pages/index/index',
+                        '/pages/mall/list/list',
+                        '/pages/service/list/list',
+                        '/pages/mine/mine'
+                    ];
+                    const isTabBarPage = tabBarPages.some(page => redirectUrl.includes(page));
+                    
+                    if (isTabBarPage) {
+                        wx.switchTab({ 
+                            url: redirectUrl,
+                            success: () => {
+                                console.log('[Login] User redirect success (switchTab)');
+                            },
+                            fail: (err) => {
+                                console.error('[Login] User redirect failed (switchTab):', err);
+                                wx.reLaunch({ url: '/pages/index/index' });
+                            }
+                        });
+                    } else {
+                        wx.navigateTo({ 
+                            url: redirectUrl,
+                            success: () => {
+                                console.log('[Login] User redirect success (navigateTo)');
+                            },
+                            fail: (err) => {
+                                console.error('[Login] User redirect failed (navigateTo):', err);
+                                logError('LoginRedirect', err);
+                                // 跳转失败时的降级处理
+                                wx.switchTab({
+                                    url: '/pages/index/index',
+                                    fail: () => {
+                                        wx.reLaunch({ url: '/pages/index/index' });
+                                    }
+                                });
+                            }
+                        });
+                    }
                 }
             }, 1500);
         }).catch(error => {
-            console.error('Login error:', error);
+            console.error('[Login] Error:', error);
             wx.showToast({
                 title: error.message || '登录失败',
                 icon: 'none'
@@ -276,7 +315,7 @@ Page({
         });
 
     } catch (e) {
-        console.error('HandleLogin exception:', e);
+        console.error('[Login] HandleLogin exception:', e);
         this.setData({ loading: false });
         wx.showToast({ title: '系统错误', icon: 'none' });
     }

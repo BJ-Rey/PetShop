@@ -92,20 +92,43 @@ App({
   /**
    * 检查登录状态
    * 从本地存储中获取用户信息并设置到全局数据
+   * Requirements: 5.1, 5.2, 5.3
    */
   checkLoginStatus: function() {
     try {
       const userInfo = wx.getStorageSync('userInfo')
       const merchantInfo = wx.getStorageSync('merchantInfo')
+      const token = wx.getStorageSync('token')
       
       if (userInfo) {
+        // 从 Storage 恢复 userInfo
         this.globalData.userInfo = userInfo
-        // 直接从userInfo.role获取角色，设置isMerchant标志
+        // 根据 userInfo.role 设置 globalData.isMerchant
         this.globalData.isMerchant = userInfo.role === 'merchant'
         this.globalData.merchantInfo = merchantInfo
+        // 恢复 token
+        if (token) {
+          this.globalData.userToken = token
+        }
+        
+        // 添加调试日志
+        console.log('[App] Restored login status:', {
+          role: userInfo.role,
+          isMerchant: this.globalData.isMerchant,
+          hasToken: !!token
+        })
+      } else {
+        // 未登录状态，确保 isMerchant 为 false
+        this.globalData.isMerchant = false
+        console.log('[App] No userInfo found, user not logged in')
       }
     } catch (error) {
-      this.logger.error('check_login_status_failed', '检查登录状态失败', error)
+      console.error('[App] checkLoginStatus failed:', error)
+      // 出错时视为未登录状态
+      this.globalData.isMerchant = false
+      if (this.logger) {
+        this.logger.error('check_login_status_failed', '检查登录状态失败', error)
+      }
     }
   },
   
