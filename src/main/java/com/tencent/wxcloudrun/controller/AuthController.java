@@ -28,38 +28,43 @@ public class AuthController {
         String phone = request.get("phone");
         String code = request.get("code"); // Verification code (mock check)
 
+        logger.info("[Auth] Login attempt with phone: {}", phone);
+
         // Basic mock verification (in real world, verify SMS code)
         if (!"123456".equals(code)) {
              // For demo simplicity, accept 123456
              // return ApiResponse.error("Invalid verification code");
         }
 
-        // Find user by phone (simulating login)
-        // In real WeChat login, we use wx.login -> code -> openid
-        // Here we use phone to simulate the identity for the existing frontend flow
+        // 优先按手机号查询已有用户（保留原有角色设置）
+        User user = userService.getUserByPhone(phone);
         
-        // Since UserMapper doesn't have getUserByPhone, I'll add it or search by known openids if phone matches test accounts
-        // But better to add getUserByPhone to Mapper.
-        // For now, I will use a simple mapping or just check existing users.
-        // Wait, I updated User model but not Mapper for phone search.
-        
-        // Let's assume the frontend sends 'openid' if it knows it, or we generate one based on phone for this demo.
-        String openid = "openid_" + phone; // Deterministic openid for demo
-        
-        User user = userService.getUserByOpenId(openid);
-        if (user == null) {
-            // Register new user
-            user = new User();
-            user.setOpenid(openid);
-            user.setPhone(phone);
-            user.setNickname("User " + phone.substring(7));
-            user.setAvatarUrl("https://placehold.co/100x100/png?text=U");
+        if (user != null) {
+            // 找到已有用户，使用其原有信息和角色
+            logger.info("[Auth] Found existing user by phone: {}, role: {}", phone, user.getRole());
+        } else {
+            // 按手机号找不到，尝试按生成的 openid 查找
+            String openid = "openid_" + phone;
+            user = userService.getUserByOpenId(openid);
             
-            // Default role is 'user'. 
-            // Merchant/Admin roles must be set via database admin or specific registration flow.
-            user.setRole("user");
-            
-            userService.registerUser(user);
+            if (user == null) {
+                // 都找不到，创建新用户
+                logger.info("[Auth] Creating new user for phone: {}", phone);
+                user = new User();
+                user.setOpenid(openid);
+                user.setPhone(phone);
+                user.setNickname("User " + phone.substring(7));
+                user.setAvatarUrl("https://placehold.co/100x100/png?text=U");
+                
+                // Default role is 'user'. 
+                // Merchant/Admin roles must be set via database admin or specific registration flow.
+                user.setRole("user");
+                
+                userService.registerUser(user);
+                logger.info("[Auth] New user created with role: {}", user.getRole());
+            } else {
+                logger.info("[Auth] Found existing user by openid: {}, role: {}", openid, user.getRole());
+            }
         }
 
         // Return token and role
@@ -68,6 +73,8 @@ public class AuthController {
         data.put("role", user.getRole());
         data.put("openid", user.getOpenid());
         data.put("userInfo", user);
+
+        logger.info("[Auth] Login success, returning role: {}", user.getRole());
 
         return ApiResponse.ok(data);
     }

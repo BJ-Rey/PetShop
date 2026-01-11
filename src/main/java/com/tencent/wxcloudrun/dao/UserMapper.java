@@ -8,6 +8,7 @@ import org.apache.ibatis.annotations.Param;
 public interface UserMapper {
     User getUserByOpenId(String openid);
     User getUserById(Integer id);
+    User getUserByPhone(String phone);
     void createUser(User user);
     void updateUserRole(@Param("openid") String openid, @Param("role") String role);
 }

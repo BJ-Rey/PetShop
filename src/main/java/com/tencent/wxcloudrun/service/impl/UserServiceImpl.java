@@ -22,6 +22,11 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
+    public User getUserByPhone(String phone) {
+        return userMapper.getUserByPhone(phone);
+    }
+
+    @Override
     public User registerUser(User user) {
         User existing = userMapper.getUserByOpenId(user.getOpenid());
         if (existing != null) {

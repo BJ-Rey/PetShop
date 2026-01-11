@@ -30,6 +30,13 @@
         where id = #{id,jdbcType=INTEGER}
     </select>
 
+    <select id="getUserByPhone" resultMap="BaseResultMap" parameterType="java.lang.String">
+        select
+        <include refid="Base_Column_List"/>
+        from users
+        where phone = #{phone,jdbcType=VARCHAR}
+    </select>
+
     <insert id="createUser" parameterType="com.tencent.wxcloudrun.model.User" useGeneratedKeys="true" keyProperty="id">
         insert into users (openid, nickname, avatar_url, phone, role)
         values (#{openid}, #{nickname}, #{avatarUrl}, #{phone}, #{role})

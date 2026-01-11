@@ -37,3 +37,9 @@ logs/
 Thumbs.db
 ehthumbs.db
 Desktop.ini
+
+# Kiro specs (开发规格文档，无需上传)
+.kiro/
+
+# Trae documents (开发文档，无需上传)
+.trae/
