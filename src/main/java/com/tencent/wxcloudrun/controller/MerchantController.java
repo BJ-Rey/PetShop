@@ -50,9 +50,17 @@ public class MerchantController {
 
     @GetMapping("/list")
     public ApiResponse getMerchantList(@RequestParam(defaultValue = "1") int page,
-                                       @RequestParam(defaultValue = "10") int size) {
-        List<Merchant> merchants = merchantService.getMerchants(page, size);
-        return ApiResponse.ok(merchants);
+                                       @RequestParam(defaultValue = "10") int size,
+                                       @RequestParam(required = false) String keyword) {
+        List<Merchant> merchants = merchantService.getMerchants(page, size, keyword);
+        
+        Map<String, Object> result = new HashMap<>();
+        result.put("list", merchants);
+        result.put("page", page);
+        result.put("size", size);
+        result.put("total", merchants.size());
+        
+        return ApiResponse.ok(result);
     }
 
     @GetMapping("/detail/{id}")

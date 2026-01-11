@@ -51,10 +51,27 @@ Page({
   // 加载我的宠物
   loadMyPets() {
     if (!auth.isLoggedIn()) return;
-    const myPets = wx.getStorageSync('myPets') || [];
-    // 添加translateX用于滑动
-    const petsWithSlide = myPets.map(p => ({ ...p, translateX: 0 }));
-    this.setData({ pets: petsWithSlide });
+    
+    // 从后端API获取用户的宠物列表
+    const catApi = require('../../../api/catApi');
+    const userInfo = auth.getUserInfo();
+    
+    catApi.getCatList({ 
+      page: 1, 
+      size: 50,
+      userId: userInfo?.id || userInfo?.openid  // 按用户ID筛选
+    }).then(res => {
+      const pets = res.list || res.data || res || [];
+      // 添加translateX用于滑动
+      const petsWithSlide = pets.map(p => ({ ...p, translateX: 0 }));
+      this.setData({ pets: petsWithSlide });
+    }).catch(err => {
+      console.error('[PetList] loadMyPets failed:', err);
+      // 失败时尝试从本地缓存获取（降级方案）
+      const myPets = wx.getStorageSync('myPets') || [];
+      const petsWithSlide = myPets.map(p => ({ ...p, translateX: 0 }));
+      this.setData({ pets: petsWithSlide });
+    });
   },
 
   // 跳转添加

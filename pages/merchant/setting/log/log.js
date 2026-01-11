@@ -1,5 +1,6 @@
 // pages/merchant/setting/log/log.js
 const app = getApp()
+const merchantApi = require('../../../../api/merchantApi')
 
 Page({
   /**
@@ -49,95 +50,31 @@ Page({
   },
 
   /**
-   * 加载操作日志
+   * 从数据库加载操作日志
    */
-  loadLogs() {
+  async loadLogs() {
     this.setData({ isLoading: true })
     
-    // 模拟API请求，实际应该调用后端API
-    setTimeout(() => {
-      // 模拟日志数据
-      const logs = [
-        {
-          id: 1,
-          operator: 'admin',
-          type: 'login',
-          module: 'system',
-          description: '管理员admin登录系统',
-          ip: '192.168.1.1',
-          createdAt: '2025-12-19T10:30:00Z',
-          extra: '登录设备：微信开发者工具'
-        },
-        {
-          id: 2,
-          operator: 'admin',
-          type: 'add',
-          module: 'product',
-          description: '添加商品：宠物食品大礼包',
-          ip: '192.168.1.1',
-          createdAt: '2025-12-19T10:25:00Z'
-        },
-        {
-          id: 3,
-          operator: 'admin',
-          type: 'edit',
-          module: 'service',
-          description: '编辑服务：宠物美容',
-          ip: '192.168.1.1',
-          createdAt: '2025-12-19T10:20:00Z'
-        },
-        {
-          id: 4,
-          operator: 'admin',
-          type: 'publish',
-          module: 'product',
-          description: '上架商品：宠物玩具球',
-          ip: '192.168.1.1',
-          createdAt: '2025-12-19T10:15:00Z'
-        },
-        {
-          id: 5,
-          operator: 'admin',
-          type: 'delete',
-          module: 'product',
-          description: '删除商品：过期宠物零食',
-          ip: '192.168.1.1',
-          createdAt: '2025-12-19T10:10:00Z'
-        },
-        {
-          id: 6,
-          operator: 'admin',
-          type: 'edit',
-          module: 'setting',
-          description: '更新通知设置',
-          ip: '192.168.1.1',
-          createdAt: '2025-12-19T10:05:00Z'
-        },
-        {
-          id: 7,
-          operator: 'admin',
-          type: 'add',
-          module: 'service',
-          description: '添加服务：宠物寄养',
-          ip: '192.168.1.1',
-          createdAt: '2025-12-19T10:00:00Z'
-        },
-        {
-          id: 8,
-          operator: 'admin',
-          type: 'login',
-          module: 'system',
-          description: '管理员admin退出系统',
-          ip: '192.168.1.1',
-          createdAt: '2025-12-19T09:55:00Z'
-        }
-      ]
+    try {
+      const res = await merchantApi.getOperationLogs({
+        type: this.data.filter.type,
+        module: this.data.filter.module,
+        keyword: this.data.filter.keyword
+      })
+      console.log('获取操作日志成功:', res)
       
       this.setData({
-        logs: logs,
-        isLoading: false
+        logs: res.data || []
       })
-    }, 1000)
+    } catch (error) {
+      console.error('获取操作日志失败:', error)
+      wx.showToast({
+        title: '加载日志失败',
+        icon: 'none'
+      })
+    } finally {
+      this.setData({ isLoading: false })
+    }
   },
 
   /**

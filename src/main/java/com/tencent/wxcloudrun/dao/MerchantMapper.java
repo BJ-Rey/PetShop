@@ -9,6 +9,7 @@ import java.util.List;
 public interface MerchantMapper {
     Merchant getMerchantById(Integer id);
     List<Merchant> getMerchants(@Param("offset") int offset, @Param("limit") int limit);
+    List<Merchant> searchMerchants(@Param("offset") int offset, @Param("limit") int limit, @Param("keyword") String keyword);
     void createMerchant(Merchant merchant);
     void updateMerchant(Merchant merchant);
     void deleteMerchant(Integer id);

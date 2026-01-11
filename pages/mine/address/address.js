@@ -1,10 +1,12 @@
 // pages/mine/address/address.js
 const auth = require('../../../utils/auth');
+const addressApi = require('../../../api/addressApi');
 
 Page({
   data: {
     addresses: [], // 收货地址列表
-    isLoggedIn: false
+    isLoggedIn: false,
+    isLoading: false
   },
 
   onLoad() {
@@ -27,11 +29,19 @@ Page({
 
   // 加载地址数据
   loadAddresses() {
-    // 从本地存储获取地址数据
-    const addresses = wx.getStorageSync('addresses') || [];
-    this.setData({
-      addresses
-    })
+    this.setData({ isLoading: true });
+    
+    // 从后端API获取地址数据
+    addressApi.getAddressList().then(res => {
+      const addresses = res.list || res.data || res || [];
+      this.setData({ addresses, isLoading: false });
+    }).catch(err => {
+      console.error('[Address] loadAddresses failed:', err);
+      this.setData({ isLoading: false });
+      // 降级：从本地存储获取
+      const addresses = wx.getStorageSync('addresses') || [];
+      this.setData({ addresses });
+    });
   },
 
   // 跳转到新增地址页面
@@ -78,18 +88,23 @@ Page({
       content: '确定要删除该收货地址吗？',
       success(res) {
         if (res.confirm) {
-          // 从数组中删除地址
-          const addresses = that.data.addresses.filter(item => item.id !== addressId)
-          that.setData({ addresses })
-          
-          // 保存到本地存储
-          wx.setStorageSync('addresses', addresses)
-          
-          // 显示删除成功提示
-          wx.showToast({
-            title: '删除成功',
-            icon: 'success'
-          })
+          // 调用后端API删除地址
+          addressApi.deleteAddress(addressId).then(() => {
+            // 从数组中删除地址
+            const addresses = that.data.addresses.filter(item => item.id !== addressId)
+            that.setData({ addresses })
+            
+            wx.showToast({
+              title: '删除成功',
+              icon: 'success'
+            })
+          }).catch(err => {
+            console.error('[Address] deleteAddress failed:', err);
+            wx.showToast({
+              title: '删除失败',
+              icon: 'none'
+            })
+          });
         }
       }
     })
@@ -99,22 +114,27 @@ Page({
   setDefaultAddress(e) {
     const addressId = e.currentTarget.dataset.id
     
-    // 更新地址列表，将选中的地址设为默认，其他设为非默认
-    const addresses = this.data.addresses.map(item => ({
-      ...item,
-      isDefault: item.id === addressId
-    }))
-    
-    this.setData({ addresses })
-    
-    // 保存到本地存储
-    wx.setStorageSync('addresses', addresses)
-    
-    // 显示设置成功提示
-    wx.showToast({
-      title: '设置成功',
-      icon: 'success'
-    })
+    // 调用后端API设置默认地址
+    addressApi.setDefaultAddress(addressId).then(() => {
+      // 更新地址列表，将选中的地址设为默认，其他设为非默认
+      const addresses = this.data.addresses.map(item => ({
+        ...item,
+        isDefault: item.id === addressId
+      }))
+      
+      this.setData({ addresses })
+      
+      wx.showToast({
+        title: '设置成功',
+        icon: 'success'
+      })
+    }).catch(err => {
+      console.error('[Address] setDefaultAddress failed:', err);
+      wx.showToast({
+        title: '设置失败',
+        icon: 'none'
+      })
+    });
   },
 
   // 上一页

@@ -1,5 +1,6 @@
 // pages/merchant/setting/business-hours/business-hours.js
 const app = getApp()
+const merchantApi = require('../../../../api/merchantApi')
 
 Page({
 
@@ -326,7 +327,7 @@ Page({
   /**
    * 保存营业时间设置
    */
-  saveBusinessHours() {
+  async saveBusinessHours() {
     if (this.isSaving) return
     this.isSaving = true
 
@@ -359,12 +360,11 @@ Page({
       mask: true
     })
     
-    // 模拟API请求，实际应该调用API保存营业时间设置
-    setTimeout(() => {
-      wx.hideLoading()
+    try {
+      const res = await merchantApi.updateBusinessHours(businessHours)
+      console.log('保存营业时间设置成功:', res)
       
-      // 保存到本地存储
-      wx.setStorageSync('businessHours', businessHours)
+      wx.hideLoading()
       
       // 更新初始数据副本，标记为已保存
       this.initialData = JSON.stringify(businessHours)
@@ -374,13 +374,20 @@ Page({
         icon: 'success'
       })
       
-      this.isSaving = false
-      
       // 返回上一页
       setTimeout(() => {
         wx.navigateBack()
       }, 1500)
-    }, 1000)
+    } catch (error) {
+      console.error('保存营业时间设置失败:', error)
+      wx.hideLoading()
+      wx.showToast({
+        title: error.message || '保存失败',
+        icon: 'none'
+      })
+    } finally {
+      this.isSaving = false
+    }
   },
 
   /**

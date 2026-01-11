@@ -23,6 +23,18 @@
         SELECT * FROM products LIMIT #{limit} OFFSET #{offset}
     </select>
 
+    <select id="searchProducts" resultMap="ProductMap">
+        SELECT * FROM products
+        <where>
+            <if test="keyword != null and keyword != ''">
+                AND (name LIKE CONCAT('%', #{keyword}, '%') 
+                     OR category LIKE CONCAT('%', #{keyword}, '%'))
+            </if>
+        </where>
+        ORDER BY sales DESC
+        LIMIT #{limit} OFFSET #{offset}
+    </select>
+
     <insert id="createProduct" parameterType="com.tencent.wxcloudrun.model.Product" useGeneratedKeys="true" keyProperty="id">
         INSERT INTO products (name, category, price, original_price, stock, sales, rating, image)
         VALUES (#{name}, #{category}, #{price}, #{originalPrice}, #{stock}, #{sales}, #{rating}, #{image})

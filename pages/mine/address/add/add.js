@@ -1,4 +1,6 @@
 // pages/mine/address/add/add.js
+const addressApi = require('../../../api/addressApi');
+
 Page({
   data: {
     address: {
@@ -9,7 +11,8 @@ Page({
       district: '',
       address: '',
       isDefault: false
-    }
+    },
+    isSubmitting: false
   },
 
   // 输入框内容变化事件
@@ -44,8 +47,8 @@ Page({
     });
   },
 
-  // 保存地址
-  saveAddress: function() {
+  // 保存地址 - 调用数据库API
+  saveAddress: async function() {
     const address = this.data.address;
     
     // 表单验证
@@ -84,35 +87,49 @@ Page({
       });
       return;
     }
-    
-    // 生成唯一ID
-    address.id = Date.now();
-    
-    // 保存到本地存储
-    let addresses = wx.getStorageSync('addresses') || [];
-    
-    // 如果是默认地址，取消其他默认地址
-    if (address.isDefault) {
-      addresses = addresses.map(item => ({ ...item, isDefault: false }));
-    } else if (addresses.length === 0) {
-      // 如果是第一个地址，强制设为默认
-      address.isDefault = true;
+
+    // 防止重复提交
+    if (this.data.isSubmitting) {
+      return;
     }
 
-    addresses.push(address);
-    wx.setStorageSync('addresses', addresses);
-    
-    // 显示成功提示
-    wx.showToast({
-      title: '地址添加成功',
-      icon: 'success',
-      duration: 2000
-    });
-    
-    // 返回上一页
-    setTimeout(() => {
-      wx.navigateBack();
-    }, 1500);
+    this.setData({ isSubmitting: true });
+
+    try {
+      // 调用数据库API添加地址
+      const res = await addressApi.addAddress({
+        name: address.name,
+        phone: address.phone,
+        province: address.province,
+        city: address.city,
+        district: address.district,
+        address: address.address,
+        isDefault: address.isDefault
+      });
+
+      console.log('添加地址成功:', res);
+      
+      // 显示成功提示
+      wx.showToast({
+        title: '地址添加成功',
+        icon: 'success',
+        duration: 2000
+      });
+      
+      // 返回上一页
+      setTimeout(() => {
+        wx.navigateBack();
+      }, 1500);
+    } catch (error) {
+      console.error('添加地址失败:', error);
+      wx.showToast({
+        title: error.message || '添加地址失败',
+        icon: 'none',
+        duration: 2000
+      });
+    } finally {
+      this.setData({ isSubmitting: false });
+    }
   },
 
   // 返回上一页

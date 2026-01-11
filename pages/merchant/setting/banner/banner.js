@@ -1,5 +1,6 @@
 const productApi = require('../../../../api/productApi');
 const catApi = require('../../../../api/catApi');
+const merchantApi = require('../../../../api/merchantApi');
 
 Page({
   data: {
@@ -14,7 +15,10 @@ Page({
     
     // Cache
     allPets: [],
-    allProducts: []
+    allProducts: [],
+    
+    // 加载状态
+    isLoading: false
   },
 
   onLoad() {
@@ -22,20 +26,21 @@ Page({
     this.loadAllItems();
   },
 
-  // Mock loading banners
-  loadBanners() {
-    // In a real app, fetch from API. Here we use localStorage or Mock.
-    const saved = wx.getStorageSync('merchant_banners');
-    if (saved) {
-      this.setData({ banners: saved });
-    } else {
-        // Default Mock if nothing saved
-        this.setData({
-            banners: [
-                { id: 1, image_url: 'https://placehold.co/800x400/2196F3/ffffff?text=Banner1', link_type: 'pet', link_name: '小黑 (金毛犬)' },
-                { id: 2, image_url: 'https://placehold.co/800x400/FF9800/ffffff?text=Banner2', link_type: 'product', link_name: '天然狗粮' }
-            ]
-        });
+  // 从数据库加载轮播图
+  async loadBanners() {
+    this.setData({ isLoading: true })
+    
+    try {
+      const res = await merchantApi.getBannerSetting()
+      console.log('获取轮播图设置成功:', res)
+      
+      this.setData({
+        banners: res.data || [],
+        isLoading: false
+      })
+    } catch (error) {
+      console.error('获取轮播图设置失败:', error)
+      this.setData({ isLoading: false })
     }
   },
 
@@ -214,15 +219,22 @@ Page({
     this.setData({ banners, showModal: false });
   },
 
-  saveSettings() {
-    // Save to local storage for persistence in this demo
-    wx.setStorageSync('merchant_banners', this.data.banners);
-    wx.showToast({
-      title: '保存成功',
-      icon: 'success'
-    });
-    
-    // In real app: call API to save
-    // merchantApi.updateBanners(this.data.banners);
+  async saveSettings() {
+    try {
+      // 调用数据库API保存轮播图设置
+      await merchantApi.updateBannerSetting(this.data.banners)
+      console.log('保存轮播图设置成功')
+      
+      wx.showToast({
+        title: '保存成功',
+        icon: 'success'
+      });
+    } catch (error) {
+      console.error('保存轮播图设置失败:', error)
+      wx.showToast({
+        title: error.message || '保存失败',
+        icon: 'none'
+      });
+    }
   }
 });

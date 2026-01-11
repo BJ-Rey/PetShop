@@ -23,6 +23,12 @@ public class PetServiceImpl implements PetService {
         int offset = (page - 1) * size;
         return petMapper.getPets(offset, size);
     }
+    
+    @Override
+    public List<Pet> getPets(int page, int size, String keyword, String userId) {
+        int offset = (page - 1) * size;
+        return petMapper.searchPets(offset, size, keyword, userId);
+    }
 
     @Override
     public void createPet(Pet pet) {

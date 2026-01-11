@@ -1,5 +1,6 @@
 // pages/merchant/setting/permission/permission.js
 const app = getApp()
+const merchantApi = require('../../../../api/merchantApi')
 
 Page({
   /**
@@ -51,61 +52,29 @@ Page({
   },
 
   /**
-   * 加载角色列表
+   * 从数据库加载角色列表
    */
-  loadRoles() {
+  async loadRoles() {
     this.setData({ isLoading: true })
     
-    // 模拟API请求，实际应该调用后端API
-    setTimeout(() => {
-      // 模拟角色数据
-      const roles = [
-        {
-          id: 1,
-          name: '超级管理员',
-          description: '拥有所有权限',
-          permissions: [
-            'manage_merchant',
-            'manage_product',
-            'manage_service',
-            'manage_order',
-            'manage_customer',
-            'manage_finance',
-            'manage_setting',
-            'manage_permission'
-          ]
-        },
-        {
-          id: 2,
-          name: '商品管理员',
-          description: '负责商品管理',
-          permissions: [
-            'manage_product'
-          ]
-        },
-        {
-          id: 3,
-          name: '服务管理员',
-          description: '负责服务管理',
-          permissions: [
-            'manage_service'
-          ]
-        },
-        {
-          id: 4,
-          name: '财务人员',
-          description: '负责财务管理',
-          permissions: [
-            'manage_finance'
-          ]
-        }
-      ]
+    try {
+      const res = await merchantApi.getRoleList()
+      console.log('获取角色列表成功:', res)
       
-      this.setData({
-        roles: roles,
-        isLoading: false
+      if (res && res.data) {
+        this.setData({
+          roles: res.data || []
+        })
+      }
+    } catch (error) {
+      console.error('获取角色列表失败:', error)
+      wx.showToast({
+        title: '加载角色列表失败',
+        icon: 'none'
       })
-    }, 1000)
+    } finally {
+      this.setData({ isLoading: false })
+    }
   },
 
   /**
@@ -156,13 +125,15 @@ Page({
   },
 
   /**
-   * 确认删除角色
+   * 确认删除角色 - 调用数据库API
    */
-  confirmDeleteRole(roleId) {
+  async confirmDeleteRole(roleId) {
     this.setData({ isLoading: true })
     
-    // 模拟API请求，实际应该调用后端API
-    setTimeout(() => {
+    try {
+      const res = await merchantApi.deleteRole(roleId)
+      console.log('删除角色成功:', res)
+      
       // 更新本地数据
       const updatedRoles = this.data.roles.filter(role => role.id !== roleId)
       
@@ -175,7 +146,14 @@ Page({
         title: '角色删除成功',
         icon: 'success'
       })
-    }, 1000)
+    } catch (error) {
+      console.error('删除角色失败:', error)
+      this.setData({ isLoading: false })
+      wx.showToast({
+        title: error.message || '删除失败',
+        icon: 'none'
+      })
+    }
   },
 
   /**

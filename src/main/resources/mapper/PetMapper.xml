@@ -26,6 +26,22 @@
         SELECT * FROM pets LIMIT #{limit} OFFSET #{offset}
     </select>
 
+    <select id="searchPets" resultMap="PetMap">
+        SELECT * FROM pets
+        <where>
+            <if test="keyword != null and keyword != ''">
+                AND (name LIKE CONCAT('%', #{keyword}, '%') 
+                     OR breed LIKE CONCAT('%', #{keyword}, '%')
+                     OR description LIKE CONCAT('%', #{keyword}, '%'))
+            </if>
+            <if test="userId != null and userId != ''">
+                AND merchant_id IN (SELECT id FROM merchants WHERE phone = #{userId})
+            </if>
+        </where>
+        ORDER BY created_at DESC
+        LIMIT #{limit} OFFSET #{offset}
+    </select>
+
     <insert id="createPet" parameterType="com.tencent.wxcloudrun.model.Pet" useGeneratedKeys="true" keyProperty="id">
         INSERT INTO pets (name, breed, age, gender, price, deposit, status, description, avatar, health_status, merchant_id)
         VALUES (#{name}, #{breed}, #{age}, #{gender}, #{price}, #{deposit}, #{status}, #{description}, #{avatar}, #{healthStatus}, #{merchantId})

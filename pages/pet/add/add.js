@@ -108,32 +108,33 @@ Page({
 
     this.setData({ isSubmitting: true });
 
-    // 模拟后端API提交
-    setTimeout(() => {
-      const userInfo = auth.getUserInfo() || { id: 'mock_user_id' };
-      const newPet = {
-        id: Date.now(),
-        userId: userInfo.id,
-        name: name,
-        breed: this.data.breeds[breedIndex],
-        gender: this.data.formData.gender,
-        age: this.data.formData.age,
-        avatar: images[0] || 'https://placehold.co/200x200/FFA726/ffffff?text=Pet',
-        images: images
-      };
-
-      // 保存到本地存储 (模拟数据库)
-      const myPets = wx.getStorageSync('myPets') || [];
-      myPets.unshift(newPet);
-      wx.setStorageSync('myPets', myPets);
-
+    // 调用后端API提交宠物数据
+    const catApi = require('../../../api/catApi');
+    const userInfo = auth.getUserInfo();
+    
+    const petData = {
+      name: name,
+      breed: this.data.breeds[breedIndex],
+      gender: this.data.formData.gender,
+      age: this.data.formData.age,
+      avatar: images[0] || '',
+      images: images,
+      userId: userInfo?.id || userInfo?.openid,
+      status: 'available'
+    };
+    
+    catApi.addCat(petData).then(res => {
       wx.showToast({ title: '保存成功', icon: 'success' });
       this.setData({ isSubmitting: false });
       
       setTimeout(() => {
         wx.navigateBack();
       }, 1500);
-    }, 1000);
+    }).catch(err => {
+      console.error('[PetAdd] addCat failed:', err);
+      wx.showToast({ title: err.message || '保存失败', icon: 'none' });
+      this.setData({ isSubmitting: false });
+    });
   },
   
   navigateBack() {

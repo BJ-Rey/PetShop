@@ -22,6 +22,12 @@ public class ServiceServiceImpl implements ServiceService {
         int offset = (page - 1) * size;
         return serviceMapper.getServices(offset, size);
     }
+    
+    @Override
+    public List<Service> getServices(int page, int size, String keyword) {
+        int offset = (page - 1) * size;
+        return serviceMapper.searchServices(offset, size, keyword);
+    }
 
     @Override
     public void createService(Service service) {

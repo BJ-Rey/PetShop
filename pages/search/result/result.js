@@ -45,99 +45,55 @@ Page({
     
     this.setData({ isLoading: true });
     
-    // 模拟API请求，实际项目中替换为真实接口调用
-    setTimeout(() => {
-      logger.info('加载搜索结果', { keyword, currentPage, pageSize, activeType });
+    // 从后端API获取搜索结果
+    const catApi = require('../../../api/catApi');
+    const productApi = require('../../../api/productApi');
+    const serviceApi = require('../../../api/serviceApi');
+    const merchantApi = require('../../../api/merchantApi');
+    
+    logger.info('加载搜索结果', { keyword, currentPage, pageSize, activeType });
+    
+    // 并行请求各类数据
+    Promise.all([
+      catApi.getCatList({ keyword, page: currentPage, size: pageSize }).catch(() => []),
+      productApi.getProductList({ keyword, page: currentPage, size: pageSize }).catch(() => []),
+      serviceApi.getServiceList({ keyword, page: currentPage, size: pageSize }).catch(() => []),
+      merchantApi.getMerchantList({ keyword, page: currentPage, size: pageSize }).catch(() => [])
+    ]).then(([petsRes, productsRes, servicesRes, merchantsRes]) => {
+      // 处理返回数据
+      const pets = petsRes.list || petsRes.data || petsRes || [];
+      const products = productsRes.list || productsRes.data || productsRes || [];
+      const services = servicesRes.list || servicesRes.data || servicesRes || [];
+      const merchants = merchantsRes.list || merchantsRes.data || merchantsRes || [];
       
-      // 模拟搜索结果数据
-      const newResults = this.generateMockResults(currentPage, pageSize);
-      const hasMore = currentPage < 3; // 模拟只有3页数据
+      // 判断是否还有更多数据
+      const hasMore = pets.length >= pageSize || products.length >= pageSize || 
+                      services.length >= pageSize || merchants.length >= pageSize;
       
       // 计算总结果数
-      const totalResults = Object.values(newResults).reduce((sum, items) => sum + items.length, 0);
+      const totalResults = pets.length + products.length + services.length + merchants.length;
       
-      // 更新结果
+      // 更新结果（分页追加）
       const updatedResults = {
-        pets: currentPage === 1 ? newResults.pets : [...this.data.results.pets, ...newResults.pets],
-        products: currentPage === 1 ? newResults.products : [...this.data.results.products, ...newResults.products],
-        services: currentPage === 1 ? newResults.services : [...this.data.results.services, ...newResults.services],
-        merchants: currentPage === 1 ? newResults.merchants : [...this.data.results.merchants, ...newResults.merchants]
+        pets: currentPage === 1 ? pets : [...this.data.results.pets, ...pets],
+        products: currentPage === 1 ? products : [...this.data.results.products, ...products],
+        services: currentPage === 1 ? services : [...this.data.results.services, ...services],
+        merchants: currentPage === 1 ? merchants : [...this.data.results.merchants, ...merchants]
       };
       
       this.setData({
         results: updatedResults,
-        totalResults,
+        totalResults: currentPage === 1 ? totalResults : this.data.totalResults + totalResults,
         isLoading: false,
         hasMore,
         currentPage: currentPage + 1
       });
-    }, 500);
+    }).catch(err => {
+      console.error('[Search] loadSearchResults failed:', err);
+      this.setData({ isLoading: false });
+      wx.showToast({ title: '搜索失败', icon: 'none' });
+    });
   }),
-
-  // 生成模拟搜索结果
-  generateMockResults(page, pageSize) {
-    const startIndex = (page - 1) * pageSize;
-    const endIndex = startIndex + pageSize;
-    
-    // 生成不同类型的模拟数据
-    const pets = [];
-    const products = [];
-    const services = [];
-    const merchants = [];
-    
-    // 根据页码生成不同类型的数据
-    for (let i = startIndex; i < endIndex; i++) {
-      // 宠物数据
-      if (i % 2 === 0) {
-        pets.push({
-          id: i + 1, // 使用纯数字ID以匹配详情页逻辑，原为 `pet-${i}`
-          name: `${this.data.keyword} 宠物 ${i + 1}`,
-          breed: ['金毛', '布偶', '哈士奇', '英短'][Math.floor(Math.random() * 4)],
-          age: `${Math.floor(Math.random() * 5) + 1}岁`,
-          gender: i % 3 === 0 ? 'male' : 'female',
-          price: Math.floor(Math.random() * 3000) + 1000,
-          avatar: `/images/default.png`
-        });
-      }
-      
-      // 商品数据
-      if (i % 3 === 0) {
-        products.push({
-          id: i + 1, // 使用纯数字ID以匹配详情页逻辑，原为 `product-${i}`
-          name: `${this.data.keyword} 商品 ${i + 1}`,
-          price: Math.floor(Math.random() * 1000) + 100,
-          sales: Math.floor(Math.random() * 5000),
-          image: `/images/default.png`
-        });
-      }
-      
-      // 服务数据
-      if (i % 4 === 0) {
-        services.push({
-          id: i + 1, // 使用纯数字ID
-          name: `${this.data.keyword} 服务 ${i + 1}`,
-          description: `这是与"${this.data.keyword}"相关的服务描述，提供专业的宠物服务。`,
-          price: Math.floor(Math.random() * 500) + 50,
-          merchantName: `宠物服务商家 ${Math.floor(Math.random() * 10) + 1}`,
-          image: `/images/default.png`
-        });
-      }
-      
-      // 商家数据
-      if (i % 5 === 0) {
-        merchants.push({
-          id: i + 1, // 使用纯数字ID
-          name: `${this.data.keyword} 商家 ${i + 1}`,
-          logo: `/images/default.png`,
-          rating: (Math.random() * 5).toFixed(1),
-          address: '北京市朝阳区宠物大街123号',
-          services: ['宠物美容', '疫苗接种', '宠物寄养', '宠物咨询'].slice(0, Math.floor(Math.random() * 4) + 1)
-        });
-      }
-    }
-    
-    return { pets, products, services, merchants };
-  },
 
   // 切换结果类型
   switchResultType(e) {

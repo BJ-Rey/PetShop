@@ -20,6 +20,18 @@
         SELECT * FROM merchants LIMIT #{limit} OFFSET #{offset}
     </select>
 
+    <select id="searchMerchants" resultMap="MerchantMap">
+        SELECT * FROM merchants
+        <where>
+            <if test="keyword != null and keyword != ''">
+                AND (name LIKE CONCAT('%', #{keyword}, '%') 
+                     OR address LIKE CONCAT('%', #{keyword}, '%'))
+            </if>
+        </where>
+        ORDER BY rating DESC
+        LIMIT #{limit} OFFSET #{offset}
+    </select>
+
     <insert id="createMerchant" parameterType="com.tencent.wxcloudrun.model.Merchant" useGeneratedKeys="true" keyProperty="id">
         INSERT INTO merchants (name, phone, address, logo, rating)
         VALUES (#{name}, #{phone}, #{address}, #{logo}, #{rating})

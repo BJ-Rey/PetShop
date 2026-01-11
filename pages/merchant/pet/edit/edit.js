@@ -1,5 +1,6 @@
 // pages/merchant/pet/edit/edit.js
 const app = getApp()
+const catApi = require('../../../api/catApi')
 
 Page({
   /**
@@ -24,7 +25,9 @@ Page({
     // 原始宠物信息，用于比较是否有修改
     originalPetInfo: null,
     // 加载状态
-    isLoading: false
+    isLoading: false,
+    // 提交状态
+    isSubmitting: false
   },
 
   /**
@@ -57,62 +60,56 @@ Page({
   },
 
   /**
-   * 加载宠物信息
+   * 从数据库加载宠物信息
    */
-  loadPetInfo() {
+  async loadPetInfo() {
     console.log('loadPetInfo called')
     // 显示加载状态
     this.setData({
       isLoading: true
     })
-    console.log('Set isLoading to true')
     
-    // 从本地存储中获取宠物数据
-    const currentPet = wx.getStorageSync('currentPet')
-    console.log('Current pet from local storage:', currentPet)
-    console.log('Current petId:', this.data.petId)
-    console.log('Current pet exists:', !!currentPet)
-    console.log('Current pet id type:', typeof currentPet?.id)
-    console.log('this.data.petId type:', typeof this.data.petId)
-    console.log('Current pet.id:', currentPet?.id)
-    console.log('Current petId:', this.data.petId)
-    console.log('Current pet exists and matches ID:', currentPet && currentPet.id == this.data.petId)
-    
-    // 模拟API请求延迟
-    setTimeout(() => {
-      console.log('Timeout finished, setting data')
+    try {
+      // 调用数据库API获取宠物详情
+      const res = await catApi.getCatDetail(this.data.petId)
+      console.log('获取宠物详情成功:', res)
       
-      // 强制使用模拟数据，确保页面能显示内容
-      const mockPet = {
-        id: this.data.petId,
-        name: '小黑',
-        breed: '金毛犬',
-        age: '2岁',
-        gender: 'male',
-        color: '黄色',
-        status: 'published',
-        images: [
-          'https://example.com/pet1.jpg',
-          'https://example.com/pet1-2.jpg'
-        ],
-        description: '性格温顺，非常听话，喜欢玩耍。',
-        price: 3000,
-        deposit: 1000,
-        createdAt: '2025-12-18T10:00:00Z',
-        updatedAt: '2025-12-18T10:00:00Z'
+      if (res && res.data) {
+        const petData = res.data
+        const petInfo = {
+          id: petData.id,
+          name: petData.name || '',
+          breed: petData.breed || '',
+          age: petData.age || '',
+          gender: petData.gender || 'male',
+          color: petData.color || '',
+          status: petData.status || 'published',
+          images: petData.images || [],
+          description: petData.description || '',
+          price: petData.price || 0,
+          deposit: petData.deposit || 0
+        }
+        
+        this.setData({
+          petInfo: petInfo,
+          originalPetInfo: JSON.parse(JSON.stringify(petInfo)), // 深拷贝保存原始数据
+          isLoading: false
+        })
+        
+        console.log('Set petInfo from database:', petInfo)
+      } else {
+        throw new Error('宠物数据不存在')
       }
-      
+    } catch (error) {
+      console.error('获取宠物详情失败:', error)
+      wx.showToast({
+        title: error.message || '加载宠物信息失败',
+        icon: 'none'
+      })
       this.setData({
-        petInfo: mockPet,
-        originalPetInfo: { ...mockPet }, // 保存原始数据用于比较
         isLoading: false
       })
-      
-      console.log('Set petInfo to mock data:', mockPet)
-      console.log('Final data:', this.data)
-      console.log('PetInfo after setData:', this.data.petInfo)
-      console.log('IsLoading after setData:', this.data.isLoading)
-    }, 500)
+    }
   },
 
   /**
@@ -191,9 +188,9 @@ Page({
   },
 
   /**
-   * 保存宠物信息
+   * 保存宠物信息 - 调用数据库API
    */
-  savePet() {
+  async savePet() {
     // 表单验证
     if (!this.validateForm()) {
       return
@@ -207,29 +204,57 @@ Page({
       })
       return
     }
+
+    // 防止重复提交
+    if (this.data.isSubmitting) {
+      return
+    }
     
     // 显示加载状态
     this.setData({
-      isLoading: true
+      isLoading: true,
+      isSubmitting: true
     })
     
-    // 模拟API请求，实际应该调用后端API
-    setTimeout(() => {
-      // 保存成功
-      this.setData({
-        isLoading: false
+    try {
+      // 调用数据库API更新宠物信息
+      const res = await catApi.updateCat({
+        id: this.data.petId,
+        name: this.data.petInfo.name,
+        breed: this.data.petInfo.breed,
+        age: this.data.petInfo.age,
+        gender: this.data.petInfo.gender,
+        color: this.data.petInfo.color,
+        status: this.data.petInfo.status,
+        images: this.data.petInfo.images,
+        description: this.data.petInfo.description,
+        price: this.data.petInfo.price,
+        deposit: this.data.petInfo.deposit
       })
+
+      console.log('更新宠物信息成功:', res)
       
       wx.showToast({
         title: '保存成功',
         icon: 'success'
       })
       
-      // 上一页
+      // 返回上一页
       setTimeout(() => {
         wx.navigateBack()
       }, 1500)
-    }, 1500)
+    } catch (error) {
+      console.error('更新宠物信息失败:', error)
+      wx.showToast({
+        title: error.message || '保存失败',
+        icon: 'none'
+      })
+    } finally {
+      this.setData({
+        isLoading: false,
+        isSubmitting: false
+      })
+    }
   },
 
   /**

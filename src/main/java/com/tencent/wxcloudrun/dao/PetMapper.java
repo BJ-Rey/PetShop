@@ -9,6 +9,8 @@ import java.util.List;
 public interface PetMapper {
     Pet getPetById(Integer id);
     List<Pet> getPets(@Param("offset") int offset, @Param("limit") int limit);
+    List<Pet> searchPets(@Param("offset") int offset, @Param("limit") int limit, 
+                         @Param("keyword") String keyword, @Param("userId") String userId);
     void createPet(Pet pet);
     void updatePet(Pet pet);
     void deletePet(Integer id);

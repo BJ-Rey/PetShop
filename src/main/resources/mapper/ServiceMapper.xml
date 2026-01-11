@@ -25,6 +25,19 @@
         SELECT * FROM services LIMIT #{limit} OFFSET #{offset}
     </select>
 
+    <select id="searchServices" resultMap="ServiceMap">
+        SELECT * FROM services
+        <where>
+            <if test="keyword != null and keyword != ''">
+                AND (name LIKE CONCAT('%', #{keyword}, '%') 
+                     OR category LIKE CONCAT('%', #{keyword}, '%')
+                     OR description LIKE CONCAT('%', #{keyword}, '%'))
+            </if>
+        </where>
+        ORDER BY sales DESC
+        LIMIT #{limit} OFFSET #{offset}
+    </select>
+
     <insert id="createService" parameterType="com.tencent.wxcloudrun.model.Service" useGeneratedKeys="true" keyProperty="id">
         INSERT INTO services (name, category, price, duration, description, merchant_name, merchant_id, image, sales, rating)
         VALUES (#{name}, #{category}, #{price}, #{duration}, #{description}, #{merchantName}, #{merchantId}, #{image}, #{sales}, #{rating})

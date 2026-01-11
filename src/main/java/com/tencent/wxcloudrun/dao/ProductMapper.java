@@ -9,6 +9,7 @@ import java.util.List;
 public interface ProductMapper {
     Product getProductById(Integer id);
     List<Product> getProducts(@Param("offset") int offset, @Param("limit") int limit);
+    List<Product> searchProducts(@Param("offset") int offset, @Param("limit") int limit, @Param("keyword") String keyword);
     void createProduct(Product product);
     void updateProduct(Product product);
     void deleteProduct(Integer id);

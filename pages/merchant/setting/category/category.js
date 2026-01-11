@@ -1,6 +1,7 @@
 // pages/merchant/setting/category/category.js
 const app = getApp()
 const globalUtils = require('../../../../utils/globalUtils')
+const merchantApi = require('../../../../api/merchantApi')
 const { preventReclick } = globalUtils
 
 Page({
@@ -42,36 +43,27 @@ Page({
   },
 
   /**
-   * 加载分类数据
+   * 从数据库加载分类数据
    */
-  loadCategories() {
+  async loadCategories() {
     this.setData({ isLoading: true })
     
-    // 模拟从服务器获取数据
-    // 优先从本地存储获取
-    const savedCategories = wx.getStorageSync('productCategories')
-    
-    setTimeout(() => {
-      if (savedCategories) {
-        this.setData({
-          categories: savedCategories,
-          isLoading: false
-        })
-      } else {
-        // 默认分类
-        const defaultCategories = [
-          { id: 1, name: '宠物食品', count: 12 },
-          { id: 2, name: '宠物玩具', count: 8 },
-          { id: 3, name: '宠物护理', count: 5 },
-          { id: 4, name: '宠物服饰', count: 3 }
-        ]
-        this.setData({
-          categories: defaultCategories,
-          isLoading: false
-        })
-        wx.setStorageSync('productCategories', defaultCategories)
-      }
-    }, 500)
+    try {
+      const res = await merchantApi.getCategorySetting()
+      console.log('获取分类设置成功:', res)
+      
+      this.setData({
+        categories: res.data || [],
+        isLoading: false
+      })
+    } catch (error) {
+      console.error('获取分类设置失败:', error)
+      this.setData({ isLoading: false })
+      wx.showToast({
+        title: '加载分类失败',
+        icon: 'none'
+      })
+    }
   },
 
   /**
@@ -124,9 +116,9 @@ Page({
   },
 
   /**
-   * 确认保存分类
+   * 确认保存分类 - 调用数据库API
    */
-  confirmSave: function() {
+  confirmSave: async function() {
     // 防止重复点击逻辑封装在方法内部，因为是模态框操作
     if (this.isSaving) return
     this.isSaving = true
@@ -161,7 +153,7 @@ Page({
       title: '保存中...'
     })
     
-    setTimeout(() => {
+    try {
       let newCategories = [...categories]
       
       if (editingCategory) {
@@ -183,22 +175,30 @@ Page({
         })
       }
       
+      // 调用数据库API保存分类
+      await merchantApi.updateCategorySetting(newCategories)
+      console.log('保存分类成功')
+      
       this.setData({
         categories: newCategories,
         showModal: false
       })
-      
-      // 保存到本地存储
-      wx.setStorageSync('productCategories', newCategories)
       
       wx.hideLoading()
       wx.showToast({
         title: '保存成功',
         icon: 'success'
       })
-      
+    } catch (error) {
+      console.error('保存分类失败:', error)
+      wx.hideLoading()
+      wx.showToast({
+        title: error.message || '保存失败',
+        icon: 'none'
+      })
+    } finally {
       this.isSaving = false
-    }, 500)
+    }
   },
 
   /**
@@ -231,28 +231,37 @@ Page({
   },
 
   /**
-   * 执行删除操作
+   * 执行删除操作 - 调用数据库API
    */
-  performDelete(id) {
+  async performDelete(id) {
     wx.showLoading({
       title: '删除中...'
     })
     
-    setTimeout(() => {
+    try {
       const newCategories = this.data.categories.filter(c => c.id !== id)
+      
+      // 调用数据库API保存分类
+      await merchantApi.updateCategorySetting(newCategories)
+      console.log('删除分类成功')
       
       this.setData({
         categories: newCategories
       })
-      
-      wx.setStorageSync('productCategories', newCategories)
       
       wx.hideLoading()
       wx.showToast({
         title: '删除成功',
         icon: 'success'
       })
-    }, 500)
+    } catch (error) {
+      console.error('删除分类失败:', error)
+      wx.hideLoading()
+      wx.showToast({
+        title: error.message || '删除失败',
+        icon: 'none'
+      })
+    }
   },
 
   /**

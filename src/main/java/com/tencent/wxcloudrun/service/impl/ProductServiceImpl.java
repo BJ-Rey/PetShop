@@ -23,6 +23,12 @@ public class ProductServiceImpl implements ProductService {
         int offset = (page - 1) * size;
         return productMapper.getProducts(offset, size);
     }
+    
+    @Override
+    public List<Product> getProducts(int page, int size, String keyword) {
+        int offset = (page - 1) * size;
+        return productMapper.searchProducts(offset, size, keyword);
+    }
 
     @Override
     public void createProduct(Product product) {

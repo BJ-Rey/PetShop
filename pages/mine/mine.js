@@ -128,19 +128,50 @@ Page({
    * 加载订单统计数据
    */
   loadOrderStats() {
+    const orderApi = require('../../api/orderApi');
+    
     return new Promise((resolve) => {
-      // 模拟从服务器获取订单统计数据
-      setTimeout(() => {
+      // 从后端API获取订单统计数据
+      orderApi.getUserOrderList({ page: 1, pageSize: 100 }).then(res => {
+        const orders = res.list || res.data || res || [];
+        
+        // 统计各状态订单数量
+        const stats = {
+          pending: 0,      // 待付款
+          paid: 0,         // 待发货
+          shipped: 0,      // 待收货
+          completed: 0     // 已完成
+        };
+        
+        orders.forEach(order => {
+          if (order.status === 'pending') stats.pending++;
+          else if (order.status === 'paid') stats.paid++;
+          else if (order.status === 'shipped') stats.shipped++;
+          else if (order.status === 'completed') stats.completed++;
+        });
+        
         this.setData({
           orderStats: [
-            { status: 'pendingPayment', name: '待付款', count: 2, icon: '💳' },
-            { status: 'pendingShipment', name: '待发货', count: 1, icon: '📦' },
-            { status: 'pendingReceipt', name: '待收货', count: 1, icon: '🚚' },
-            { status: 'completed', name: '已完成', count: 5, icon: '✅' }
+            { status: 'pendingPayment', name: '待付款', count: stats.pending, icon: '💳' },
+            { status: 'pendingShipment', name: '待发货', count: stats.paid, icon: '📦' },
+            { status: 'pendingReceipt', name: '待收货', count: stats.shipped, icon: '🚚' },
+            { status: 'completed', name: '已完成', count: stats.completed, icon: '✅' }
           ]
         });
         resolve();
-      }, 300);
+      }).catch(err => {
+        console.error('[Mine] loadOrderStats failed:', err);
+        // 失败时显示0
+        this.setData({
+          orderStats: [
+            { status: 'pendingPayment', name: '待付款', count: 0, icon: '💳' },
+            { status: 'pendingShipment', name: '待发货', count: 0, icon: '📦' },
+            { status: 'pendingReceipt', name: '待收货', count: 0, icon: '🚚' },
+            { status: 'completed', name: '已完成', count: 0, icon: '✅' }
+          ]
+        });
+        resolve();
+      });
     });
   },
 

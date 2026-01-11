@@ -1,10 +1,12 @@
 // pages/merchant/setting/delivery-setting/delivery-setting.js
 const app = getApp()
+const merchantApi = require('../../../../api/merchantApi')
 
 Page({
 
   /**
-   * 椤甸潰鐨勫垵濮嬫暟鎹?   */
+   * 页面的初始数据
+   */
   data: {
     // 配送方式
     deliveryMethods: {
@@ -24,10 +26,7 @@ Page({
     deliveryRadius: 5,
     
     // 配送区域列表
-    deliveryAreaList: [
-      { id: 1, name: '朝阳区' },
-      { id: 2, name: '海淀区' }
-    ],
+    deliveryAreaList: [],
     
     // 费用计算方式
     feeCalculationMethods: ['固定费用', '按距离计费', '按重量计费'],
@@ -67,11 +66,16 @@ Page({
     scheduledAdvanceTime: 2,
     
     // 自提设置
-    selfPickupAddress: '北京市朝阳区宠物大街123号',
+    selfPickupAddress: '',
     selfPickupTimeSlots: [
       { start: '09:00', end: '21:00' }
     ],
-    selfPickupNote: '请提前1小时预约自提'
+    selfPickupNote: '',
+    
+    // 加载状态
+    isLoading: false,
+    // 提交状态
+    isSubmitting: false
   },
 
   /**
@@ -128,14 +132,46 @@ Page({
   },
 
   /**
-   * 加载配送设置
+   * 从数据库加载配送设置
    */
-  loadDeliverySetting() {
-    // 模拟数据，实际应该调用API获取配送设置
-    // 从本地存储获取设置（如果有）
-    const savedDeliverySetting = wx.getStorageSync('deliverySetting')
-    if (savedDeliverySetting) {
-      this.setData(savedDeliverySetting)
+  async loadDeliverySetting() {
+    this.setData({ isLoading: true })
+    
+    try {
+      const res = await merchantApi.getDeliverySetting()
+      console.log('获取配送设置成功:', res)
+      
+      if (res && res.data) {
+        this.setData({
+          deliveryMethods: res.data.deliveryMethods || this.data.deliveryMethods,
+          deliveryRangeType: res.data.deliveryRangeType || this.data.deliveryRangeType,
+          deliveryRadius: res.data.deliveryRadius || this.data.deliveryRadius,
+          deliveryAreaList: res.data.deliveryAreaList || this.data.deliveryAreaList,
+          selectedFeeMethodIndex: res.data.selectedFeeMethodIndex || this.data.selectedFeeMethodIndex,
+          fixedDeliveryFee: res.data.fixedDeliveryFee || this.data.fixedDeliveryFee,
+          distanceFeeRules: res.data.distanceFeeRules || this.data.distanceFeeRules,
+          firstWeight: res.data.firstWeight || this.data.firstWeight,
+          firstWeightFee: res.data.firstWeightFee || this.data.firstWeightFee,
+          addWeight: res.data.addWeight || this.data.addWeight,
+          addWeightFee: res.data.addWeightFee || this.data.addWeightFee,
+          freeDeliveryThreshold: res.data.freeDeliveryThreshold || this.data.freeDeliveryThreshold,
+          estimatedDeliveryTime: res.data.estimatedDeliveryTime || this.data.estimatedDeliveryTime,
+          deliveryTimeSlots: res.data.deliveryTimeSlots || this.data.deliveryTimeSlots,
+          supportScheduledDelivery: res.data.supportScheduledDelivery || this.data.supportScheduledDelivery,
+          scheduledAdvanceTime: res.data.scheduledAdvanceTime || this.data.scheduledAdvanceTime,
+          selfPickupAddress: res.data.selfPickupAddress || this.data.selfPickupAddress,
+          selfPickupTimeSlots: res.data.selfPickupTimeSlots || this.data.selfPickupTimeSlots,
+          selfPickupNote: res.data.selfPickupNote || this.data.selfPickupNote
+        })
+      }
+    } catch (error) {
+      console.error('获取配送设置失败:', error)
+      wx.showToast({
+        title: '加载配送设置失败',
+        icon: 'none'
+      })
+    } finally {
+      this.setData({ isLoading: false })
     }
   },
 
@@ -293,11 +329,13 @@ Page({
   },
 
   /**
-   * 保存配送设置
+   * 保存配送设置 - 调用数据库API
    */
-  saveDeliverySetting() {
-    if (this.isSaving) return
-    this.isSaving = true
+  async saveDeliverySetting() {
+    // 防止重复提交
+    if (this.data.isSubmitting) {
+      return
+    }
 
     const deliverySetting = {
       deliveryMethods: this.data.deliveryMethods,
@@ -321,17 +359,18 @@ Page({
       selfPickupNote: this.data.selfPickupNote
     }
     
+    this.setData({ isSubmitting: true })
+    
     wx.showLoading({
       title: '保存中..',
       mask: true
     })
     
-    // 模拟API请求，实际应该调用API保存配送设置
-    setTimeout(() => {
-      wx.hideLoading()
+    try {
+      const res = await merchantApi.updateDeliverySetting(deliverySetting)
+      console.log('保存配送设置成功:', res)
       
-      // 保存到本地存储
-      wx.setStorageSync('deliverySetting', deliverySetting)
+      wx.hideLoading()
       
       // 更新初始数据副本，标记为已保存
       this.initialData = JSON.stringify(deliverySetting)
@@ -341,13 +380,20 @@ Page({
         icon: 'success'
       })
       
-      this.isSaving = false
-      
       // 返回上一页
       setTimeout(() => {
         wx.navigateBack()
       }, 1500)
-    }, 1000)
+    } catch (error) {
+      console.error('保存配送设置失败:', error)
+      wx.hideLoading()
+      wx.showToast({
+        title: error.message || '保存失败',
+        icon: 'none'
+      })
+    } finally {
+      this.setData({ isSubmitting: false })
+    }
   },
 
   /**

@@ -1,5 +1,6 @@
 // pages/merchant/setting/notification-setting/notification-setting.js
 const app = getApp()
+const merchantApi = require('../../../../api/merchantApi')
 
 Page({
 
@@ -47,10 +48,12 @@ Page({
     },
     
     // 通知接收人列表
-    recipients: [
-      { id: 1, name: '李经理', phone: '13800138000', email: 'manager@example.com' },
-      { id: 2, name: '张客服', phone: '13900139000', email: 'service@example.com' }
-    ]
+    recipients: [],
+    
+    // 加载状态
+    isLoading: false,
+    // 提交状态
+    isSubmitting: false
   },
 
   /**
@@ -92,14 +95,31 @@ Page({
   },
 
   /**
-   * 加载通知设置
+   * 从数据库加载通知设置
    */
-  loadNotificationSetting() {
-    // 模拟数据，实际应该调用API获取通知设置
-    // 从本地存储获取设置（如果有）
-    const savedNotificationSetting = wx.getStorageSync('notificationSetting')
-    if (savedNotificationSetting) {
-      this.setData(savedNotificationSetting)
+  async loadNotificationSetting() {
+    this.setData({ isLoading: true })
+    
+    try {
+      const res = await merchantApi.getNotificationSetting()
+      console.log('获取通知设置成功:', res)
+      
+      if (res && res.data) {
+        this.setData({
+          orderNotification: res.data.orderNotification || this.data.orderNotification,
+          customerNotification: res.data.customerNotification || this.data.customerNotification,
+          financeNotification: res.data.financeNotification || this.data.financeNotification,
+          recipients: res.data.recipients || []
+        })
+      }
+    } catch (error) {
+      console.error('获取通知设置失败:', error)
+      wx.showToast({
+        title: '加载通知设置失败',
+        icon: 'none'
+      })
+    } finally {
+      this.setData({ isLoading: false })
     }
   },
 
@@ -247,27 +267,32 @@ Page({
   },
 
   /**
-   * 保存通知设置
+   * 保存通知设置 - 调用数据库API
    */
-  saveNotificationSetting() {
+  async saveNotificationSetting() {
+    // 防止重复提交
+    if (this.data.isSubmitting) {
+      return
+    }
+
     const notificationSetting = {
-      notificationChannels: this.data.notificationChannels,
       orderNotification: this.data.orderNotification,
       customerNotification: this.data.customerNotification,
       financeNotification: this.data.financeNotification,
       recipients: this.data.recipients
     }
     
+    this.setData({ isSubmitting: true })
+    
     wx.showLoading({
       title: '保存中..'
     })
     
-    // 模拟API请求，实际应该调用API保存通知设置
-    setTimeout(() => {
-      wx.hideLoading()
+    try {
+      const res = await merchantApi.updateNotificationSetting(notificationSetting)
+      console.log('保存通知设置成功:', res)
       
-      // 保存到本地存储
-      wx.setStorageSync('notificationSetting', notificationSetting)
+      wx.hideLoading()
       
       // 更新初始数据副本，标记为已保存
       this.initialData = JSON.stringify(notificationSetting)
@@ -281,7 +306,16 @@ Page({
       setTimeout(() => {
         wx.navigateBack()
       }, 1500)
-    }, 1000)
+    } catch (error) {
+      console.error('保存通知设置失败:', error)
+      wx.hideLoading()
+      wx.showToast({
+        title: error.message || '保存失败',
+        icon: 'none'
+      })
+    } finally {
+      this.setData({ isSubmitting: false })
+    }
   },
 
   /**

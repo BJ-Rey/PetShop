@@ -1,5 +1,6 @@
 // pages/merchant/setting/upload-logo/upload-logo.js
 const app = getApp()
+const merchantApi = require('../../../../api/merchantApi')
 
 Page({
 
@@ -29,7 +30,10 @@ Page({
     scaledValue: '1.00',
     
     // 最大图片大小(2MB)
-    maxSize: 2 * 1024 * 1024
+    maxSize: 2 * 1024 * 1024,
+    
+    // 加载状态
+    isLoading: false
   },
 
   /**
@@ -58,16 +62,27 @@ Page({
   },
 
   /**
-   * 加载现有LOGO
+   * 从数据库加载现有LOGO
    */
-  loadCurrentLogo() {
-    // 模拟数据，实际应该调用API获取现有LOGO
-    const mockLogo = 'https://example.com/merchant-logo.png'
+  async loadCurrentLogo() {
+    this.setData({ isLoading: true })
     
-    this.setData({
-      logoPath: mockLogo,
-      initialLogoPath: mockLogo
-    })
+    try {
+      const res = await merchantApi.getCurrentMerchant()
+      console.log('获取商家信息成功:', res)
+      
+      if (res && res.data && res.data.logoUrl) {
+        this.setData({
+          logoPath: res.data.logoUrl,
+          initialLogoPath: res.data.logoUrl
+        })
+      }
+    } catch (error) {
+      console.error('获取商家LOGO失败:', error)
+      // 不显示错误提示，允许用户上传新LOGO
+    } finally {
+      this.setData({ isLoading: false })
+    }
   },
 
   /**
@@ -246,9 +261,9 @@ Page({
   },
 
   /**
-   * 保存LOGO
+   * 保存LOGO - 调用数据库API
    */
-  saveLogo() {
+  async saveLogo() {
     const { logoPath } = this.data
     
     if (!logoPath) {
@@ -267,42 +282,50 @@ Page({
     
     const request = require('../../../../utils/request');
     
-    request.upload('/api/upload', logoPath).then(url => {
-        // 这里应该调用更新商家信息的接口保存LOGO URL
-        // 暂时只提示成功
-        wx.showToast({
-            title: 'LOGO保存成功',
-            icon: 'success'
-        });
-        
-        // 返回上一页
-        setTimeout(() => {
-            wx.navigateBack()
-        }, 1500);
-    }).catch(err => {
-        console.error('上传LOGO失败', err);
-        wx.showToast({
-            title: '上传失败',
-            icon: 'error'
-        });
-    });
+    try {
+      // 上传图片
+      const uploadedUrl = await request.upload('/api/upload', logoPath)
+      console.log('上传LOGO成功:', uploadedUrl)
+      
+      // 调用API保存LOGO URL到数据库
+      const res = await merchantApi.updateLogo(uploadedUrl)
+      console.log('保存LOGO到数据库成功:', res)
+      
+      wx.showToast({
+          title: 'LOGO保存成功',
+          icon: 'success'
+      });
+      
+      // 返回上一页
+      setTimeout(() => {
+          wx.navigateBack()
+      }, 1500);
+    } catch (error) {
+      console.error('保存LOGO失败:', error);
+      wx.showToast({
+          title: error.message || '保存失败',
+          icon: 'error'
+      });
+    }
   },
 
   /**
-   * 删除LOGO
+   * 删除LOGO - 调用数据库API
    */
   removeLogo() {
     wx.showModal({
       title: '确认删除',
       content: '确定要删除当前LOGO吗？',
-      success: (res) => {
+      success: async (res) => {
         if (res.confirm) {
           wx.showLoading({
             title: '删除中..'
           })
           
-          // 模拟API请求，实际应该调用API删除LOGO
-          setTimeout(() => {
+          try {
+            const result = await merchantApi.deleteLogo()
+            console.log('删除LOGO成功:', result)
+            
             wx.hideLoading()
             
             this.setData({
@@ -313,7 +336,14 @@ Page({
               title: 'LOGO删除成功',
               icon: 'success'
             })
-          }, 1000)
+          } catch (error) {
+            console.error('删除LOGO失败:', error)
+            wx.hideLoading()
+            wx.showToast({
+              title: error.message || '删除失败',
+              icon: 'none'
+            })
+          }
         }
       }
     })

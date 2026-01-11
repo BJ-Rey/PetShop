@@ -6,6 +6,8 @@ import com.tencent.wxcloudrun.service.ProductService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 import java.util.List;
+import java.util.HashMap;
+import java.util.Map;
 
 @RestController
 @RequestMapping("/api/product")
@@ -16,9 +18,17 @@ public class ProductController {
 
     @GetMapping("/list")
     public ApiResponse getProductList(@RequestParam(defaultValue = "1") int page,
-                                      @RequestParam(defaultValue = "10") int size) {
-        List<Product> products = productService.getProducts(page, size);
-        return ApiResponse.ok(products);
+                                      @RequestParam(defaultValue = "10") int size,
+                                      @RequestParam(required = false) String keyword) {
+        List<Product> products = productService.getProducts(page, size, keyword);
+        
+        Map<String, Object> result = new HashMap<>();
+        result.put("list", products);
+        result.put("page", page);
+        result.put("size", size);
+        result.put("total", products.size());
+        
+        return ApiResponse.ok(result);
     }
 
     @GetMapping("/detail/{id}")

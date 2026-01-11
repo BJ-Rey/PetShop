@@ -1,6 +1,7 @@
 // pages/merchant/setting/promotion/promotion.js
 const app = getApp()
 const globalUtils = require('../../../../utils/globalUtils')
+const merchantApi = require('../../../../api/merchantApi')
 const { preventReclick } = globalUtils
 
 Page({
@@ -82,46 +83,29 @@ Page({
   },
 
   /**
-   * 加载活动数据
+   * 从数据库加载活动数据
    */
-  loadPromotions() {
+  async loadPromotions() {
     this.setData({ isLoading: true })
     
-    // 模拟数据
-    const savedPromotions = wx.getStorageSync('promotions')
-    
-    setTimeout(() => {
-      if (savedPromotions && savedPromotions.length > 0) {
-        this.processPromotions(savedPromotions)
+    try {
+      const res = await merchantApi.getPromotionSetting()
+      console.log('获取促销活动成功:', res)
+      
+      if (res && res.data) {
+        this.processPromotions(res.data)
       } else {
-        // 默认活动
-        const defaultPromotions = [
-          {
-            id: 1,
-            title: '开业大酬宾',
-            type: 'discount',
-            value: '8.8',
-            startTime: '2025-01-01',
-            endTime: '2025-12-31',
-            minSpend: '0',
-            status: 'active'
-          },
-          {
-            id: 2,
-            title: '满100减20',
-            type: 'amount',
-            value: '20',
-            startTime: '2025-01-01',
-            endTime: '2025-06-30',
-            minSpend: '100',
-            status: 'active'
-          }
-        ]
-        this.processPromotions(defaultPromotions)
-        wx.setStorageSync('promotions', defaultPromotions)
+        this.setData({ promotions: [], filteredPromotions: [] })
       }
+    } catch (error) {
+      console.error('获取促销活动失败:', error)
+      wx.showToast({
+        title: '加载活动失败',
+        icon: 'none'
+      })
+    } finally {
       this.setData({ isLoading: false })
-    }, 500)
+    }
   },
 
   /**
@@ -255,9 +239,9 @@ Page({
   },
 
   /**
-   * 保存活动
+   * 保存活动 - 调用数据库API
    */
-  savePromotion: function() {
+  savePromotion: async function() {
     // 防止重复点击逻辑封装
     if (this.isSaving) return
     this.isSaving = true
@@ -271,7 +255,7 @@ Page({
     
     wx.showLoading({ title: '保存中...' })
     
-    setTimeout(() => {
+    try {
       const { formData, editingId, promotions } = this.data
       let newPromotions = [...promotions]
       
@@ -285,15 +269,22 @@ Page({
         newPromotions.push({ ...formData, id: newId })
       }
       
-      wx.setStorageSync('promotions', newPromotions)
+      // 调用数据库API保存促销活动
+      await merchantApi.updatePromotionSetting(newPromotions)
+      console.log('保存促销活动成功')
       
       this.processPromotions(newPromotions)
       this.hideForm()
       
       wx.hideLoading()
       wx.showToast({ title: '保存成功', icon: 'success' })
+    } catch (error) {
+      console.error('保存促销活动失败:', error)
+      wx.hideLoading()
+      wx.showToast({ title: error.message || '保存失败', icon: 'none' })
+    } finally {
       this.isSaving = false
-    }, 500)
+    }
   },
 
   /**
@@ -313,9 +304,10 @@ Page({
     })
   },
 
-  performEnd(id) {
+  async performEnd(id) {
     wx.showLoading({ title: '处理中...' })
-    setTimeout(() => {
+    
+    try {
       const promotions = this.data.promotions.map(p => {
         if (p.id === id) {
           return { ...p, manualEnded: true }
@@ -323,12 +315,19 @@ Page({
         return p
       })
       
-      wx.setStorageSync('promotions', promotions)
+      // 调用数据库API保存
+      await merchantApi.updatePromotionSetting(promotions)
+      console.log('结束活动成功')
+      
       this.processPromotions(promotions)
       
       wx.hideLoading()
       wx.showToast({ title: '活动已结束', icon: 'none' })
-    }, 500)
+    } catch (error) {
+      console.error('结束活动失败:', error)
+      wx.hideLoading()
+      wx.showToast({ title: error.message || '操作失败', icon: 'none' })
+    }
   },
 
   /**
@@ -349,11 +348,25 @@ Page({
     })
   },
 
-  performDelete(id) {
-    const newPromotions = this.data.promotions.filter(p => p.id !== id)
-    wx.setStorageSync('promotions', newPromotions)
-    this.processPromotions(newPromotions)
-    wx.showToast({ title: '删除成功', icon: 'success' })
+  async performDelete(id) {
+    wx.showLoading({ title: '删除中...' })
+    
+    try {
+      const newPromotions = this.data.promotions.filter(p => p.id !== id)
+      
+      // 调用数据库API保存
+      await merchantApi.updatePromotionSetting(newPromotions)
+      console.log('删除活动成功')
+      
+      this.processPromotions(newPromotions)
+      
+      wx.hideLoading()
+      wx.showToast({ title: '删除成功', icon: 'success' })
+    } catch (error) {
+      console.error('删除活动失败:', error)
+      wx.hideLoading()
+      wx.showToast({ title: error.message || '删除失败', icon: 'none' })
+    }
   },
 
   /**

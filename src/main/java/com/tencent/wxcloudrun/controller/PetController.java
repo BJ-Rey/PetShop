@@ -6,6 +6,8 @@ import com.tencent.wxcloudrun.service.PetService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 import java.util.List;
+import java.util.HashMap;
+import java.util.Map;
 
 @RestController
 @RequestMapping("/api/cat")
@@ -16,9 +18,19 @@ public class PetController {
 
     @GetMapping("/list")
     public ApiResponse getPetList(@RequestParam(defaultValue = "1") int page,
-                                  @RequestParam(defaultValue = "10") int size) {
-        List<Pet> pets = petService.getPets(page, size);
-        return ApiResponse.ok(pets);
+                                  @RequestParam(defaultValue = "10") int size,
+                                  @RequestParam(required = false) String keyword,
+                                  @RequestParam(required = false) String userId) {
+        List<Pet> pets = petService.getPets(page, size, keyword, userId);
+        
+        // 返回带分页信息的结果
+        Map<String, Object> result = new HashMap<>();
+        result.put("list", pets);
+        result.put("page", page);
+        result.put("size", size);
+        result.put("total", pets.size());
+        
+        return ApiResponse.ok(result);
     }
 
     @GetMapping("/detail/{id}")

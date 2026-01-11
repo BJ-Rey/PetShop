@@ -23,6 +23,12 @@ public class MerchantServiceImpl implements MerchantService {
         int offset = (page - 1) * size;
         return merchantMapper.getMerchants(offset, size);
     }
+    
+    @Override
+    public List<Merchant> getMerchants(int page, int size, String keyword) {
+        int offset = (page - 1) * size;
+        return merchantMapper.searchMerchants(offset, size, keyword);
+    }
 
     @Override
     public void createMerchant(Merchant merchant) {

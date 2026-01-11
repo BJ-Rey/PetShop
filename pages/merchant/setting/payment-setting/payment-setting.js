@@ -1,5 +1,6 @@
 // pages/merchant/setting/payment-setting/payment-setting.js
 const app = getApp()
+const merchantApi = require('../../../../api/merchantApi')
 
 Page({
 
@@ -38,7 +39,12 @@ Page({
       refundSuccess: true,
       withdrawSuccess: true,
       paymentFailed: false
-    }
+    },
+    
+    // 加载状态
+    isLoading: false,
+    // 提交状态
+    isSubmitting: false
   },
 
   /**
@@ -84,14 +90,35 @@ Page({
   },
 
   /**
-   * 加载支付设置
+   * 从数据库加载支付设置
    */
-  loadPaymentSetting() {
-    // 模拟数据，实际应该调用API获取支付设置
-    // 从本地存储获取设置（如果有）
-    const savedPaymentSetting = wx.getStorageSync('paymentSetting')
-    if (savedPaymentSetting) {
-      this.setData(savedPaymentSetting)
+  async loadPaymentSetting() {
+    this.setData({ isLoading: true })
+    
+    try {
+      const res = await merchantApi.getPaymentSetting()
+      console.log('获取支付设置成功:', res)
+      
+      if (res && res.data) {
+        this.setData({
+          paymentMethods: res.data.paymentMethods || this.data.paymentMethods,
+          paymentTimeout: res.data.paymentTimeout || this.data.paymentTimeout,
+          autoConfirmDays: res.data.autoConfirmDays || this.data.autoConfirmDays,
+          transactionFee: res.data.transactionFee || this.data.transactionFee,
+          minWithdrawAmount: res.data.minWithdrawAmount || this.data.minWithdrawAmount,
+          withdrawFee: res.data.withdrawFee || this.data.withdrawFee,
+          refundSettings: res.data.refundSettings || this.data.refundSettings,
+          notificationSettings: res.data.notificationSettings || this.data.notificationSettings
+        })
+      }
+    } catch (error) {
+      console.error('获取支付设置失败:', error)
+      wx.showToast({
+        title: '加载支付设置失败',
+        icon: 'none'
+      })
+    } finally {
+      this.setData({ isLoading: false })
     }
   },
 
@@ -204,11 +231,13 @@ Page({
   },
 
   /**
-   * 保存支付设置
+   * 保存支付设置 - 调用数据库API
    */
-  savePaymentSetting() {
-    if (this.isSaving) return
-    this.isSaving = true
+  async savePaymentSetting() {
+    // 防止重复提交
+    if (this.data.isSubmitting) {
+      return
+    }
 
     const paymentSetting = {
       paymentMethods: this.data.paymentMethods,
@@ -221,17 +250,18 @@ Page({
       notificationSettings: this.data.notificationSettings
     }
     
+    this.setData({ isSubmitting: true })
+    
     wx.showLoading({
       title: '保存中..',
       mask: true
     })
     
-    // 模拟API请求，实际应该调用API保存支付设置
-    setTimeout(() => {
-      wx.hideLoading()
+    try {
+      const res = await merchantApi.updatePaymentSetting(paymentSetting)
+      console.log('保存支付设置成功:', res)
       
-      // 保存到本地存储
-      wx.setStorageSync('paymentSetting', paymentSetting)
+      wx.hideLoading()
       
       // 更新初始数据副本，标记为已保存
       this.initialData = JSON.stringify(paymentSetting)
@@ -241,13 +271,20 @@ Page({
         icon: 'success'
       })
       
-      this.isSaving = false
-      
       // 返回上一页
       setTimeout(() => {
         wx.navigateBack()
       }, 1500)
-    }, 1000)
+    } catch (error) {
+      console.error('保存支付设置失败:', error)
+      wx.hideLoading()
+      wx.showToast({
+        title: error.message || '保存失败',
+        icon: 'none'
+      })
+    } finally {
+      this.setData({ isSubmitting: false })
+    }
   },
 
   /**

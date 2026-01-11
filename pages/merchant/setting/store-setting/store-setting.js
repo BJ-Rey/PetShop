@@ -1,5 +1,6 @@
 // pages/merchant/setting/store-setting/store-setting.js
 const app = getApp()
+const merchantApi = require('../../../../api/merchantApi')
 
 Page({
 
@@ -40,7 +41,12 @@ Page({
     selectedCategoryIndex: 0,
     
     // 营业时间文本
-    businessHoursText: '周一至周日 9:00-21:00'
+    businessHoursText: '周一至周日 9:00-21:00',
+    
+    // 加载状态
+    isLoading: false,
+    // 提交状态
+    isSubmitting: false
   },
 
   /**
@@ -69,26 +75,43 @@ Page({
   },
 
   /**
-   * 加载店铺信息
+   * 从数据库加载店铺信息
    */
-  loadStoreInfo() {
-    // 模拟数据，实际应该调用API获取店铺信息
-    const mockStoreInfo = {
-      name: '宠物乐园宠物店',
-      description: '专业的宠物服务提供商，提供宠物食品、寄养、训练等服务',
-      announcement: '新店开业，全场商品8折优惠，欢迎惠顾！',
-      mainCategory: '宠物美容',
-      status: 'open'
+  async loadStoreInfo() {
+    this.setData({ isLoading: true })
+    
+    try {
+      const res = await merchantApi.getStoreSetting()
+      console.log('获取店铺设置成功:', res)
+      
+      if (res && res.data) {
+        const storeInfo = {
+          name: res.data.name || '',
+          description: res.data.description || '',
+          announcement: res.data.announcement || '',
+          mainCategory: res.data.mainCategory || '',
+          status: res.data.status || 'open'
+        }
+        
+        // 计算选中的类目索引
+        const selectedCategoryIndex = this.data.categories.indexOf(storeInfo.mainCategory)
+        
+        this.setData({
+          storeInfo: storeInfo,
+          initialStoreInfo: JSON.parse(JSON.stringify(storeInfo)),
+          selectedCategoryIndex: selectedCategoryIndex >= 0 ? selectedCategoryIndex : 0,
+          businessHoursText: res.data.businessHoursText || '周一至周日 9:00-21:00'
+        })
+      }
+    } catch (error) {
+      console.error('获取店铺设置失败:', error)
+      wx.showToast({
+        title: '加载店铺信息失败',
+        icon: 'none'
+      })
+    } finally {
+      this.setData({ isLoading: false })
     }
-    
-    // 计算选中的类目索引
-    const selectedCategoryIndex = this.data.categories.indexOf(mockStoreInfo.mainCategory)
-    
-    this.setData({
-      storeInfo: mockStoreInfo,
-      initialStoreInfo: JSON.parse(JSON.stringify(mockStoreInfo)),
-      selectedCategoryIndex: selectedCategoryIndex >= 0 ? selectedCategoryIndex : 0
-    })
   },
 
   /**
@@ -166,22 +189,38 @@ Page({
   },
 
   /**
-   * 保存店铺设置
+   * 保存店铺设置 - 调用数据库API
    */
-  saveStoreSetting() {
+  async saveStoreSetting() {
     // 表单验证
     if (!this.validateForm()) {
+      return
+    }
+
+    // 防止重复提交
+    if (this.data.isSubmitting) {
       return
     }
     
     const { storeInfo } = this.data
     
+    this.setData({ isSubmitting: true })
+    
     wx.showLoading({
       title: '保存中..'
     })
     
-    // 模拟API请求，实际应该调用API保存店铺设置
-    setTimeout(() => {
+    try {
+      const res = await merchantApi.updateStoreSetting({
+        name: storeInfo.name,
+        description: storeInfo.description,
+        announcement: storeInfo.announcement,
+        mainCategory: storeInfo.mainCategory,
+        status: storeInfo.status
+      })
+      
+      console.log('保存店铺设置成功:', res)
+      
       wx.hideLoading()
       
       // 保存成功
@@ -194,7 +233,16 @@ Page({
       setTimeout(() => {
         wx.navigateBack()
       }, 1500)
-    }, 1000)
+    } catch (error) {
+      console.error('保存店铺设置失败:', error)
+      wx.hideLoading()
+      wx.showToast({
+        title: error.message || '保存失败',
+        icon: 'none'
+      })
+    } finally {
+      this.setData({ isSubmitting: false })
+    }
   },
 
   /**

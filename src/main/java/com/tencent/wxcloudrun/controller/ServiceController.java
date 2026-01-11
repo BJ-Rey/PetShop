@@ -6,6 +6,8 @@ import com.tencent.wxcloudrun.service.ServiceService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 import java.util.List;
+import java.util.HashMap;
+import java.util.Map;
 
 @RestController
 @RequestMapping("/api/service")
@@ -16,9 +18,17 @@ public class ServiceController {
 
     @GetMapping("/list")
     public ApiResponse getServiceList(@RequestParam(defaultValue = "1") int page,
-                                      @RequestParam(defaultValue = "10") int size) {
-        List<Service> services = serviceService.getServices(page, size);
-        return ApiResponse.ok(services);
+                                      @RequestParam(defaultValue = "10") int size,
+                                      @RequestParam(required = false) String keyword) {
+        List<Service> services = serviceService.getServices(page, size, keyword);
+        
+        Map<String, Object> result = new HashMap<>();
+        result.put("list", services);
+        result.put("page", page);
+        result.put("size", size);
+        result.put("total", services.size());
+        
+        return ApiResponse.ok(result);
     }
 
     @GetMapping("/detail/{id}")

@@ -1,5 +1,6 @@
 // pages/merchant/setting/edit-basic-info/edit-basic-info.js
 const app = getApp()
+const merchantApi = require('../../../../api/merchantApi')
 
 Page({
 
@@ -35,8 +36,8 @@ Page({
     saveStatus: 'saved', // saved, saving, unsaved
     showSaveStatus: false,
     
-    // 本地存储键名
-    storageKey: 'merchant_basic_info_draft'
+    // 加载状态
+    isLoading: false
   },
 
   /**
@@ -73,46 +74,59 @@ Page({
    * 生命周期函数--监听页面显示
    */
   onShow() {
-    // 从本地存储恢复草稿数据
-    this.restoreDraftData()
+    // 页面显示时不再从本地存储恢复草稿
   },
 
   /**
    * 生命周期函数--监听页面隐藏
    */
   onHide() {
-    // 保存草稿数据到本地存储
-    this.saveDraftData()
+    // 页面隐藏时不再保存草稿到本地存储
   },
 
   /**
    * 生命周期函数--监听页面卸载
    */
   onUnload() {
-    // 保存草稿数据到本地存储
-    this.saveDraftData()
+    // 页面卸载时不再保存草稿到本地存储
   },
 
   /**
-   * 加载商家信息
+   * 从数据库加载商家信息
    */
-  loadMerchantInfo() {
-    // 模拟数据，实际应该调用API获取商家信息
-    const mockMerchantInfo = {
-      name: '宠物乐园',
-      phone: '13800138000',
-      address: '北京市朝阳区宠物大街123号',
-      businessLicense: '123456789012345678',
-      description: '专业的宠物服务提供商，提供宠物美容、寄养、训练等服务',
-      contactPerson: '张三',
-      email: 'contact@petpark.com',
-      status: 'open'
-    }
+  async loadMerchantInfo() {
+    this.setData({ isLoading: true })
     
-    this.setData({
-      merchantInfo: mockMerchantInfo,
-      initialMerchantInfo: JSON.parse(JSON.stringify(mockMerchantInfo))
-    })
+    try {
+      const res = await merchantApi.getBasicInfo()
+      console.log('获取商家基本信息成功:', res)
+      
+      if (res && res.data) {
+        const merchantInfo = {
+          name: res.data.name || '',
+          phone: res.data.phone || '',
+          address: res.data.address || '',
+          businessLicense: res.data.businessLicense || '',
+          description: res.data.description || '',
+          contactPerson: res.data.contactPerson || '',
+          email: res.data.email || '',
+          status: res.data.status || 'open'
+        }
+        
+        this.setData({
+          merchantInfo: merchantInfo,
+          initialMerchantInfo: JSON.parse(JSON.stringify(merchantInfo))
+        })
+      }
+    } catch (error) {
+      console.error('获取商家基本信息失败:', error)
+      wx.showToast({
+        title: '加载商家信息失败',
+        icon: 'none'
+      })
+    } finally {
+      this.setData({ isLoading: false })
+    }
   },
 
   /**
@@ -134,9 +148,6 @@ Page({
     
     // 更新保存状态
     this.updateSaveStatus();
-    
-    // 防抖保存草稿数据
-    this.debounceSaveDraft();
   },
 
   /**
@@ -184,9 +195,6 @@ Page({
     
     // 更新保存状态
     this.updateSaveStatus();
-    
-    // 防抖保存草稿数据
-    this.debounceSaveDraft();
   },
 
   /**
@@ -246,9 +254,9 @@ Page({
   },
 
   /**
-   * 保存商家信息
+   * 保存商家信息 - 调用数据库API
    */
-  saveMerchantInfo() {
+  async saveMerchantInfo() {
     // 防止重复点击
     if (this.data.saveStatus === 'saving') {
       return;
@@ -271,8 +279,20 @@ Page({
     
     const { merchantInfo } = this.data;
     
-    // 模拟API请求，实际应该调用API保存商家信息
-    setTimeout(() => {
+    try {
+      const res = await merchantApi.updateBasicInfo({
+        name: merchantInfo.name,
+        phone: merchantInfo.phone,
+        address: merchantInfo.address,
+        businessLicense: merchantInfo.businessLicense,
+        description: merchantInfo.description,
+        contactPerson: merchantInfo.contactPerson,
+        email: merchantInfo.email,
+        status: merchantInfo.status
+      })
+      
+      console.log('保存商家基本信息成功:', res)
+      
       wx.hideLoading();
 
       // 保存成功
@@ -288,14 +308,24 @@ Page({
         duration: 2000
       });
       
-      // 清除本地草稿数据
-      this.clearDraftData();
-      
       // 返回上一页
       setTimeout(() => {
         wx.navigateBack();
       }, 2000);
-    }, 1000);
+    } catch (error) {
+      console.error('保存商家基本信息失败:', error)
+      wx.hideLoading();
+      
+      this.setData({
+        saveStatus: 'unsaved'
+      });
+      
+      wx.showToast({
+        title: error.message || '保存失败',
+        icon: 'none',
+        duration: 2000
+      });
+    }
   },
 
   /**
@@ -322,93 +352,6 @@ Page({
   },
 
   /**
-   * 保存草稿数据到本地存储
-   */
-  saveDraftData() {
-    const { merchantInfo, storageKey } = this.data;
-    
-    try {
-      wx.setStorageSync(storageKey, {
-        data: merchantInfo,
-        timestamp: Date.now()
-      });
-    } catch (error) {
-      console.error('保存草稿失败:', error);
-    }
-  },
-
-  /**
-   * 从本地存储恢复草稿数据
-   */
-  restoreDraftData() {
-    const { storageKey } = this.data;
-    
-    try {
-      const draft = wx.getStorageSync(storageKey);
-      
-      if (draft && draft.data) {
-        // 检查草稿是否在24小时内
-        const now = Date.now();
-        const isWithin24Hours = (now - draft.timestamp) < 24 * 60 * 60 * 1000;
-        
-        if (isWithin24Hours) {
-          // 显示恢复提示
-          wx.showModal({
-            title: '恢复草稿',
-            content: '检测到您有未完成的编辑，是否恢复上次编辑的数据？',
-            success: (res) => {
-              if (res.confirm) {
-                this.setData({
-                  merchantInfo: draft.data
-                });
-                
-                // 更新保存状态
-                this.updateSaveStatus();
-              } else {
-                // 用户选择不恢复，清除草稿
-                this.clearDraftData();
-              }
-            }
-          });
-        } else {
-          // 草稿超过24小时，自动清除
-          this.clearDraftData();
-        }
-      }
-    } catch (error) {
-      console.error('恢复草稿失败:', error);
-    }
-  },
-
-  /**
-   * 清除本地草稿数据
-   */
-  clearDraftData() {
-    const { storageKey } = this.data;
-    
-    try {
-      wx.removeStorageSync(storageKey);
-    } catch (error) {
-      console.error('清除草稿失败:', error);
-    }
-  },
-
-  /**
-   * 防抖函数，延迟保存草稿
-   */
-  debounceSaveDraft() {
-    // 清除之前的定时器
-    if (this.draftTimer) {
-      clearTimeout(this.draftTimer);
-    }
-    
-    // 设置新的定时器，延迟1秒保存草稿
-    this.draftTimer = setTimeout(() => {
-      this.saveDraftData();
-    }, 1000);
-  },
-
-  /**
    * 返回上一页
    */
   goBack() {
@@ -418,8 +361,6 @@ Page({
         content: '您有未保存的修改，是否确认返回？',
         success: (res) => {
           if (res.confirm) {
-            // 保存草稿数据
-            this.saveDraftData();
             wx.navigateBack();
           }
         }

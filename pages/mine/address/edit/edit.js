@@ -1,4 +1,6 @@
 // pages/mine/address/edit/edit.js
+const addressApi = require('../../../api/addressApi');
+
 Page({
   data: {
     address: {
@@ -10,7 +12,9 @@ Page({
       district: '',
       address: '',
       isDefault: false
-    }
+    },
+    isLoading: false,
+    isSubmitting: false
   },
 
   onLoad: function(options) {
@@ -20,14 +24,38 @@ Page({
     }
   },
 
-  // 加载地址数据
-  loadAddress: function(addressId) {
-    const addresses = wx.getStorageSync('addresses') || [];
-    const address = addresses.find(item => item.id == addressId) || this.data.address;
-    
-    this.setData({
-      address: address
-    });
+  // 从数据库加载地址数据
+  loadAddress: async function(addressId) {
+    this.setData({ isLoading: true });
+
+    try {
+      const res = await addressApi.getAddressDetail(addressId);
+      console.log('获取地址详情成功:', res);
+      
+      if (res && res.data) {
+        this.setData({
+          address: {
+            id: res.data.id,
+            name: res.data.name || '',
+            phone: res.data.phone || '',
+            province: res.data.province || '请选择',
+            city: res.data.city || '',
+            district: res.data.district || '',
+            address: res.data.address || '',
+            isDefault: res.data.isDefault || false
+          }
+        });
+      }
+    } catch (error) {
+      console.error('获取地址详情失败:', error);
+      wx.showToast({
+        title: '加载地址失败',
+        icon: 'none',
+        duration: 2000
+      });
+    } finally {
+      this.setData({ isLoading: false });
+    }
   },
 
   // 输入框内容变化事件
@@ -62,8 +90,8 @@ Page({
     });
   },
 
-  // 保存地址
-  saveAddress: function() {
+  // 保存地址 - 调用数据库API
+  saveAddress: async function() {
     const address = this.data.address;
     
     // 表单验证
@@ -102,35 +130,50 @@ Page({
       });
       return;
     }
-    
-    // 更新地址到本地存储
-    let addresses = wx.getStorageSync('addresses') || [];
-    
-    // 如果设为默认，取消其他默认
-    if (address.isDefault) {
-      addresses = addresses.map(item => ({ ...item, isDefault: false }));
+
+    // 防止重复提交
+    if (this.data.isSubmitting) {
+      return;
     }
 
-    const updatedAddresses = addresses.map(item => {
-      if (item.id == address.id) {
-        return address;
-      }
-      return item;
-    });
-    
-    wx.setStorageSync('addresses', updatedAddresses);
-    
-    // 显示成功提示
-    wx.showToast({
-      title: '地址更新成功',
-      icon: 'success',
-      duration: 2000
-    });
-    
-    // 返回上一页
-    setTimeout(() => {
-      wx.navigateBack();
-    }, 1500);
+    this.setData({ isSubmitting: true });
+
+    try {
+      // 调用数据库API更新地址
+      const res = await addressApi.updateAddress({
+        id: address.id,
+        name: address.name,
+        phone: address.phone,
+        province: address.province,
+        city: address.city,
+        district: address.district,
+        address: address.address,
+        isDefault: address.isDefault
+      });
+
+      console.log('更新地址成功:', res);
+      
+      // 显示成功提示
+      wx.showToast({
+        title: '地址更新成功',
+        icon: 'success',
+        duration: 2000
+      });
+      
+      // 返回上一页
+      setTimeout(() => {
+        wx.navigateBack();
+      }, 1500);
+    } catch (error) {
+      console.error('更新地址失败:', error);
+      wx.showToast({
+        title: error.message || '更新地址失败',
+        icon: 'none',
+        duration: 2000
+      });
+    } finally {
+      this.setData({ isSubmitting: false });
+    }
   },
 
   // 返回上一页
